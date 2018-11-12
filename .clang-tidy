@@ -1,0 +1,20 @@
+Checks: '
+    -*,
+     abseil-*,
+     boost-*,
+     bugprone-*,
+     cert-*,
+     cppcoreguidelines-*,
+     clang-analyzer-*,
+     hicpp-*,
+     misc-*,
+     modernize-*,
+     performance-*,
+     portability-*,
+     readability-*,
+    -hicpp-braces-around-statements,
+    -readability-braces-around-statements,
+    -cert-err58-cpp
+'
+WarningsAsErrors: '*'
+FormatStyle: 'file'

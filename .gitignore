@@ -30,3 +30,20 @@
 *.exe
 *.out
 *.app
+
+# vim
+*~
+*.swp
+
+# cmake
+/compile_commands.json
+/CMakeCache.txt
+/CMakeFiles*
+/Makefile
+/cmake_install.cmake
+/CTestTestfile.cmake
+/Testing
+
+# base-util
+/main
+/tests-all
