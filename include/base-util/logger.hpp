@@ -6,6 +6,7 @@
 #include "base-util/non-copyable.hpp"
 
 #include <iostream>
+#include <type_traits>
 
 namespace util {
 
@@ -32,10 +33,28 @@ private:
  * sion. */
 extern Logger& log;
 
+// This is to allow logging e.g. `endl`, although this should
+// probably be avoided for the some reasons that one should avoid
+// using endl in general.
+using IOManipulator = std::ostream&(*)( std::ostream& );
+Logger& operator<<( Logger& lgr, IOManipulator item );
+
 // This  operator  overload simply forwards requests to cout when
 // logging is enabled, otherwise does nothing.
 template<typename T>
 Logger& operator<<( Logger& lgr, T const& item ) {
+
+    // Here we explicitly decay the argument type.  This would
+    // have happened implicitely, but then clang-tidy complains.
+    // One case where decay happens is then logging a string
+    // literal, in which case e.g. T == const char[5], which gets
+    // decayed to a function pointer.
+    //
+    // We need T const& here instead of just T because otherwise
+    // the const will be stripped from the T which we don't want.
+    // i.e., there may be another const in the type T itself that
+    // we don't want to lose.
+    using decayed_t = std::decay_t<T const&>;
 
     // This is not strictly necessary  for this function, but for
     // convenience to the user of this  library we pull in all of
@@ -43,7 +62,7 @@ Logger& operator<<( Logger& lgr, T const& item ) {
     using ::util::operator<<;
 
     if( Logger::enabled )
-        std::cout << item;
+        std::cout << static_cast<decayed_t>( item );
 
     return lgr;
 }

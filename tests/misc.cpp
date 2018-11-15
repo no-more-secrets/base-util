@@ -6,8 +6,11 @@
 #include "base-util/algo.hpp"
 #include "base-util/graph.hpp"
 #include "base-util/io.hpp"
+#include "base-util/logger.hpp"
 #include "base-util/opt-util.hpp"
 #include "base-util/string-util.hpp"
+
+#include <type_traits>
 
 using namespace std;
 using namespace std::string_literals;
@@ -15,6 +18,9 @@ using namespace std::string_literals;
 fs::path const data_common = "tests/data";
 
 namespace testing {
+
+// Compile-time test that we can log IO manipulators such as endl.
+using io_manip_valid = decltype( operator<<( util::log, endl ) );
 
 TEST( datetime )
 {
