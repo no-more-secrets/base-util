@@ -13,6 +13,18 @@ project(
 
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
+# Enable all warnings and treat warnings as errors.
+function( set_warning_options target )
+	target_compile_options(
+        ${target} PRIVATE
+        # clang/GCC warnings
+        $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:
+            -Wall -Wextra -Wpedantic -Werror >
+        # MSVC warnings
+        $<$<CXX_COMPILER_ID:MSVC>:
+            /Wall /WX > )
+endfunction( set_warning_options )
+
 # === clang-tidy ==================================================
 
 find_program(
@@ -70,8 +82,7 @@ target_compile_features( base-util PUBLIC cxx_std_17 )
 set_target_properties( base-util PROPERTIES CXX_EXTENSIONS OFF )
 target_link_libraries( base-util PUBLIC stdc++fs )
 target_link_libraries( base-util PUBLIC Threads::Threads )
-# FIXME: Hack
-target_compile_definitions( base-util PUBLIC OS_LINUX )
+set_warning_options( base-util )
 
 # === main ========================================================
 
@@ -79,6 +90,7 @@ add_executable( main app/main.cpp )
 target_compile_features( main PUBLIC cxx_std_17 )
 set_target_properties( main PROPERTIES CXX_EXTENSIONS OFF )
 target_link_libraries( main PRIVATE base-util )
+set_warning_options( main )
 
 # === test ========================================================
 
@@ -93,6 +105,7 @@ add_executable(
 target_compile_features( tests-all PUBLIC cxx_std_17 )
 set_target_properties( tests-all PROPERTIES CXX_EXTENSIONS OFF )
 target_link_libraries( tests-all PRIVATE base-util )
+set_warning_options( tests-all )
 add_test( tests-all tests-all )
 enable_testing()
 
