@@ -8,6 +8,13 @@
 
 #include <experimental/filesystem>
 
+// Case-insensitive file system?
+#if( _WIN32 || __APPLE__ )
+#    define CASE_INSENSITIVE_FS() 1
+#else
+#    define CASE_INSENSITIVE_FS() 0
+#endif
+
 namespace fs = std::experimental::filesystem;
 
 namespace util {

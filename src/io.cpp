@@ -156,9 +156,8 @@ PathVec wildcard( fs::path const& p, bool with_folders ) {
 
     // ECMAScript is the default if no flags are specified.
     auto flags = regex::ECMAScript;
-#ifndef OS_LINUX
-    // On a non-Linux platform assume that  the  file  system  is
-    // case-insensitive.
+#if CASE_INSENSITIVE_FS()
+    // Filesystem is case-insensitive.
     flags |= std::regex::icase;
 #endif
 

@@ -60,7 +60,7 @@ TEST( wildcard )
     EQUALS( util::wildcard( "tests/fs.cp", true ), (PathVec{}) );
     EQUALS( util::wildcard( "tests/fs.cpp", true ), (PathVec{"tests/fs.cpp"}) );
 
-#ifndef OS_LINUX
+#if CASE_INSENSITIVE_FS()
     // Test that on non-linux  platforms  (which  we are assuming
     // have case-insensitive filesystems) that  the wildcard func-
     // tion   enables  case-insensitivity  when  matching   files.
@@ -101,9 +101,10 @@ TEST( dos_to_from_unix )
     // time points we get from file time stamps don't contain any
     // sub-second  information,  so we need to make it at least a
     // second on that platform.
-#ifdef OS_LINUX
+#ifdef __linux__
     auto const delta = 10ms;
 #else
+    // OSX too?
     auto const delta = 1001ms;
 #endif
 
@@ -232,9 +233,10 @@ TEST( touch )
     // time points we get from file time stamps don't contain any
     // sub-second  information,  so we need to make it at least a
     // second on that platform.
-#ifdef OS_LINUX
+#ifdef __linux__
     auto const delta = 10ms;
 #else
+    // OSX too?
     auto const delta = 1001ms;
 #endif
 
