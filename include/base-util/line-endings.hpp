@@ -17,7 +17,7 @@ template<typename Container>
 void dos2unix( Container& c,
     std::enable_if_t<std::is_same_v<
         typename Container::iterator::value_type, char>>*
-            /*unused*/ = 0 ) {
+            /*unused*/ = nullptr ) {
     util::remove_if( c, L( _ == 0x0d ) );
 }
 
@@ -35,7 +35,7 @@ template<typename Container>
 void unix2dos( Container& in,
     std::enable_if_t<std::is_same_v<
         typename Container::iterator::value_type, char>>*
-            /*unused*/ = 0 ) {
+            /*unused*/ = nullptr ) {
 
     // Some quick experiments suggest that the average ascii text
     // file will grow about 3-4% in size after this operation, so

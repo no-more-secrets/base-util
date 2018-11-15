@@ -3,6 +3,8 @@
 ****************************************************************/
 #pragma once
 
+#include "base-util/logger.hpp"
+
 #include <chrono>
 #include <iostream>
 #include <map>
@@ -74,7 +76,13 @@ public:
     ScopedWatch& operator=( ScopedWatch&& )      = delete;
 
     ~ScopedWatch() {
-        watch.stop( name );
+        // Can't throw in destructor, so need to catch everything.
+        try {
+            watch.stop( name );
+        } catch( ... ) {
+            log << "WARNING: exception thrown while "
+                << "stopping StopWatch " << name;
+        }
         // Must  go  to  cerr  here to avoid interfering with pro-
         // grams that communicate their output via stdout.
         std::cerr << name << " time: " << watch.human( name )

@@ -15,26 +15,26 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 # === clang-tidy ==================================================
 
-#find_program(
-#    CLANG_TIDY_EXE
-#    NAMES "clang-tidy"
-#    DOC "Path to clang-tidy executable"
-#)
+find_program(
+    CLANG_TIDY_EXE
+    NAMES "clang-tidy"
+    DOC "Path to clang-tidy executable"
+)
 
-#if( NOT CLANG_TIDY_EXE )
-#    message( STATUS "clang-tidy not found." )
-#else()
-#    message( STATUS "clang-tidy found: ${CLANG_TIDY_EXE}" )
-#    set( DO_CLANG_TIDY "${CLANG_TIDY_EXE}" "-quiet" )
-#endif()
+if( NOT CLANG_TIDY_EXE )
+    message( FATAL_ERROR "clang-tidy not found." )
+else()
+    message( STATUS "clang-tidy found: ${CLANG_TIDY_EXE}" )
+    set( DO_CLANG_TIDY "${CLANG_TIDY_EXE}" "-quiet" )
+endif()
 
 ## If clang-tidy binary found, will enable it for the given target.
-#function( clang_tidy target )
-#    if( CLANG_TIDY_EXE )
-#        set_target_properties( ${target} PROPERTIES
-#            CXX_CLANG_TIDY "${DO_CLANG_TIDY}" )
-#    endif()
-#endfunction( clang_tidy )
+function( clang_tidy target )
+    if( CLANG_TIDY_EXE )
+        set_target_properties( ${target} PROPERTIES
+            CXX_CLANG_TIDY "${DO_CLANG_TIDY}" )
+    endif()
+endfunction( clang_tidy )
 
 # === ccache ======================================================
 

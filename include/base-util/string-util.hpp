@@ -40,7 +40,10 @@ bool iequals( StringT const& s1, StringT const& s2 ) {
         return false;
 
     auto predicate = []( auto l, auto r ) {
-        if constexpr( sizeof( StringT ) == 1 )
+        if constexpr ( sizeof( StringT ) == 1 )
+            // This is until [bugprone-suspicious-semicolon] gets
+            // fixed (should be shortly) to handle constexpr if's.
+            // NOLINTNEXTLINE( bugprone-suspicious-semicolon )
             return (std::tolower( l ) == std::tolower( r ));
         int l_i( l ), r_i( r );
         constexpr int signed_byte_max{127};

@@ -48,8 +48,9 @@ std::string to_string( std::optional<T> const& opt ) {
 // in as an argument apart from using  this  helper  function  in-
 // volving the index_sequence.
 template<typename Tuple, size_t... Indexes>
-StrVec tuple_elems_to_string( Tuple const& tp,
-                              std::index_sequence<Indexes...> ) {
+StrVec tuple_elems_to_string(
+        Tuple const& tp,
+        std::index_sequence<Indexes...> /*unused*/ ) {
     StrVec res; res.reserve( std::tuple_size_v<Tuple> );
     // Unary right fold of template parameter pack.
     ((res.push_back( util::to_string( std::get<Indexes>( tp ) ))), ...);
@@ -71,7 +72,7 @@ std::string to_string( std::tuple<Args...> const& tp ) {
 template<typename Variant, size_t... Indexes>
 std::string variant_elems_to_string(
         Variant const& v,
-        std::index_sequence<Indexes...> ) {
+        std::index_sequence<Indexes...> /*unused*/ ) {
     std::string res;
     // Unary right fold of template parameter pack.
     (( res += (Indexes == v.index())
