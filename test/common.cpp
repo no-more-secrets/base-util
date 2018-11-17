@@ -5,7 +5,7 @@
 #include "base-util/main.hpp"
 
 #include "base-util/logger.hpp"
-#include "base-util/string-util.hpp"
+#include "base-util/string.hpp"
 #include "base-util/types.hpp"
 
 using namespace std;

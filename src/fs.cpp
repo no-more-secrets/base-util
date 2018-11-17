@@ -4,7 +4,7 @@
 #include "base-util/macros.hpp"
 #include "base-util/fs.hpp"
 #include "base-util/logger.hpp"
-#include "base-util/string-util.hpp"
+#include "base-util/string.hpp"
 
 #include <algorithm>
 #include <fstream>

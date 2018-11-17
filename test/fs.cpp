@@ -7,8 +7,8 @@
 #include "base-util/line-endings.hpp"
 #include "base-util/logger.hpp"
 #include "base-util/io.hpp"
-#include "base-util/string-util.hpp"
-#include "base-util/util.hpp"
+#include "base-util/string.hpp"
+#include "base-util/misc.hpp"
 
 #include <thread>
 

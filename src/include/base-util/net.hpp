@@ -3,7 +3,7 @@
 ****************************************************************/
 #pragma once
 
-#include "string-util.hpp"
+#include "string.hpp"
 
 #include <string>
 #include <string_view>

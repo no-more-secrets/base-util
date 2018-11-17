@@ -3,7 +3,7 @@
 ****************************************************************/
 #include "common.hpp"
 
-#include "base-util/string-util.hpp"
+#include "base-util/string.hpp"
 
 using namespace std;
 

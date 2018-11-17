@@ -3,7 +3,7 @@
 ****************************************************************/
 #include "base-util/datetime.hpp"
 #include "base-util/macros.hpp"
-#include "base-util/string-util.hpp"
+#include "base-util/string.hpp"
 
 #include <algorithm>
 

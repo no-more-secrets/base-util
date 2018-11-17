@@ -3,11 +3,11 @@
 ****************************************************************/
 #include "common.hpp"
 
-#include "base-util/conv-util.hpp"
+#include "base-util/conv.hpp"
 #include "base-util/io.hpp"
 #include "base-util/types.hpp"
-#include "base-util/string-util.hpp"
-#include "base-util/util.hpp"
+#include "base-util/string.hpp"
+#include "base-util/misc.hpp"
 
 using namespace std;
 

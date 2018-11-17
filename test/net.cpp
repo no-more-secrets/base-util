@@ -5,7 +5,7 @@
 
 #include "base-util/bimap.hpp"
 #include "base-util/io.hpp"
-#include "base-util/net-util.hpp"
+#include "base-util/net.hpp"
 #include "base-util/types.hpp"
 
 using namespace std;

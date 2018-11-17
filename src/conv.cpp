@@ -1,7 +1,7 @@
 /****************************************************************
 * Text Encoding Conversion Utilities
 ****************************************************************/
-#include "base-util/conv-util.hpp"
+#include "base-util/conv.hpp"
 
 #include "base-util/io.hpp"
 #include "base-util/macros.hpp"

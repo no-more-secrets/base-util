@@ -17,16 +17,16 @@ add_library(
     base-util
     STATIC
     algo-par.cpp
-    conv-util.cpp
+    conv.cpp
     datetime.cpp
     fs.cpp
     io.cpp
     line-endings.cpp
     logger.cpp
-    net-util.cpp
+    net.cpp
     stopwatch.cpp
-    string-util.cpp
-    util.cpp
+    string.cpp
+    misc.cpp
 )
 
 # TODO: Do all these need to be PUBLIC?

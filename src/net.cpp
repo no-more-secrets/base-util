@@ -1,7 +1,7 @@
 /****************************************************************
 * Network Utilities
 ****************************************************************/
-#include "base-util/net-util.hpp"
+#include "base-util/net.hpp"
 
 #include <cctype>
 #include <iomanip>

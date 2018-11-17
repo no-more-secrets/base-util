@@ -6,7 +6,7 @@
 #include "base-util/macros.hpp"
 #include "base-util/non-copyable.hpp"
 #include "base-util/bimap.hpp"
-#include "base-util/util.hpp"
+#include "base-util/misc.hpp"
 
 #include <map>
 #include <unordered_map>

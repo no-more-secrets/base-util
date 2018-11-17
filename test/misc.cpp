@@ -7,8 +7,8 @@
 #include "base-util/graph.hpp"
 #include "base-util/io.hpp"
 #include "base-util/logger.hpp"
-#include "base-util/opt-util.hpp"
-#include "base-util/string-util.hpp"
+#include "base-util/optional.hpp"
+#include "base-util/string.hpp"
 
 #include <type_traits>
 

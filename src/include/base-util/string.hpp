@@ -5,7 +5,7 @@
 
 #include "base-util/datetime.hpp"
 #include "base-util/error.hpp"
-#include "base-util/util.hpp"
+#include "base-util/misc.hpp"
 #include "base-util/types.hpp"
 
 #include <cctype>
@@ -300,4 +300,4 @@ int stoi( std::string const& s, int base = default_base );
 // to_string method to be able to call any other to_string method
 // (say, if we have a tuple nested within a tuple) then must  all
 // be declared first before the function bodies  are  encountered.
-#include "string-util.inl"
+#include "string.inl"
