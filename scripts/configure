@@ -7,8 +7,7 @@ def cmake_bool( b ):
     return 'ON' if b else 'OFF'
 
 # Get terminal columns with fallback values.
-# (COLUMNS, _) = shutil.get_terminal_size( (80,20) )
-COLUMNS = 75
+(COLUMNS, _) = shutil.get_terminal_size( (80,20) )
 
 class bcolors:
     HEADER = '\033[95m'
