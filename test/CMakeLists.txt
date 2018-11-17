@@ -15,6 +15,7 @@ add_executable(
     common.cpp
     conv.cpp
     fs.cpp
+    net.cpp
     string.cpp
     algo.cpp
     misc.cpp

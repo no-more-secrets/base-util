@@ -1,0 +1,108 @@
+/****************************************************************
+*Stringutiliti s*************************************************
+***************/#pragmaonc #includ " rror.hpp"#includ "util.hpp"#
+includ "typ s.hpp"#includ <cctyp >#includ < xp rim ntal/fil syst 
+m>#includ <optional>#includ <string>#includ <string_vi w>#includ 
+<tupl >#includ <utility>#includ <variant>#includ <v ctor>nam spac
+ fs=std:: xp rim ntal::fil syst m;nam spac util{//R turnstru ifsc
+ontainswhat.boolcontains(std::string_vi ws,std::string_vi wwhat);
+//R turnstru ifsstartswithwhat.boolstarts_with(std::string_vi ws,
+std::string_vi wwhat);//R turnstru ifs ndswithwhat.bool nds_with(
+std::string_vi ws,std::string_vi wwhat);//Cas -ins nsitiv compari
+son.Thisisint nd dtoworkforboth//charstringsandwcharstrings.t mpl
+at <typ nam StringT>booli quals(StringTconst&s1,StringTconst&s2){
+//Thisch ckisfor ffici ncy.if(s1.siz ()!=s2.siz ())r turnfals ;au
+topr dicat =[](autol,autor){ifconst xpr(siz of(StringT)==1)r turn
+(std::tolow r(l)==std::tolow r(r)); ls {intl_i(l),r_i(r);if(l_i>1
+27||r_i>127)//notsur howtomak high r-ord rcharslow r-//cas ,sojus
+tcompar th m.r turn(l_i==r_i); ls r turn(tolow r(l_i)==tolow r(r_
+i));}};r turnstd:: qual(std::b gin(s1),std:: nd(s1),std::b gin(s2
+),std:: nd(s2),pr dicat );}//Thiswillint rsp rs `what`intoth v ct
+orofstringsand//jointh r sult.Itwillatt mpttocomput r quir r s rv
+ //spac b for handtominimiz m moryallocations.t mplat <typ nam T>
+std::stringjoin(std::v ctor<T>const&v,std::string_vi wwhat){if(!v
+.siz ())r turn{};//Firstatt mpttocomput howmuchspac w n  d,whichw
+ //shouldb abl todo xactly.siz _ttotal=0;for(autoconst& :v)total+
+= .siz ();total+=what.siz ()*(v.siz ()-1);//v.siz ()>0always//Now
+constructth r sult(r s rv +1forgoodm asur ).std::stringr s;r s.r 
+s rv (total+1);boolfirst=tru ;for(autoconst& :v){if(!first)r s+=w
+hat;r s+= ;first=fals ;}//Justtomak sur w didth calculationright;
+ifnot,//th nw mightpay xtrainm moryallocations.ASS RT(r s.siz ()=
+=total,"r s.siz ()=="<<r s.siz ()<<"andtotal=="<<total);r turnr s
+;}//Stripallblankspac offofastringvi wandr turn//an won .std::str
+ing_vi wstrip(std::string_vi wsv);//Splitastringonacharact r.std:
+:v ctor<std::string_vi w>split(std::string_vi wsv,charc);//Splita
+string,stripall l m nts,andr mov  mptystrings//fromr sult.std::v 
+ctor<std::string_vi w>split_strip(std::string_vi wsv,charc);//Con
+v rt l m nttyp .std::v ctor<std::string>to_strings(std::v ctor<st
+d::string_vi w>const&svs);//Conv rtstringtopathfs::pathto_path(st
+d::string_vi wsv);//Conv rt l m nttyp .std::v ctor<fs::path>to_pa
+ths(std::v ctor<std::string>const&ss);/**************************
+***************************************To-Stringutiliti s**util::
+to_stringfamilyofov rload dfunctionsar int nd dso*thataus rcancal
+lth monanycommonly-us dtyp andth y*willr turnas nsiblyformatt dr 
+sult.Unlik std::to_string*th s ov rloadsworkonvariouscontain rsas
+w ll,suchas*v ctorsandtupl s.Forsimpl num rictyp sutil::to_string
+*d l gat stostd::to_string.Ifall ls fails,th d fault*ov rloadatt 
+mptstous astringstr amtodoth conv rsion.**S  th sp cialnot b lowo
+nth std::stringov rload.In*short,Wh n v rth to_stringm thodsconv 
+rtastring(orany*string-lik  ntity)toastring,th ywillins rtquot si
+nth *stringits lf.***********************************************
+*****************/t mplat <typ nam T>std::stringto_string(Tconst&
+);//NOT :Thisputssingl quot saroundth charact r!t mplat <>std::st
+ringto_string<char>(charconst&c);//NOT :Th s putsquot saroundth s
+tring!Th r asonforthis//b havioristhatw wanttotrytop rformth to_s
+tringop r-//ation(ing n ral)suchthatithassom d gr  ofr v rsibil-/
+/ity.For xampl ,conv rtingth int g r55andth string//"55"tostrings
+shouldyi lddiff r ntr sultssothatw can//distinguishth typ sfromth
+ stringr pr s ntations(and/or//conv rtback,atl astapproximat ly).
+Soth r for ,wh n v r//th to_stringm thodsconv rtaalr ady-string-l
+ik  ntityto//astring,itwillins rtquot sinth stringits lf.t mplat 
+<>std::stringto_string<std::string>(std::stringconst&s);t mplat <
+>std::stringto_string<std::string_vi w>(std::string_vi wconst&s);
+//NOT :Thisputsquot saroundth string!Also,itisnota//t mplat sp ci
+alizationb caus forsom r asongccalways//wantstos l ctth v rsionfo
+rints/floatsb lowinst adof//thison wh nw giv itstringlit rals(i. 
+.,typ d duction//isnotdoingwhatw want).Buthavingthison caus sgcct
+o//s l ctitwh nw giv itastringlit ral.std::stringto_string(charco
+nst*s);//Not twoimportantthingsaboutthisfunction:1)itwillwill//fo
+rc th stringtob conv rt dtoastd::stringbycalling//itsstring()m mb
+ rfunction,d spit th factthatonsom //platforms( .g.Windows)pathsa
+r stor dint rnallyinUTF16.//Also,itwillputquot saroundit.Toconv r
+tapathtoa//stringwithoutquot sus th path'sstring()m thod(oron //o
+fitsvariants).t mplat <>std::stringto_string<fs::path>(fs::pathco
+nst&p);//Simplyd l gat toth wrapp dtyp .t mplat <typ nam T>std::s
+tringto_string(R f<T>const&rw);//Notsur ifthison isalson  d d,but
+do sn'ts  mtohurt.t mplat <typ nam T>std::stringto_string(CR f<T>
+const&rw);t mplat <typ nam T>std::stringto_string(std::optional<T
+>const&opt);//WilldoJSON-lik notation. .g.(1,2,3)t mplat <typ nam
+ ...Args>std::stringto_string(std::tupl <Args...>const&tp);//This
+function xistsforth purpos ofhavingth compil r//d duc th Ind x sv
+ariadicint g rargum ntsthatw canth n//us toind xth tupl ;itprobab
+lyisnotus fultocallthis//m thoddir ctly(itiscall dbyto_string).Wa
+snotabl to//findamor  l gantwayofunpackinganarbitrarytupl pass d/
+/inasanargum ntapartfromusingthish lp rfunctionin-//volvingth ind
+ x_s qu nc .t mplat <typ nam Tupl ,siz _t...Ind x s>StrV ctupl _ 
+l ms_to_string(Tupl const&tp,std::ind x_s qu nc <Ind x s...>);//W
+illdoJSON-lik notation. .g.(1,2,3)t mplat <typ nam ...Args>std::s
+tringto_string(std::tupl <Args...>const&tp);//Thisfunction xistsf
+orth purpos ofhavingth compil r//d duc th Ind x svariadicint g ra
+rgum ntsthatw canth n//us toind xth variant;itprobablyisnotus ful
+tocall//thism thoddir ctly(itiscall dbyto_string).t mplat <typ na
+m Variant,siz _t...Ind x s>std::stringvariant_ l ms_to_string(Var
+iantconst&v,std::ind x_s qu nc <Ind x s...>);t mplat <typ nam ...
+Args>std::stringto_string(std::variant<Args...>const&v);t mplat <
+>std::stringto_string< rror>( rrorconst& );//WilldoJSON-lik notat
+ion. .g.(1,"h llo")t mplat <typ nam U,typ nam V>std::stringto_str
+ing(std::pair<U,V>const&p);//PrintsinJSONstyl notation. .g.[1,2,3
+]t mplat <typ nam T>std::stringto_string(std::v ctor<T>const&v);/
+/D faultv rsionus sstd::to_stringwhichisonlyd fin dfor//af wprimi
+tiv typ s.t mplat <typ nam T>std::stringto_string(Tconst&arg);t m
+plat <typ nam T>std::ostr am&op rator<<(std::ostr am&out,std::v c
+tor<T>const&v);t mplat <typ nam U,typ nam V>std::ostr am&op rator
+<<(std::ostr am&out,std::pair<U,V>const&p);}//Impl m ntationsoft 
+mplat functionbodi sinh r .W do//thisnotonlyfororganizationalpurp
+os s,butinord rfora//to_stringm thodtob abl tocallanyoth rto_stri
+ngm thod//(say,ifw hav atupl n st dwithinatupl )th nmustall//b d 
+clar dfirstb for th functionbodi sar  ncount r d.#includ "string-
+util.inl"

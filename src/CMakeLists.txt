@@ -23,6 +23,7 @@ add_library(
     io.cpp
     line-endings.cpp
     logger.cpp
+    net-util.cpp
     stopwatch.cpp
     string-util.cpp
     util.cpp
