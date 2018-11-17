@@ -11,7 +11,7 @@
 using namespace std;
 using namespace std::string_literals;
 
-fs::path const data_common = "../tests/data";
+fs::path const data_common = "tests/data";
 
 namespace testing {
 

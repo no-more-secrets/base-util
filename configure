@@ -1,13 +1,86 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env python3
+import os, argparse
+import shutil
+import subprocess as sp
 
-cd $(dirname $0)
+def cmake_bool( b ):
+    return 'ON' if b else 'OFF'
 
-type=Debug
+# Get terminal columns with fallback values.
+(COLUMNS, _) = shutil.get_terminal_size( (80,20) )
 
-[[ "$1" == release ]] && type=Release
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
-mkdir -p build
-cd build
+# Takes a string and embeds it in a long bar of =======
+def in_bar( s ):
+    res = ''
+    res_no_color = '' # need this to take string length
+    if s:
+        res = bcolors.HEADER + '===== ' + bcolors.OKBLUE + s + bcolors.ENDC + ' '
+        res_no_color = '===== ' + s + ' '
+    return res + bcolors.HEADER + '='*(COLUMNS - len( res_no_color )) + bcolors.ENDC
 
-cmake .. -DCMAKE_BUILD_TYPE=$type
+def log( s ):
+    if args.verbose:
+        print( s )
+
+def log_title( s ):
+    log( in_bar( s ) )
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(
+        description='Configure CMake Build' )
+
+    parser.add_argument( '--build-type',
+                         dest='build_type',
+                         type=str,
+                         default='debug',
+                         choices=['debug', 'release'],
+                         help='Set the build configuration' )
+    parser.add_argument( '-t', '--tidy',
+                         dest='tidy',
+                         action='store_true',
+                         help='Whether to run clang-tidy' )
+    parser.add_argument( '-v', '--verbose',
+                         dest='verbose',
+                         action='store_true',
+                         help='Display verbose output from configure script itself' )
+
+    args = parser.parse_args()
+
+    log_title( "Initialization" )
+
+    if not os.path.isdir( 'build' ):
+        log( 'Creating "build" directory' )
+        os.mkdir( 'build' )
+    log( 'Changing to "build" directory' )
+    os.chdir( 'build' )
+
+    build_type = { 'debug': 'Debug', 'release': 'Release' }[args.build_type]
+    log( 'Deduced CMake build type: ' + build_type )
+
+    cmake_args = []
+    cmake_args.append( '-DCMAKE_BUILD_TYPE=%s' % build_type )
+    cmake_args.append( '-DUSE_CLANG_TIDY=%s' % cmake_bool( args.tidy ) )
+
+    cmd = ['cmake', '..'] + cmake_args
+
+    log_title( "CMake Command" )
+    log( ' '.join( cmd ) )
+
+    log_title( 'CMake Output' )
+    p = sp.Popen( cmd )
+    p.communicate()
+
+    log_title( 'Finished' )
+
+    exit( p.returncode )
