@@ -13,6 +13,7 @@ endfunction( set_warning_options )
 add_executable(
     tests-all
     common.cpp
+    conv.cpp
     fs.cpp
     string.cpp
     algo.cpp

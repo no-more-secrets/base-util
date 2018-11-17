@@ -17,6 +17,7 @@ add_library(
     base-util
     STATIC
     algo-par.cpp
+    conv-util.cpp
     datetime.cpp
     fs.cpp
     io.cpp
