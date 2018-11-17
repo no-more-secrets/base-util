@@ -35,12 +35,3 @@ set_target_properties( base-util PROPERTIES CXX_EXTENSIONS OFF )
 target_link_libraries( base-util PUBLIC stdc++fs )
 target_link_libraries( base-util PUBLIC Threads::Threads )
 set_warning_options( base-util )
-if( USE_CLANG_TIDY )
-    if( NOT CLANG_TIDY_EXE )
-        message( FATAL_ERROR "USE_CLANG_TIDY is true but CLANG_TIDY_EXE is not;"
-            "top-level CMakeLists.txt file needs to find clang-tidy" )
-    endif()
-    set( DO_CLANG_TIDY "${CLANG_TIDY_EXE}" "-quiet" )
-    set_target_properties( base-util PROPERTIES
-        CXX_CLANG_TIDY "${DO_CLANG_TIDY}" )
-endif()

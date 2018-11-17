@@ -13,15 +13,6 @@ project(
 
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
-# === clang-tidy ==================================================
-
-if( USE_CLANG_TIDY )
-    find_program( CLANG_TIDY_EXE NAMES "clang-tidy" )
-    if( NOT CLANG_TIDY_EXE )
-        message( FATAL_ERROR "clang-tidy not found." )
-    endif()
-endif()
-
 # === ccache ======================================================
 
 find_program( CCACHE_PROGRAM ccache )
@@ -54,5 +45,20 @@ add_subdirectory( src )
 add_subdirectory( app )
 add_subdirectory( tests )
 
-add_custom_target( run COMMAND main WORKING_DIRECTORY ../ USES_TERMINAL )
-#add_dependencies( run main )
+# Should also automatically add a dependency on main.
+add_custom_target( run
+                   COMMAND main
+                   WORKING_DIRECTORY ../
+                   USES_TERMINAL )
+
+# === clang-tidy ==================================================
+
+if( USE_CLANG_TIDY )
+    find_program( CLANG_TIDY_EXE NAMES "clang-tidy" )
+    if( NOT CLANG_TIDY_EXE )
+        message( FATAL_ERROR "clang-tidy not found." )
+    endif()
+    set( DO_CLANG_TIDY "${CLANG_TIDY_EXE}" "-quiet" )
+    set_target_properties( base-util PROPERTIES
+        CXX_CLANG_TIDY "${DO_CLANG_TIDY}" )
+endif()

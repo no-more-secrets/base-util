@@ -40,7 +40,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Configure CMake Build' )
 
-    parser.add_argument( '--build-type',
+    parser.add_argument( '--type',
                          dest='build_type',
                          type=str,
                          default='debug',
@@ -54,16 +54,26 @@ if __name__ == '__main__':
                          dest='verbose',
                          action='store_true',
                          help='Display verbose output from configure script itself' )
+    parser.add_argument( '--clang',
+                         dest='clang',
+                         action='store_true',
+                         help='Use clang' )
 
     args = parser.parse_args()
 
     log_title( "Initialization" )
 
-    if not os.path.isdir( 'build' ):
-        log( 'Creating "build" directory' )
-        os.mkdir( 'build' )
-    log( 'Changing to "build" directory' )
-    os.chdir( 'build' )
+    root_dir = os.path.abspath( os.path.join( os.path.dirname( __file__ ), '..' ) )
+    log( 'Changing to root directory: ' + root_dir )
+    os.chdir( root_dir )
+
+    build_dir = 'build'
+
+    if not os.path.isdir( build_dir ):
+        log( 'Creating "%s" directory' % build_dir )
+        os.mkdir( build_dir )
+    log( 'Changing to "%s" directory' % build_dir )
+    os.chdir( build_dir )
 
     build_type = { 'debug': 'Debug', 'release': 'Release' }[args.build_type]
     log( 'Deduced CMake build type: ' + build_type )
@@ -71,11 +81,17 @@ if __name__ == '__main__':
     cmake_args = []
     cmake_args.append( '-DCMAKE_BUILD_TYPE=%s' % build_type )
     cmake_args.append( '-DUSE_CLANG_TIDY=%s' % cmake_bool( args.tidy ) )
+    cmake_args.append( '-DCMAKE_TARGET_MESSAGES=OFF' )
+
+    if args.clang:
+        cmake_args.append( '-DCMAKE_CXX_COMPILER=%s/dev/tools/llvm-current/bin/clang++' % os.environ['HOME'] )
 
     cmd = ['cmake', '..'] + cmake_args
 
     log_title( "CMake Command" )
-    log( ' '.join( cmd ) )
+    log( ' '.join( cmd[:2] ) )
+    for arg in cmd[2:]:
+        log( '     ' + arg )
 
     log_title( 'CMake Output' )
     p = sp.Popen( cmd )

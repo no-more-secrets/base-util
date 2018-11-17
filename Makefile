@@ -15,4 +15,4 @@ run: build/CMakeFiles
 .PHONY: all clean test run
 
 build/CMakeFiles:
-	@./configure
+	@scripts/configure
