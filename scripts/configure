@@ -75,6 +75,10 @@ if __name__ == '__main__':
     log( 'Changing to "%s" directory' % build_dir )
     os.chdir( build_dir )
 
+    if os.path.exists( 'CMakeCache.txt' ):
+        log( 'Removing CMakeCache.txt' )
+        os.remove( 'CMakeCache.txt' )
+
     build_type = { 'debug': 'Debug', 'release': 'Release' }[args.build_type]
     log( 'Deduced CMake build type: ' + build_type )
 
