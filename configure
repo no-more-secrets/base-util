@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+
+cd $(dirname $0)
+
+type=Debug
+
+[[ "$1" == release ]] && type=Release
+
+mkdir -p build
+cd build
+
+cmake .. -DCMAKE_BUILD_TYPE=$type
