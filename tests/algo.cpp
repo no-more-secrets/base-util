@@ -9,8 +9,6 @@
 
 using namespace std;
 
-fs::path const data_common = "tests/data";
-
 namespace testing {
 
 TEST( map )

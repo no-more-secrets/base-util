@@ -5,12 +5,15 @@
 
 #include "base-util/colors.hpp"
 #include "base-util/macros.hpp"
+#include "base-util/types.hpp"
 
 #include <exception>
 #include <functional>
 #include <regex>
 #include <string>
 #include <vector>
+
+extern fs::path const data_common;
 
 namespace testing {
 

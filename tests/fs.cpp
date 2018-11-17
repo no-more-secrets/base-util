@@ -14,8 +14,6 @@
 
 using namespace std;
 
-fs::path const data_common = "tests/data";
-
 // Utility macro used to wrap string literals containing absolute
 // paths; on windows it will attach a root name  to  them  (since
 // our path manipulation functions  do  not  support paths with a

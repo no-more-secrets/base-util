@@ -15,8 +15,6 @@
 using namespace std;
 using namespace std::string_literals;
 
-fs::path const data_common = "tests/data";
-
 namespace testing {
 
 // Compile-time test that we can log IO manipulators such as endl.
