@@ -1,18 +1,17 @@
 # This Makefile is just for convenience
 
-all: build/CMakeFiles
-	@cd build && $(MAKE) -s
+.DEFAULT_GOAL := all
 
-clean:
-	@cd build && $(MAKE) -s clean
+configure-marker := build/CMakeFiles
 
 test: all
-	@build/tests/tests-all
+	@build/test/tests-all
 
-run: build/CMakeFiles
-	@cd build && $(MAKE) -s run
+.PHONY: test
 
-.PHONY: all clean test run
+# Just forwards targets
+%: $(configure-marker)
+	@cd build && $(MAKE) -s $@
 
-build/CMakeFiles:
+$(configure-marker):
 	@scripts/configure

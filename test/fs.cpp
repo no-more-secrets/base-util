@@ -34,7 +34,7 @@ TEST( wildcard )
     EQUALS( util::wildcard( "..",   false ), (PathVec{}) );
     EQUALS( util::wildcard( "../",  false ), (PathVec{}) );
     EQUALS( util::wildcard( "../a", false ), (PathVec{}) );
-    EQUALS( util::wildcard( "tests/?s.?pp", false ), (PathVec{"tests/fs.cpp"}) );
+    EQUALS( util::wildcard( "test/?s.?pp", false ), (PathVec{"test/fs.cpp"}) );
 
     // Files and Folders
     EQUALS( util::wildcard( "",     true ), (PathVec{})     );
@@ -42,10 +42,10 @@ TEST( wildcard )
     EQUALS( util::wildcard( "..",   true ), (PathVec{".."}) );
     EQUALS( util::wildcard( "../",  true ), (PathVec{".."}) );
     EQUALS( util::wildcard( "../a", true ), (PathVec{})     );
-    EQUALS( util::wildcard( "tests/?s.?pp", true ), (PathVec{"tests/fs.cpp"}) );
+    EQUALS( util::wildcard( "test/?s.?pp", true ), (PathVec{"test/fs.cpp"}) );
 
     auto abs1 = util::lexically_absolute( "." );
-    auto abs2 = util::lexically_absolute( "tests" );
+    auto abs2 = util::lexically_absolute( "test" );
     EQUALS( util::wildcard( abs1, true ), (PathVec{abs1}) );
     EQUALS( util::wildcard( abs2/"?s.?pp", true ),
             (PathVec{abs2/"fs.cpp"}) );
@@ -53,21 +53,21 @@ TEST( wildcard )
     THROWS( util::wildcard( "x/y/z/*" ) );
 
     // Test that wildcard must match full filename.
-    EQUALS( util::wildcard( "tests/e",  true ), (PathVec{}) );
-    EQUALS( util::wildcard( "tests/e*", true ), (PathVec{}) );
-    EQUALS( util::wildcard( "tests/fs.cp", true ), (PathVec{}) );
-    EQUALS( util::wildcard( "tests/fs.cpp", true ), (PathVec{"tests/fs.cpp"}) );
+    EQUALS( util::wildcard( "test/e",  true ), (PathVec{}) );
+    EQUALS( util::wildcard( "test/e*", true ), (PathVec{}) );
+    EQUALS( util::wildcard( "test/fs.cp", true ), (PathVec{}) );
+    EQUALS( util::wildcard( "test/fs.cpp", true ), (PathVec{"test/fs.cpp"}) );
 
 #if CASE_INSENSITIVE_FS()
     // Test that on non-linux  platforms  (which  we are assuming
     // have case-insensitive filesystems) that  the wildcard func-
     // tion   enables  case-insensitivity  when  matching   files.
-    EQUALS( util::wildcard( "tests/?s.?pp", true ), (PathVec{"tests/fs.cpp"}) );
-    EQUALS( util::wildcard( "tests/?s.?PP", true ), (PathVec{"tests/fs.cpp"}) );
+    EQUALS( util::wildcard( "test/?s.?pp", true ), (PathVec{"test/fs.cpp"}) );
+    EQUALS( util::wildcard( "test/?s.?PP", true ), (PathVec{"test/fs.cpp"}) );
 #else
     // Otherwise it should be case-sensitive.
-    EQUALS( util::wildcard( "tests/?s.?pp", true ), (PathVec{"tests/fs.cpp"}) );
-    EQUALS( util::wildcard( "tests/?s.?PP", true ), (PathVec{}) );
+    EQUALS( util::wildcard( "test/?s.?pp", true ), (PathVec{"test/fs.cpp"}) );
+    EQUALS( util::wildcard( "test/?s.?PP", true ), (PathVec{}) );
 #endif
 }
 

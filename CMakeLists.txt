@@ -43,7 +43,7 @@ message( STATUS "Build type: ${CMAKE_BUILD_TYPE}" )
 
 add_subdirectory( src )
 add_subdirectory( app )
-add_subdirectory( tests )
+add_subdirectory( test )
 
 # Should also automatically add a dependency on main.
 add_custom_target( run
