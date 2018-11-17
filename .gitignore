@@ -38,7 +38,6 @@
 # cmake
 /CMakeCache.txt
 /CMakeFiles*
-/Makefile
 /cmake_install.cmake
 /CTestTestfile.cmake
 /Testing

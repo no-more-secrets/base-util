@@ -53,3 +53,6 @@ message( STATUS "Build type: ${CMAKE_BUILD_TYPE}" )
 add_subdirectory( src )
 add_subdirectory( app )
 add_subdirectory( tests )
+
+add_custom_target( run COMMAND main WORKING_DIRECTORY ../ USES_TERMINAL )
+#add_dependencies( run main )
