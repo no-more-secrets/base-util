@@ -88,10 +88,6 @@ if __name__ == '__main__':
         log( 'Removing CMakeCache.txt' )
         os.remove( 'CMakeCache.txt' )
 
-    if os.path.exists( 'configure-finished' ):
-        log( 'Removing configure-finished marker' )
-        os.remove( 'configure-finished' )
-
     build_type = { 'debug': 'Debug', 'release': 'Release' }[args.build_type]
     log( 'Deduced CMake build type: ' + build_type )
 

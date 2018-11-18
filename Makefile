@@ -1,6 +1,6 @@
 # This Makefile is just for convenience
 
-configure-marker := build/finished-configure
+configure-marker := build/CMakeFiles
 
 all: $(configure-marker)
 	@cd build && $(MAKE) -s all
@@ -23,5 +23,5 @@ distclean:
 .PHONY: all clean run test distclean
 
 $(configure-marker):
-	@scripts/configure -v
-	@touch $@
+	@echo "You must run scripts/configure first!"
+	@false
