@@ -44,9 +44,12 @@ add_library(
 add_library( base-util::base-util ALIAS base-util )
 
 #target_include_directories( base-util PUBLIC include )
-target_include_directories( base-util PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
+target_include_directories( base-util
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src> )
 
 target_compile_features( base-util PUBLIC cxx_std_17 )
 set_target_properties( base-util PROPERTIES CXX_EXTENSIONS OFF )
@@ -60,6 +63,8 @@ install( TARGETS base-util
          ARCHIVE DESTINATION lib
          #RUNTIME DESTINATION bin
          INCLUDES DESTINATION include )
+
+install( DIRECTORY include DESTINATION include )
 
 include( CMakePackageConfigHelpers )
 write_basic_package_version_file(
