@@ -72,7 +72,8 @@ if __name__ == '__main__':
 
     log_title( "Initialization" )
 
-    root_dir = os.path.abspath( os.path.join( os.path.dirname( __file__ ), '..' ) )
+    # root_dir = os.path.abspath( os.path.join( os.path.dirname( __file__ ), '..' ) )
+    root_dir = os.path.dirname( __file__ )
     log( 'Changing to root directory: ' + root_dir )
     os.chdir( root_dir )
 
