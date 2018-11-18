@@ -58,6 +58,10 @@ if __name__ == '__main__':
                          dest='clang',
                          action='store_true',
                          help='Use clang' )
+    parser.add_argument( '--gui',
+                         dest='gui',
+                         action='store_true',
+                         help='Use CMake GUI' )
     parser.add_argument( '--prefix',
                          dest='prefix',
                          type=str,
@@ -100,7 +104,8 @@ if __name__ == '__main__':
     if args.clang:
         cmake_args.append( '-DCMAKE_CXX_COMPILER=%s/dev/tools/llvm-current/bin/clang++' % os.environ['HOME'] )
 
-    cmd = ['cmake', '..'] + cmake_args
+    exe = 'ccmake' if args.gui else 'cmake'
+    cmd = [exe, '..'] + cmake_args
 
     log_title( "CMake Command" )
     log( ' '.join( cmd[:2] ) )
