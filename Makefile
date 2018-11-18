@@ -1,6 +1,6 @@
 # This Makefile is just for convenience
 
-configure-marker := build/CMakeFiles
+configure-marker := build/finished-configure
 
 all: $(configure-marker)
 	@cd build && $(MAKE) -s all
@@ -21,3 +21,4 @@ distclean:
 
 $(configure-marker):
 	@scripts/configure -v
+	@touch $@
