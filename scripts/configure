@@ -58,6 +58,11 @@ if __name__ == '__main__':
                          dest='clang',
                          action='store_true',
                          help='Use clang' )
+    parser.add_argument( '--prefix',
+                         dest='prefix',
+                         type=str,
+                         default=os.path.join( os.environ['HOME'], '.local' ),
+                         help='Install prefix' )
 
     args = parser.parse_args()
 
@@ -79,6 +84,10 @@ if __name__ == '__main__':
         log( 'Removing CMakeCache.txt' )
         os.remove( 'CMakeCache.txt' )
 
+    if os.path.exists( 'configure-finished' ):
+        log( 'Removing configure-finished marker' )
+        os.remove( 'configure-finished' )
+
     build_type = { 'debug': 'Debug', 'release': 'Release' }[args.build_type]
     log( 'Deduced CMake build type: ' + build_type )
 
@@ -86,6 +95,7 @@ if __name__ == '__main__':
     cmake_args.append( '-DCMAKE_BUILD_TYPE=%s' % build_type )
     cmake_args.append( '-DUSE_CLANG_TIDY=%s' % cmake_bool( args.tidy ) )
     cmake_args.append( '-DCMAKE_TARGET_MESSAGES=OFF' )
+    cmake_args.append( '-DCMAKE_INSTALL_PREFIX=%s' % args.prefix )
 
     if args.clang:
         cmake_args.append( '-DCMAKE_CXX_COMPILER=%s/dev/tools/llvm-current/bin/clang++' % os.environ['HOME'] )

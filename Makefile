@@ -8,6 +8,9 @@ all: $(configure-marker)
 run: $(configure-marker)
 	@cd build && $(MAKE) -s run
 
+install: $(configure-marker)
+	@cd build && $(MAKE) -s install
+
 clean:
 	@cd build && $(MAKE) -s clean
 

@@ -1,3 +1,16 @@
+cmake_minimum_required( VERSION 3.12...3.12 )
+
+if( ${CMAKE_VERSION} VERSION_LESS 3.12 )
+    cmake_policy( VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} )
+endif()
+
+project(
+    base-util
+    VERSION 1.0
+    DESCRIPTION "C++ Base [Utilities]"
+    LANGUAGES CXX
+)
+
 # Enable all warnings and treat warnings as errors.
 function( set_warning_options target )
 	target_compile_options(
@@ -28,12 +41,44 @@ add_library(
     string.cpp
     misc.cpp
 )
+add_library( base-util::base-util ALIAS base-util )
 
-# TODO: Do all these need to be PUBLIC?
+#target_include_directories( base-util PUBLIC include )
+target_include_directories( base-util PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 
-target_include_directories( base-util PUBLIC include )
 target_compile_features( base-util PUBLIC cxx_std_17 )
 set_target_properties( base-util PROPERTIES CXX_EXTENSIONS OFF )
 target_link_libraries( base-util PUBLIC stdc++fs )
 target_link_libraries( base-util PUBLIC Threads::Threads )
 set_warning_options( base-util )
+
+install( TARGETS base-util
+         EXPORT base-util-Targets
+         #LIBRARY DESTINATION lib
+         ARCHIVE DESTINATION lib
+         #RUNTIME DESTINATION bin
+         INCLUDES DESTINATION include )
+
+include( CMakePackageConfigHelpers )
+write_basic_package_version_file(
+    base-util-ConfigVersion.cmake
+    VERSION ${PACKAGE_VERSION}
+    COMPATIBILITY AnyNewerVersion )
+
+install( EXPORT base-util-Targets
+         FILE base-util-Targets.cmake
+         NAMESPACE base-util::
+         DESTINATION lib/cmake/base-util )
+
+configure_file( ../cmake/base-util-Config.cmake.in
+                base-util-Config.cmake
+                @ONLY )
+install(
+    FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/base-util-Config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/base-util-ConfigVersion.cmake"
+    DESTINATION
+        lib/cmake/base-util
+)
