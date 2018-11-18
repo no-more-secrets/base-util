@@ -26,8 +26,8 @@ string url_encode( string_view in ) {
     for( auto c : in ) {
 
         // Keep alpha-num and other  accepted  characters  intact.
-        if( isalnum( c ) || c == '-' || c == '_' ||
-                            c == '.' || c == '~' ) {
+        if( isalnum( c ) != 0 || c == '-' || c == '_' ||
+                                 c == '.' || c == '~' ) {
             escaped << c;
             continue;
         }

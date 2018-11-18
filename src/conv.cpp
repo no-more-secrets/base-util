@@ -33,8 +33,9 @@ vector<char> ascii_2_utf16le( vector<char> const& v, bool bom ) {
     if( v.empty() )
         return res;
 
+    uint8_t const bom_1{ 0xFF }, bom_2{ 0xFE };
     if( bom )
-        res.emplace_back( 0xFF ), res.emplace_back( 0xFE );
+        res.emplace_back( bom_1 ), res.emplace_back( bom_2 );
 
     for( auto const& c : v ) {
         ASSERT( c >= 0, "non-ascii character " << int( c ) <<
