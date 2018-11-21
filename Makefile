@@ -15,7 +15,7 @@ clean:
 	@cd build && $(MAKE) -s clean
 
 test: all
-	@build/test/tests-all
+	@build/test/tests
 
 distclean:
 	@rm -rf build

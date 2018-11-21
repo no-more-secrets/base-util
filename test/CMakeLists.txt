@@ -15,7 +15,7 @@ enable_testing()
 find_package( Catch2 REQUIRED )
 
 add_executable( tests
-    main.cpp
+    infra/main.cpp
     algo.cpp
     conv.cpp
     fs.cpp

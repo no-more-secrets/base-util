@@ -1,7 +1,7 @@
 /****************************************************************
 * Unit tests for encoding conversions
 ****************************************************************/
-#include "common.hpp"
+#include "infra/common.hpp"
 
 #include "base-util/conv.hpp"
 #include "base-util/io.hpp"

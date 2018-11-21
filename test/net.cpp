@@ -1,7 +1,7 @@
 /****************************************************************
 * Unit tests for network functionality
 ****************************************************************/
-#include "common.hpp"
+#include "infra/common.hpp"
 
 #include "base-util/bimap.hpp"
 #include "base-util/io.hpp"

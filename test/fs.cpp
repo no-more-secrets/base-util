@@ -3,7 +3,7 @@
 ****************************************************************/
 #include "catch2/catch.hpp"
 
-#include "common.hpp"
+#include "infra/common.hpp"
 
 #include "base-util/fs.hpp"
 #include "base-util/line-endings.hpp"
