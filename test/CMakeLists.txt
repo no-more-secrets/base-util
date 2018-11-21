@@ -16,7 +16,6 @@ add_executable(
     tests-all
     common.cpp
     fs.cpp
-    string.cpp
     algo.cpp
     misc.cpp
 )
@@ -30,8 +29,10 @@ find_package( Catch2 REQUIRED )
 
 add_executable( tests-catch
     main.cpp
+    conv.cpp
     net.cpp
-    conv.cpp )
+    string.cpp
+)
 
 target_compile_features( tests-catch PUBLIC cxx_std_17 )
 set_target_properties( tests-catch PROPERTIES CXX_EXTENSIONS OFF )
