@@ -16,7 +16,6 @@ add_executable(
     tests-all
     common.cpp
     fs.cpp
-    misc.cpp
 )
 target_compile_features( tests-all PUBLIC cxx_std_17 )
 set_target_properties( tests-all PROPERTIES CXX_EXTENSIONS OFF )
@@ -30,6 +29,7 @@ add_executable( tests-catch
     main.cpp
     algo.cpp
     conv.cpp
+    misc.cpp
     net.cpp
     string.cpp
 )
