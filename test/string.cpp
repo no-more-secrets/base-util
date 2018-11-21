@@ -7,8 +7,6 @@
 
 using namespace std;
 
-namespace testing {
-
 TEST_CASE( "from_string" )
 {
     REQUIRE_THROWS( util::stoi( "" ) );
@@ -315,5 +313,3 @@ TEST_CASE( "string_util" )
     b = util::iequals<string>( "xabcde", "abcde"  ); REQUIRE( b == false );
     b = util::iequals<string>( "ABCDE",  "abcde"  ); REQUIRE( b == true  );
 }
-
-} // namespace testing
