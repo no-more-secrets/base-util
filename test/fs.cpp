@@ -1,6 +1,8 @@
 /****************************************************************
 * Unit tests for filesystem-related code
 ****************************************************************/
+#include "catch2/catch.hpp"
+
 #include "common.hpp"
 
 #include "base-util/fs.hpp"
@@ -26,70 +28,70 @@ using namespace std;
 
 namespace testing {
 
-TEST( wildcard )
+TEST_CASE( "wildcard" )
 {
     // Files only
-    EQUALS( util::wildcard( "",     false ), (PathVec{}) );
-    EQUALS( util::wildcard( ".",    false ), (PathVec{}) );
-    EQUALS( util::wildcard( "..",   false ), (PathVec{}) );
-    EQUALS( util::wildcard( "../",  false ), (PathVec{}) );
-    EQUALS( util::wildcard( "../a", false ), (PathVec{}) );
-    EQUALS( util::wildcard( "test/?s.?pp", false ), (PathVec{"test/fs.cpp"}) );
+    REQUIRE( util::wildcard( "",     false ) == (PathVec{}) );
+    REQUIRE( util::wildcard( ".",    false ) == (PathVec{}) );
+    REQUIRE( util::wildcard( "..",   false ) == (PathVec{}) );
+    REQUIRE( util::wildcard( "../",  false ) == (PathVec{}) );
+    REQUIRE( util::wildcard( "../a", false ) == (PathVec{}) );
+    REQUIRE( util::wildcard( "test/?s.?pp", false ) == (PathVec{"test/fs.cpp"}) );
 
     // Files and Folders
-    EQUALS( util::wildcard( "",     true ), (PathVec{})     );
-    EQUALS( util::wildcard( ".",    true ), (PathVec{"."})  );
-    EQUALS( util::wildcard( "..",   true ), (PathVec{".."}) );
-    EQUALS( util::wildcard( "../",  true ), (PathVec{".."}) );
-    EQUALS( util::wildcard( "../a", true ), (PathVec{})     );
-    EQUALS( util::wildcard( "test/?s.?pp", true ), (PathVec{"test/fs.cpp"}) );
+    REQUIRE( util::wildcard( "",     true ) == (PathVec{})     );
+    REQUIRE( util::wildcard( ".",    true ) == (PathVec{"."})  );
+    REQUIRE( util::wildcard( "..",   true ) == (PathVec{".."}) );
+    REQUIRE( util::wildcard( "../",  true ) == (PathVec{".."}) );
+    REQUIRE( util::wildcard( "../a", true ) == (PathVec{})     );
+    REQUIRE( util::wildcard( "test/?s.?pp", true ) == (PathVec{"test/fs.cpp"}) );
 
     auto abs1 = util::lexically_absolute( "." );
     auto abs2 = util::lexically_absolute( "test" );
-    EQUALS( util::wildcard( abs1, true ), (PathVec{abs1}) );
-    EQUALS( util::wildcard( abs2/"?s.?pp", true ),
-            (PathVec{abs2/"fs.cpp"}) );
+    REQUIRE( util::wildcard( abs1, true ) == (PathVec{abs1}) );
+    REQUIRE( util::wildcard( abs2/"?s.?pp", true ) ==
+             (PathVec{abs2/"fs.cpp"}) );
 
-    THROWS( util::wildcard( "x/y/z/*" ) );
+    REQUIRE_THROWS( util::wildcard( "x/y/z/*" ) );
 
     // Test that wildcard must match full filename.
-    EQUALS( util::wildcard( "test/e",  true ), (PathVec{}) );
-    EQUALS( util::wildcard( "test/e*", true ), (PathVec{}) );
-    EQUALS( util::wildcard( "test/fs.cp", true ), (PathVec{}) );
-    EQUALS( util::wildcard( "test/fs.cpp", true ), (PathVec{"test/fs.cpp"}) );
+    REQUIRE( util::wildcard( "test/e",  true ) == (PathVec{}) );
+    REQUIRE( util::wildcard( "test/e*", true ) == (PathVec{}) );
+    REQUIRE( util::wildcard( "test/fs.cp", true ) == (PathVec{}) );
+    REQUIRE( util::wildcard( "test/fs.cpp", true ) == (PathVec{"test/fs.cpp"}) );
 
 #if CASE_INSENSITIVE_FS()
     // Test that on non-linux  platforms  (which  we are assuming
     // have case-insensitive filesystems) that  the wildcard func-
     // tion   enables  case-insensitivity  when  matching   files.
-    EQUALS( util::wildcard( "test/?s.?pp", true ), (PathVec{"test/fs.cpp"}) );
-    EQUALS( util::wildcard( "test/?s.?PP", true ), (PathVec{"test/fs.cpp"}) );
+    REQUIRE( util::wildcard( "test/?s.?pp", true ) == (PathVec{"test/fs.cpp"}) );
+    REQUIRE( util::wildcard( "test/?s.?PP", true ) == (PathVec{"test/fs.cpp"}) );
 #else
     // Otherwise it should be case-sensitive.
-    EQUALS( util::wildcard( "test/?s.?pp", true ), (PathVec{"test/fs.cpp"}) );
-    EQUALS( util::wildcard( "test/?s.?PP", true ), (PathVec{}) );
+    REQUIRE( util::wildcard( "test/?s.?pp", true ) == (PathVec{"test/fs.cpp"}) );
+    REQUIRE( util::wildcard( "test/?s.?PP", true ) == (PathVec{}) );
 #endif
 }
 
-TEST( slashes )
+TEST_CASE( "slashes" )
 {
-    EQUALS( util::fwd_slashes( "" ), "" );
-    EQUALS( util::back_slashes( "" ), "" );
+    REQUIRE( util::fwd_slashes( "" ) == "" );
+    REQUIRE( util::back_slashes( "" ) == "" );
 
-    EQUALS( util::fwd_slashes( "/"), "/" );
-    EQUALS( util::back_slashes( "\\" ), "\\" );
+    REQUIRE( util::fwd_slashes( "/") == "/" );
+    REQUIRE( util::back_slashes( "\\" ) == "\\" );
 
-    EQUALS( util::fwd_slashes( "////" ), "////" );
-    EQUALS( util::back_slashes( "\\\\\\\\" ), "\\\\\\\\" );
+    REQUIRE( util::fwd_slashes( "////" ) == "////" );
+    REQUIRE( util::back_slashes( "\\\\\\\\" ) == "\\\\\\\\" );
 
-    EQUALS( util::back_slashes( "////" ), "\\\\\\\\" );
-    EQUALS( util::fwd_slashes( "\\\\\\\\" ), "////" );
+    REQUIRE( util::back_slashes( "////" ) == "\\\\\\\\" );
+    REQUIRE( util::fwd_slashes( "\\\\\\\\" ) == "////" );
 
-    EQUALS( util::back_slashes( "1/a/b/c/d" ), "1\\a\\b\\c\\d" );
-    EQUALS( util::fwd_slashes( "1\\2\\3\\4\\5" ), "1/2/3/4/5" );
+    REQUIRE( util::back_slashes( "1/a/b/c/d" ) == "1\\a\\b\\c\\d" );
+    REQUIRE( util::fwd_slashes( "1\\2\\3\\4\\5" ) == "1/2/3/4/5" );
 }
 
-TEST( dos_to_from_unix )
+TEST_CASE( "dos_to_from_unix" )
 {
     using namespace std::chrono_literals;
 
@@ -112,11 +114,11 @@ TEST( dos_to_from_unix )
     util::dos2unix( v1 ); util::dos2unix( v2 );
     util::dos2unix( v3 ); util::dos2unix( v4 );
     util::dos2unix( v5 );
-    EQUALS( v1, (vector<char>{ }) );
-    EQUALS( v2, (vector<char>{ 0x0A }) );
-    EQUALS( v3, (vector<char>{ }) );
-    EQUALS( v4, (vector<char>{ 0x0A }) );
-    EQUALS( v5, (vector<char>{ 0x0A }) );
+    REQUIRE( v1 == (vector<char>{ }) );
+    REQUIRE( v2 == (vector<char>{ 0x0A }) );
+    REQUIRE( v3 == (vector<char>{ }) );
+    REQUIRE( v4 == (vector<char>{ 0x0A }) );
+    REQUIRE( v5 == (vector<char>{ 0x0A }) );
 
     // Now test some edge cases with unix2dos.
     vector<char> v6{}, v7{ 0x0A }, v8{ 0x0D }, v9{ 0x0D, 0x0A };
@@ -124,11 +126,11 @@ TEST( dos_to_from_unix )
     util::unix2dos( v6 ); util::unix2dos( v7 );
     util::unix2dos( v8 ); util::unix2dos( v9 );
     util::unix2dos( v10 );
-    EQUALS( v6,  (vector<char>{ }) );
-    EQUALS( v7,  (vector<char>{ 0x0D, 0x0A }) );
-    EQUALS( v8,  (vector<char>{ 0x0D }) );
-    EQUALS( v9,  (vector<char>{ 0x0D, 0x0A }) );
-    EQUALS( v10, (vector<char>{ 0x0D, 0x0A, 0x0D }) );
+    REQUIRE( v6 ==  (vector<char>{ }) );
+    REQUIRE( v7 ==  (vector<char>{ 0x0D, 0x0A }) );
+    REQUIRE( v8 ==  (vector<char>{ 0x0D }) );
+    REQUIRE( v9 ==  (vector<char>{ 0x0D, 0x0A }) );
+    REQUIRE( v10 == (vector<char>{ 0x0D, 0x0A, 0x0D }) );
 
     // Test dos2unix( vector )
     auto unix = util::read_file( data_common / "lines-unix.txt" );
@@ -137,26 +139,26 @@ TEST( dos_to_from_unix )
     // Sanity check to make  sure  the  files have different line
     // endings  to  begin  with (e.g., that the repository hasn't
     // auto converted them for us which we don't want).
-    TRUE_( win.size() > unix.size() );
+    REQUIRE( win.size() > unix.size() );
 
     auto unix_to_unix = unix; util::dos2unix( unix_to_unix );
     auto win_to_unix  = unix; util::dos2unix( win_to_unix  );
 
-    EQUALS( unix_to_unix, unix );
-    EQUALS( win_to_unix,  unix );
+    REQUIRE( unix_to_unix == unix );
+    REQUIRE( win_to_unix ==  unix );
 
     // Test dos2unix( string )
     string win_str( &win[0], win.size() );
     auto win_str_tmp = win_str;
-    EQUALS( win_str.size(), 64 );
+    REQUIRE( win_str.size() == 64 );
     util::dos2unix( win_str );
-    EQUALS( win_str.size(), 53 );
+    REQUIRE( win_str.size() == 53 );
     util::unix2dos( win_str );
-    EQUALS( win_str.size(), 64 );
-    EQUALS( win_str, win_str_tmp );
+    REQUIRE( win_str.size() == 64 );
+    REQUIRE( win_str == win_str_tmp );
 
     // Test dos2unix( path )
-    EQUALS( unix.size(), 53 );
+    REQUIRE( unix.size() == 53 );
     fs::path win_inp  = "lines-win.txt";
     fs::path unix_inp = "lines-unix.txt";
     auto win_tmp  = fs::temp_directory_path()/win_inp;
@@ -169,48 +171,48 @@ TEST( dos_to_from_unix )
     auto time_0 = util::timestamp( win_tmp );
     util::timestamp( unix_tmp, time_0 );
 
-    TRUE_( util::timestamp( win_tmp  ) ==
-           util::timestamp( unix_tmp ) );
+    REQUIRE( util::timestamp( win_tmp  ) ==
+             util::timestamp( unix_tmp ) );
 
-    EQUALS( fs::file_size( win_tmp  ), 64 );
-    EQUALS( fs::file_size( unix_tmp ), 53 );
+    REQUIRE( fs::file_size( win_tmp  ) == 64 );
+    REQUIRE( fs::file_size( unix_tmp ) == 53 );
 
     this_thread::sleep_for( delta );
-    EQUALS( util::dos2unix( win_tmp,  true ), true  );
-    EQUALS( util::dos2unix( unix_tmp, true ), false );
+    REQUIRE( util::dos2unix( win_tmp,  true ) == true  );
+    REQUIRE( util::dos2unix( unix_tmp, true ) == false );
 
-    EQUALS( fs::file_size( win_tmp  ), 53 );
-    EQUALS( fs::file_size( unix_tmp ), 53 );
+    REQUIRE( fs::file_size( win_tmp  ) == 53 );
+    REQUIRE( fs::file_size( unix_tmp ) == 53 );
 
-    TRUE_( util::timestamp( unix_tmp ) == time_0 );
-    TRUE_( util::timestamp( win_tmp )  == time_0 );
+    REQUIRE( util::timestamp( unix_tmp ) == time_0 );
+    REQUIRE( util::timestamp( win_tmp )  == time_0 );
 
     auto time_1 = util::timestamp( win_tmp );
 
     this_thread::sleep_for( delta );
-    EQUALS( util::dos2unix( win_tmp  ), false );
-    EQUALS( util::dos2unix( unix_tmp ), false );
+    REQUIRE( util::dos2unix( win_tmp  ) == false );
+    REQUIRE( util::dos2unix( unix_tmp ) == false );
 
-    EQUALS( fs::file_size( win_tmp  ), 53 );
-    EQUALS( fs::file_size( unix_tmp ), 53 );
+    REQUIRE( fs::file_size( win_tmp  ) == 53 );
+    REQUIRE( fs::file_size( unix_tmp ) == 53 );
 
-    TRUE_( util::timestamp( win_tmp )  == time_1 );
-    TRUE_( util::timestamp( unix_tmp ) == time_1 );
+    REQUIRE( util::timestamp( win_tmp )  == time_1 );
+    REQUIRE( util::timestamp( unix_tmp ) == time_1 );
 
     auto time_2 = util::timestamp( unix_tmp );
 
     this_thread::sleep_for( delta );
-    EQUALS( util::unix2dos( win_tmp  ), true );
-    EQUALS( util::unix2dos( unix_tmp ), true );
+    REQUIRE( util::unix2dos( win_tmp  ) == true );
+    REQUIRE( util::unix2dos( unix_tmp ) == true );
 
-    EQUALS( fs::file_size( win_tmp  ), 64 );
-    EQUALS( fs::file_size( unix_tmp ), 64 );
+    REQUIRE( fs::file_size( win_tmp  ) == 64 );
+    REQUIRE( fs::file_size( unix_tmp ) == 64 );
 
-    TRUE_( util::timestamp( win_tmp )  > time_2 );
-    TRUE_( util::timestamp( unix_tmp ) > time_2 );
+    REQUIRE( util::timestamp( win_tmp )  > time_2 );
+    REQUIRE( util::timestamp( unix_tmp ) > time_2 );
 }
 
-TEST( touch )
+TEST_CASE( "touch" )
 {
     auto p = fs::temp_directory_path();
     util::log << "temp folder: " << p << "\n";
@@ -246,29 +248,29 @@ TEST( touch )
     // later  than  the original timestamp on temp folder (before
     // we created the file in it).
     bool gt = util::timestamp( t1 ) > base_time;
-    EQUALS( gt, true );
+    REQUIRE( gt == true );
 
     // Check that an attempt to touch a file  in  a  non-existent
     // folder will throw.
-    THROWS( util::touch( t2 ) );
+    REQUIRE_THROWS( util::touch( t2 ) );
 }
 
-TEST( read_write_file )
+TEST_CASE( "read_write_file" )
 {
     auto f = data_common / "3-lines.txt";
 
     auto v = util::read_file_lines( f );
-    EQUALS( v, (StrVec{ "line 1", "line 2", "line 3" }) );
+    REQUIRE( v == (StrVec{ "line 1", "line 2", "line 3" }) );
 
     auto s = util::read_file_str( f );
-    EQUALS( s, "line 1\nline 2\nline 3" );
+    REQUIRE( s == "line 1\nline 2\nline 3" );
 
     // read file as vector of char.
     vector<char> v2 = util::read_file( data_common/"random.bin" );
-    EQUALS( v2.size(), 1920 );
+    REQUIRE( v2.size() == 1920 );
 
     // Test a random byte in the file.
-    EQUALS( v2[0x6c0], char( 0x6b ) );
+    REQUIRE( v2[0x6c0] == char( 0x6b ) );
 
     // Now write to a file and read it back in to verify.
     vector<char> v3{ 3, 4, 5, 6, 7 };
@@ -277,280 +279,280 @@ TEST( read_write_file )
     util::remove_if_exists( p );
 
     util::write_file( p, v3 );
-    TRUE_( fs::exists( p ) );
-    EQUALS( fs::file_size( p ), v3.size() );
+    REQUIRE( fs::exists( p ) );
+    REQUIRE( fs::file_size( p ) == v3.size() );
 
     auto v4 = util::read_file( p );
-    EQUALS( v3, v4 );
+    REQUIRE( v3 == v4 );
 
     auto copy = fs::temp_directory_path()/"3-lines.txt";
     util::copy_file( data_common/"3-lines.txt", copy );
-    EQUALS( fs::file_size( copy ), 21 );
+    REQUIRE( fs::file_size( copy ) == 21 );
 }
 
-TEST( rename )
+TEST_CASE( "rename" )
 {
     auto f1 = fs::temp_directory_path()/"abcdefg";
     auto f2 = fs::temp_directory_path()/"gabcdef";
 
     util::remove_if_exists( f1 );
     util::remove_if_exists( f2 );
-    EQUALS( fs::exists( f1 ), false );
-    EQUALS( fs::exists( f2 ), false );
+    REQUIRE( fs::exists( f1 ) == false );
+    REQUIRE( fs::exists( f2 ) == false );
 
     bool res;
 
     // Should a) not throw, b) return false
     res = util::rename_if_exists( f1, f2 );
-    EQUALS( res, false );
+    REQUIRE( res == false );
 
     util::touch( f1 );
 
     res = util::rename_if_exists( f1, f2 );
-    EQUALS( res, true );
+    REQUIRE( res == true );
 
-    EQUALS( fs::exists( f1 ), false );
-    EQUALS( fs::exists( f2 ), true  );
+    REQUIRE( fs::exists( f1 ) == false );
+    REQUIRE( fs::exists( f2 ) == true  );
 
     res = util::rename_if_exists( f1, f2 );
-    EQUALS( res, false );
+    REQUIRE( res == false );
 
-    EQUALS( fs::exists( f1 ), false );
-    EQUALS( fs::exists( f2 ), true  );
+    REQUIRE( fs::exists( f1 ) == false );
+    REQUIRE( fs::exists( f2 ) == true  );
 
     util::touch( f1 );
 
     res = util::rename_if_exists( f1, f2 );
-    EQUALS( res, true );
+    REQUIRE( res == true );
 
-    EQUALS( fs::exists( f1 ), false );
-    EQUALS( fs::exists( f2 ), true  );
+    REQUIRE( fs::exists( f1 ) == false );
+    REQUIRE( fs::exists( f2 ) == true  );
 }
 
-TEST( filesystem )
+TEST_CASE( "filesystem" )
 {
     bool b;
 
     util::CaseSensitive sens = util::CaseSensitive::YES;
 
-    b = util::path_equals( "", "",                sens ); EQUALS( b, true  );
-    b = util::path_equals( "A", "",               sens ); EQUALS( b, false );
-    b = util::path_equals( "", "A",               sens ); EQUALS( b, false );
-    b = util::path_equals( "A/B", "A",            sens ); EQUALS( b, false );
-    b = util::path_equals( "A", "A/B",            sens ); EQUALS( b, false );
-    b = util::path_equals( "A/B", "A/B",          sens ); EQUALS( b, true  );
-    b = util::path_equals( "A//B///C//", "A/B/C", sens ); EQUALS( b, true  );
-    b = util::path_equals( "a/b/c", "A/B/C",      sens ); EQUALS( b, false );
-    b = util::path_equals( "A", "a",              sens ); EQUALS( b, false );
+    b = util::path_equals( "", "",                sens ); REQUIRE( b == true  );
+    b = util::path_equals( "A", "",               sens ); REQUIRE( b == false );
+    b = util::path_equals( "", "A",               sens ); REQUIRE( b == false );
+    b = util::path_equals( "A/B", "A",            sens ); REQUIRE( b == false );
+    b = util::path_equals( "A", "A/B",            sens ); REQUIRE( b == false );
+    b = util::path_equals( "A/B", "A/B",          sens ); REQUIRE( b == true  );
+    b = util::path_equals( "A//B///C//", "A/B/C", sens ); REQUIRE( b == true  );
+    b = util::path_equals( "a/b/c", "A/B/C",      sens ); REQUIRE( b == false );
+    b = util::path_equals( "A", "a",              sens ); REQUIRE( b == false );
 
-    b = util::path_equals(    "A/B/C",  A( "/A/B/C" ), sens ); EQUALS( b, false );
-    b = util::path_equals( A( "/abc" ), A( "/abc"   ), sens ); EQUALS( b, true  );
-    b = util::path_equals( A( "/ABC" ), A( "/abc"   ), sens ); EQUALS( b, false );
+    b = util::path_equals(    "A/B/C",  A( "/A/B/C" ), sens ); REQUIRE( b == false );
+    b = util::path_equals( A( "/abc" ), A( "/abc"   ), sens ); REQUIRE( b == true  );
+    b = util::path_equals( A( "/ABC" ), A( "/abc"   ), sens ); REQUIRE( b == false );
 
     sens = util::CaseSensitive::NO;
 
-    b = util::path_equals( "", "",                sens ); EQUALS( b, true  );
-    b = util::path_equals( "A", "",               sens ); EQUALS( b, false );
-    b = util::path_equals( "", "A",               sens ); EQUALS( b, false );
-    b = util::path_equals( "A/B", "A",            sens ); EQUALS( b, false );
-    b = util::path_equals( "A", "A/B",            sens ); EQUALS( b, false );
-    b = util::path_equals( "A/B", "A/B",          sens ); EQUALS( b, true  );
-    b = util::path_equals( "A//B///C//", "A/B/C", sens ); EQUALS( b, true  );
-    b = util::path_equals( "a/b/c", "A/B/C",      sens ); EQUALS( b, true  );
-    b = util::path_equals( "A", "a",              sens ); EQUALS( b, true  );
+    b = util::path_equals( "", "",                sens ); REQUIRE( b == true  );
+    b = util::path_equals( "A", "",               sens ); REQUIRE( b == false );
+    b = util::path_equals( "", "A",               sens ); REQUIRE( b == false );
+    b = util::path_equals( "A/B", "A",            sens ); REQUIRE( b == false );
+    b = util::path_equals( "A", "A/B",            sens ); REQUIRE( b == false );
+    b = util::path_equals( "A/B", "A/B",          sens ); REQUIRE( b == true  );
+    b = util::path_equals( "A//B///C//", "A/B/C", sens ); REQUIRE( b == true  );
+    b = util::path_equals( "a/b/c", "A/B/C",      sens ); REQUIRE( b == true  );
+    b = util::path_equals( "A", "a",              sens ); REQUIRE( b == true  );
 
-    b = util::path_equals(    "A/B/C",  A( "/A/B/C" ), sens ); EQUALS( b, false );
-    b = util::path_equals( A( "/abc" ), A( "/abc"   ), sens ); EQUALS( b, true  );
-    b = util::path_equals( A( "/ABC" ), A( "/abc"   ), sens ); EQUALS( b, true  );
+    b = util::path_equals(    "A/B/C",  A( "/A/B/C" ), sens ); REQUIRE( b == false );
+    b = util::path_equals( A( "/abc" ), A( "/abc"   ), sens ); REQUIRE( b == true  );
+    b = util::path_equals( A( "/ABC" ), A( "/abc"   ), sens ); REQUIRE( b == true  );
 }
 
-TEST( lexically_normal )
+TEST_CASE( "lexically_normal" )
 {
     auto f = util::lexically_normal;
 
     // Absolute paths
-    EQUALS( f( A( "/"                  )  ), A( "/"          )  );
-    EQUALS( f( A( "/a"                 )  ), A( "/a"         )  );
-    EQUALS( f( A( "/.."                )  ), A( "/"          )  );
-    EQUALS( f( A( "/../"               )  ), A( "/"          )  );
-    EQUALS( f( A( "/../../../"         )  ), A( "/"          )  );
-    EQUALS( f( A( "/..//../c/."        )  ), A( "/c"         )  );
-    EQUALS( f( A( "/.//../../."        )  ), A( "/"          )  );
-    EQUALS( f( A( "/a/b/c/../../c"     )  ), A( "/a/c"       )  );
-    EQUALS( f( A( "/a/b/c/../../../"   )  ), A( "/"          )  );
-    EQUALS( f( A( "/a/b/../../../../"  )  ), A( "/"          )  );
-    EQUALS( f( A( "/aa/bb/cc/./../x/y" )  ), A( "/aa/bb/x/y" )  );
+    REQUIRE( f( A( "/"                  )  ) == A( "/"          )  );
+    REQUIRE( f( A( "/a"                 )  ) == A( "/a"         )  );
+    REQUIRE( f( A( "/.."                )  ) == A( "/"          )  );
+    REQUIRE( f( A( "/../"               )  ) == A( "/"          )  );
+    REQUIRE( f( A( "/../../../"         )  ) == A( "/"          )  );
+    REQUIRE( f( A( "/..//../c/."        )  ) == A( "/c"         )  );
+    REQUIRE( f( A( "/.//../../."        )  ) == A( "/"          )  );
+    REQUIRE( f( A( "/a/b/c/../../c"     )  ) == A( "/a/c"       )  );
+    REQUIRE( f( A( "/a/b/c/../../../"   )  ) == A( "/"          )  );
+    REQUIRE( f( A( "/a/b/../../../../"  )  ) == A( "/"          )  );
+    REQUIRE( f( A( "/aa/bb/cc/./../x/y" )  ) == A( "/aa/bb/x/y" )  );
 
 #ifdef _WIN32
-    THROWS( f( "C:abc" ) );
-    THROWS( f( "/abc"  ) );
+    REQUIRE_THROWS( f( "C:abc" ) );
+    REQUIRE_THROWS( f( "/abc"  ) );
 #endif
 
     // Relative paths
-    EQUALS( f( ""                  ), "."         );
-    EQUALS( f( "a"                 ), "a"         );
-    EQUALS( f( ".."                ), ".."        );
-    EQUALS( f( "../"               ), ".."        );
-    EQUALS( f( "../../../"         ), "../../.."  );
-    EQUALS( f( "..//../c/."        ), "../../c"   );
-    EQUALS( f( ".//../../."        ), "../.."     );
-    EQUALS( f( "a/b/c/../../c"     ), "a/c"       );
-    EQUALS( f( "a/b/c/../../../"   ), "."         );
-    EQUALS( f( "a/b/../../../../"  ), "../.."     );
-    EQUALS( f( "aa/bb/cc/./../x/y" ), "aa/bb/x/y" );
+    REQUIRE( f( ""                  ) == "."         );
+    REQUIRE( f( "a"                 ) == "a"         );
+    REQUIRE( f( ".."                ) == ".."        );
+    REQUIRE( f( "../"               ) == ".."        );
+    REQUIRE( f( "../../../"         ) == "../../.."  );
+    REQUIRE( f( "..//../c/."        ) == "../../c"   );
+    REQUIRE( f( ".//../../."        ) == "../.."     );
+    REQUIRE( f( "a/b/c/../../c"     ) == "a/c"       );
+    REQUIRE( f( "a/b/c/../../../"   ) == "."         );
+    REQUIRE( f( "a/b/../../../../"  ) == "../.."     );
+    REQUIRE( f( "aa/bb/cc/./../x/y" ) == "aa/bb/x/y" );
 }
 
-TEST( lexically_absolute )
+TEST_CASE( "lexically_absolute" )
 {
     auto f = util::lexically_absolute;
 
     // Absolute paths. This behavior should  be identical to just
     // passing to lexically_normal, so  we  just copy those tests
     // from above, even though it might be overkill.
-    EQUALS( f( A( "/"                  )  ), A( "/"          )  );
-    EQUALS( f( A( "/a"                 )  ), A( "/a"         )  );
-    EQUALS( f( A( "/.."                )  ), A( "/"          )  );
-    EQUALS( f( A( "/../"               )  ), A( "/"          )  );
-    EQUALS( f( A( "/../../../"         )  ), A( "/"          )  );
-    EQUALS( f( A( "/..//../c/."        )  ), A( "/c"         )  );
-    EQUALS( f( A( "/.//../../."        )  ), A( "/"          )  );
-    EQUALS( f( A( "/a/b/c/../../c"     )  ), A( "/a/c"       )  );
-    EQUALS( f( A( "/a/b/c/../../../"   )  ), A( "/"          )  );
-    EQUALS( f( A( "/a/b/../../../../"  )  ), A( "/"          )  );
-    EQUALS( f( A( "/aa/bb/cc/./../x/y" )  ), A( "/aa/bb/x/y" )  );
+    REQUIRE( f( A( "/"                  )  ) == A( "/"          )  );
+    REQUIRE( f( A( "/a"                 )  ) == A( "/a"         )  );
+    REQUIRE( f( A( "/.."                )  ) == A( "/"          )  );
+    REQUIRE( f( A( "/../"               )  ) == A( "/"          )  );
+    REQUIRE( f( A( "/../../../"         )  ) == A( "/"          )  );
+    REQUIRE( f( A( "/..//../c/."        )  ) == A( "/c"         )  );
+    REQUIRE( f( A( "/.//../../."        )  ) == A( "/"          )  );
+    REQUIRE( f( A( "/a/b/c/../../c"     )  ) == A( "/a/c"       )  );
+    REQUIRE( f( A( "/a/b/c/../../../"   )  ) == A( "/"          )  );
+    REQUIRE( f( A( "/a/b/../../../../"  )  ) == A( "/"          )  );
+    REQUIRE( f( A( "/aa/bb/cc/./../x/y" )  ) == A( "/aa/bb/x/y" )  );
 
     // Relative paths
     auto cp = fs::current_path();
 
-    EQUALS( f( ""    ), cp         );
-    EQUALS( f( "a"   ), cp/"a"     );
-    EQUALS( f( "."   ), cp         );
-    EQUALS( f( "a/b" ), cp/"a"/"b" );
+    REQUIRE( f( ""    ) == cp         );
+    REQUIRE( f( "a"   ) == cp/"a"     );
+    REQUIRE( f( "."   ) == cp         );
+    REQUIRE( f( "a/b" ) == cp/"a"/"b" );
 
     // Test the slash() function
-    EQUALS( util::slash( A( "/"     ),  ( "."     ) ), A( "/."         ) );
-    EQUALS( util::slash(  ( "."     ), A( "/"     ) ), A( "/"          ) );
-    EQUALS( util::slash(  ( "a/b/c" ), A( "/d/e"  ) ), A( "/d/e"       ) );
-    EQUALS( util::slash( A( "/d/e"  ),  ( "a/b/c" ) ), A( "/d/e/a/b/c" ) );
-    EQUALS( util::slash(  ( "a/b/c" ),  ( "d/e"   ) ),  ( "a/b/c/d/e"  ) );
+    REQUIRE( util::slash( A( "/"     ),  ( "."     ) ) == A( "/."         ) );
+    REQUIRE( util::slash(  ( "."     ), A( "/"     ) ) == A( "/"          ) );
+    REQUIRE( util::slash(  ( "a/b/c" ), A( "/d/e"  ) ) == A( "/d/e"       ) );
+    REQUIRE( util::slash( A( "/d/e"  ),  ( "a/b/c" ) ) == A( "/d/e/a/b/c" ) );
+    REQUIRE( util::slash(  ( "a/b/c" ),  ( "d/e"   ) ) ==  ( "a/b/c/d/e"  ) );
 }
 
-TEST( lexically_relative )
+TEST_CASE( "lexically_relative" )
 {
     auto f = util::lexically_relative;
 
     // Relative paths.
-    EQUALS( f( "", "" ), "." );
+    REQUIRE( f( "", "" ) == "." );
 
-    EQUALS( f( ".", ""  ), "." );
-    EQUALS( f( "",  "." ), "." );
-    EQUALS( f( ".", "." ), "." );
+    REQUIRE( f( ".", ""  ) == "." );
+    REQUIRE( f( "",  "." ) == "." );
+    REQUIRE( f( ".", "." ) == "." );
 
-    EQUALS( f( "..", ""   ), ".." );
-    EQUALS( f( ".",  ".." ), ""   );
-    EQUALS( f( "..", "."  ), ".." );
-    EQUALS( f( "..", ".." ), "."  );
+    REQUIRE( f( "..", ""   ) == ".." );
+    REQUIRE( f( ".",  ".." ) == ""   );
+    REQUIRE( f( "..", "."  ) == ".." );
+    REQUIRE( f( "..", ".." ) == "."  );
 
-    EQUALS( f( "a", ""  ), "a"  );
-    EQUALS( f( "",  "a" ), ".." );
-    EQUALS( f( "a", "a" ), "."  );
+    REQUIRE( f( "a", ""  ) == "a"  );
+    REQUIRE( f( "",  "a" ) == ".." );
+    REQUIRE( f( "a", "a" ) == "."  );
 
-    EQUALS( f( "a", "b"   ), "../a"    );
-    EQUALS( f( "a", "b/b" ), "../../a" );
-    EQUALS( f( "a", "b/a" ), "../../a" );
-    EQUALS( f( "a", "a/b" ), ".."      );
+    REQUIRE( f( "a", "b"   ) == "../a"    );
+    REQUIRE( f( "a", "b/b" ) == "../../a" );
+    REQUIRE( f( "a", "b/a" ) == "../../a" );
+    REQUIRE( f( "a", "a/b" ) == ".."      );
 
-    EQUALS( f( "..",       "a" ), "../.."       );
-    EQUALS( f( "../..",    "a" ), "../../.."    );
-    EQUALS( f( "../../..", "a" ), "../../../.." );
+    REQUIRE( f( "..",       "a" ) == "../.."       );
+    REQUIRE( f( "../..",    "a" ) == "../../.."    );
+    REQUIRE( f( "../../..", "a" ) == "../../../.." );
 
-    EQUALS( f( "..",       "a/b/c" ), "../../../.."       );
-    EQUALS( f( "../..",    "a/b/c" ), "../../../../.."    );
-    EQUALS( f( "../../..", "a/b/c" ), "../../../../../.." );
+    REQUIRE( f( "..",       "a/b/c" ) == "../../../.."       );
+    REQUIRE( f( "../..",    "a/b/c" ) == "../../../../.."    );
+    REQUIRE( f( "../../..", "a/b/c" ) == "../../../../../.." );
 
-    EQUALS( f( ".", "../../.." ), "" );
+    REQUIRE( f( ".", "../../.." ) == "" );
 
-    EQUALS( f( ".",  "../a" ), ""   );
-    EQUALS( f( ".",  "a/.." ), "."  );
-    EQUALS( f( "..", "../a" ), ".." );
-    EQUALS( f( "..", "a/.." ), ".." );
+    REQUIRE( f( ".",  "../a" ) == ""   );
+    REQUIRE( f( ".",  "a/.." ) == "."  );
+    REQUIRE( f( "..", "../a" ) == ".." );
+    REQUIRE( f( "..", "a/.." ) == ".." );
 
-    EQUALS( f( "..",       "a/b/c/.."          ), "../../.." );
-    EQUALS( f( "../..",    "a/b/c/../.."       ), "../../.." );
-    EQUALS( f( "../../..", "../../../a/b/c"    ), "../../.." );
-    EQUALS( f( "../../..", "../../../../a/b/c" ), ""         );
+    REQUIRE( f( "..",       "a/b/c/.."          ) == "../../.." );
+    REQUIRE( f( "../..",    "a/b/c/../.."       ) == "../../.." );
+    REQUIRE( f( "../../..", "../../../a/b/c"    ) == "../../.." );
+    REQUIRE( f( "../../..", "../../../../a/b/c" ) == ""         );
 
-    EQUALS( f( "..",       "a/b/../c"       ), "../../.." );
-    EQUALS( f( "../..",    "a/b/../../c"    ), "../../.." );
-    EQUALS( f( "../../..", "a/b/c/../../.." ), "../../.." );
-    EQUALS( f( "../../..", "a/../b/../c/.." ), "../../.." );
+    REQUIRE( f( "..",       "a/b/../c"       ) == "../../.." );
+    REQUIRE( f( "../..",    "a/b/../../c"    ) == "../../.." );
+    REQUIRE( f( "../../..", "a/b/c/../../.." ) == "../../.." );
+    REQUIRE( f( "../../..", "a/../b/../c/.." ) == "../../.." );
 
-    EQUALS( f( "a/b/c/d/e", "a/b/c/d/e" ), "."     );
-    EQUALS( f( "a/b/c/d/e", "a/b/c"     ), "d/e"   );
-    EQUALS( f( "a/b/c",     "a/b/c/d/e" ), "../.." );
+    REQUIRE( f( "a/b/c/d/e", "a/b/c/d/e" ) == "."     );
+    REQUIRE( f( "a/b/c/d/e", "a/b/c"     ) == "d/e"   );
+    REQUIRE( f( "a/b/c",     "a/b/c/d/e" ) == "../.." );
 
-    EQUALS( f( "a/b/x/y/z", "a/b/c/d/e" ), "../../../x/y/z"           );
-    EQUALS( f( "u/v/x/y/z", "a/b/c/d/e" ), "../../../../../u/v/x/y/z" );
+    REQUIRE( f( "a/b/x/y/z", "a/b/c/d/e" ) == "../../../x/y/z"           );
+    REQUIRE( f( "u/v/x/y/z", "a/b/c/d/e" ) == "../../../../../u/v/x/y/z" );
 
 #ifdef _WIN32
     // Invalid absolute paths
-    THROWS( f( "/",  "a"  ) );
-    THROWS( f( "a",  "/"  ) );
-    THROWS( f( "C:", "a"  ) );
-    THROWS( f( "a",  "C:" ) );
+    REQUIRE( f( "/" ==  "a"  ) );
+    REQUIRE( f( "a" ==  "/"  ) );
+    REQUIRE( f( "C:" == "a"  ) );
+    REQUIRE( f( "a" ==  "C:" ) );
 #endif
 
     // Absolute paths.
-    EQUALS( f( A( "/" ), A( "/" ) ), "." );
+    REQUIRE( f( A( "/" ), A( "/" ) ) == "." );
 
-    EQUALS( f( A( "/" ), "." ), "" );
-    EQUALS( f( ".", A( "/" ) ), "" );
+    REQUIRE( f( A( "/" ), "." ) == "" );
+    REQUIRE( f( ".", A( "/" ) ) == "" );
 
-    EQUALS( f( A( "/.." ), A( "/"   ) ), "." );
-    EQUALS( f( A( "/"   ), A( "/.." ) ), "." );
-    EQUALS( f( A( "/.." ), A( "/.." ) ), "." );
+    REQUIRE( f( A( "/.." ), A( "/"   ) ) == "." );
+    REQUIRE( f( A( "/"   ), A( "/.." ) ) == "." );
+    REQUIRE( f( A( "/.." ), A( "/.." ) ) == "." );
 
-    EQUALS( f( A( "/a" ), A( "/"  ) ), "a"  );
-    EQUALS( f( A( "/"  ), A( "/a" ) ), ".." );
-    EQUALS( f( A( "/a" ), A( "/a" ) ), "."  );
+    REQUIRE( f( A( "/a" ), A( "/"  ) ) == "a"  );
+    REQUIRE( f( A( "/"  ), A( "/a" ) ) == ".." );
+    REQUIRE( f( A( "/a" ), A( "/a" ) ) == "."  );
 
-    EQUALS( f( A( "/a" ), A( "/b"   ) ), "../a"    );
-    EQUALS( f( A( "/a" ), A( "/b/b" ) ), "../../a" );
-    EQUALS( f( A( "/a" ), A( "/b/a" ) ), "../../a" );
-    EQUALS( f( A( "/a" ), A( "/a/b" ) ), ".."      );
+    REQUIRE( f( A( "/a" ), A( "/b"   ) ) == "../a"    );
+    REQUIRE( f( A( "/a" ), A( "/b/b" ) ) == "../../a" );
+    REQUIRE( f( A( "/a" ), A( "/b/a" ) ) == "../../a" );
+    REQUIRE( f( A( "/a" ), A( "/a/b" ) ) == ".."      );
 
-    EQUALS( f( A( "/.."       ), A( "/a" ) ), ".." );
-    EQUALS( f( A( "/../.."    ), A( "/a" ) ), ".." );
-    EQUALS( f( A( "/../../.." ), A( "/a" ) ), ".." );
+    REQUIRE( f( A( "/.."       ), A( "/a" ) ) == ".." );
+    REQUIRE( f( A( "/../.."    ), A( "/a" ) ) == ".." );
+    REQUIRE( f( A( "/../../.." ), A( "/a" ) ) == ".." );
 
-    EQUALS( f( A( "/.."       ), A( "/a/b/c" ) ), "../../.." );
-    EQUALS( f( A( "/../.."    ), A( "/a/b/c" ) ), "../../.." );
-    EQUALS( f( A( "/../../.." ), A( "/a/b/c" ) ), "../../.." );
+    REQUIRE( f( A( "/.."       ), A( "/a/b/c" ) ) == "../../.." );
+    REQUIRE( f( A( "/../.."    ), A( "/a/b/c" ) ) == "../../.." );
+    REQUIRE( f( A( "/../../.." ), A( "/a/b/c" ) ) == "../../.." );
 
-    EQUALS( f( A( "/" ), A( "/../a" ) ), ".." );
+    REQUIRE( f( A( "/" ), A( "/../a" ) ) == ".." );
 
-    EQUALS( f( A( "/"   ), A( "/a/.." ) ), "."  );
-    EQUALS( f( A( "/.." ), A( "/../a" ) ), ".." );
-    EQUALS( f( A( "/.." ), A( "/a/.." ) ), "."  );
+    REQUIRE( f( A( "/"   ), A( "/a/.." ) ) == "."  );
+    REQUIRE( f( A( "/.." ), A( "/../a" ) ) == ".." );
+    REQUIRE( f( A( "/.." ), A( "/a/.." ) ) == "."  );
 
-    EQUALS( f( A( "/.."       ), A( "/a/b/c/.."       )  ), "../.." );
-    EQUALS( f( A( "/../.."    ), A( "/a/b/c/../.."    )  ), ".." );
-    EQUALS( f( A( "/../../.." ), A( "/../../../a/b/c" )  ), "../../.." );
+    REQUIRE( f( A( "/.."       ), A( "/a/b/c/.."       )  ) == "../.." );
+    REQUIRE( f( A( "/../.."    ), A( "/a/b/c/../.."    )  ) == ".." );
+    REQUIRE( f( A( "/../../.." ), A( "/../../../a/b/c" )  ) == "../../.." );
 
-    EQUALS( f( A( "/.."       ), A( "/a/b/../c"       )   ), "../.." );
-    EQUALS( f( A( "/../.."    ), A( "/a/b/../../c"    )   ), ".."    );
-    EQUALS( f( A( "/../../.." ), A( "/a/b/c/../../.." )   ), "."     );
-    EQUALS( f( A( "/../../.." ), A( "/a/../b/../c/.." )   ), "."     );
+    REQUIRE( f( A( "/.."       ), A( "/a/b/../c"       )   ) == "../.." );
+    REQUIRE( f( A( "/../.."    ), A( "/a/b/../../c"    )   ) == ".."    );
+    REQUIRE( f( A( "/../../.." ), A( "/a/b/c/../../.." )   ) == "."     );
+    REQUIRE( f( A( "/../../.." ), A( "/a/../b/../c/.." )   ) == "."     );
 
-    EQUALS( f( A( "/a/b/c/d/e" ), A( "/a/b/c/d/e" )   ), "."     );
-    EQUALS( f( A( "/a/b/c/d/e" ), A( "/a/b/c"     )   ), "d/e"   );
-    EQUALS( f( A( "/a/b/c"     ), A( "/a/b/c/d/e" )   ), "../.." );
+    REQUIRE( f( A( "/a/b/c/d/e" ), A( "/a/b/c/d/e" )   ) == "."     );
+    REQUIRE( f( A( "/a/b/c/d/e" ), A( "/a/b/c"     )   ) == "d/e"   );
+    REQUIRE( f( A( "/a/b/c"     ), A( "/a/b/c/d/e" )   ) == "../.." );
 
-    EQUALS( f( A( "/a/b/x/y/z" ), A( "/a/b/c/d/e" )   ), "../../../x/y/z"           );
-    EQUALS( f( A( "/u/v/x/y/z" ), A( "/a/b/c/d/e" )   ), "../../../../../u/v/x/y/z" );
+    REQUIRE( f( A( "/a/b/x/y/z" ), A( "/a/b/c/d/e" )   ) == "../../../x/y/z"           );
+    REQUIRE( f( A( "/u/v/x/y/z" ), A( "/a/b/c/d/e" )   ) == "../../../../../u/v/x/y/z" );
 
-    EQUALS( f( A( "/a/b/c/d/e" ), A( "/a/./."      )   ), "b/c/d/e" );
-    EQUALS( f( A( "/a/b/c"     ), A( "/a/./c/./.." )   ), "b/c"     );
+    REQUIRE( f( A( "/a/b/c/d/e" ), A( "/a/./."      )   ) == "b/c/d/e" );
+    REQUIRE( f( A( "/a/b/c"     ), A( "/a/./c/./.." )   ) == "b/c"     );
 }
 
 } // namespace testing

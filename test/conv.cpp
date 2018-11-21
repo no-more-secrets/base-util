@@ -1,7 +1,7 @@
 /****************************************************************
 * Unit tests for encoding conversions
 ****************************************************************/
-#include "common-catch.hpp"
+#include "common.hpp"
 
 #include "base-util/conv.hpp"
 #include "base-util/io.hpp"
