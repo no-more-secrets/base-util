@@ -49,7 +49,7 @@ target_include_directories( base-util
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     PRIVATE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src> )
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}> )
 
 target_compile_features( base-util PUBLIC cxx_std_17 )
 set_target_properties( base-util PROPERTIES CXX_EXTENSIONS OFF )
