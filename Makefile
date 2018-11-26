@@ -1,27 +1,16 @@
-# This Makefile is just for convenience
+.DEFAULT_GOAL := all
+build-current := .builds/current
 
-configure-marker := build/CMakeFiles
-
-all: $(configure-marker)
-	@cd build && $(MAKE) -s all
-
-run: $(configure-marker)
-	@cd build && $(MAKE) -s run
-
-install: $(configure-marker)
-	@cd build && $(MAKE) -s install
-
-clean:
-	@cd build && $(MAKE) -s clean
+all run clean: $(build-current)
+	@cd $(build-current) && $(MAKE) -s $@
 
 test: all
-	@build/test/tests
+	@.builds/current/test/tests
 
 distclean:
-	@rm -rf build
+	@rm -rf .builds
 
-.PHONY: all clean run test distclean
+$(build-current):
+	@scripts/configure
 
-$(configure-marker):
-	@echo "You must run scripts/configure first!"
-	@false
+.PHONY: all run clean test distclean

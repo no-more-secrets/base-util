@@ -36,13 +36,4 @@
 *.swp
 
 # cmake
-/CMakeCache.txt
-/CMakeFiles*
-/cmake_install.cmake
-/CTestTestfile.cmake
-/Testing
-/build
-
-# base-util
-/main
-/tests-all
+/.builds
