@@ -50,6 +50,10 @@ if __name__ == '__main__':
                          dest='tidy',
                          action='store_true',
                          help='Whether to run clang-tidy' )
+    parser.add_argument( '--iwyu',
+                         dest='iwyu',
+                         action='store_true',
+                         help='Whether to run include-what-you-use' )
     parser.add_argument( '-v', '--verbose',
                          dest='verbose',
                          action='store_true',
@@ -95,6 +99,7 @@ if __name__ == '__main__':
     cmake_args = []
     cmake_args.append( '-DCMAKE_BUILD_TYPE=%s' % build_type )
     cmake_args.append( '-DUSE_CLANG_TIDY=%s' % cmake_bool( args.tidy ) )
+    cmake_args.append( '-DUSE_IWYU=%s' % cmake_bool( args.iwyu ) )
     cmake_args.append( '-DCMAKE_TARGET_MESSAGES=OFF' )
     cmake_args.append( '-DCMAKE_INSTALL_PREFIX=%s' % args.prefix )
 

@@ -51,7 +51,7 @@ add_custom_target( run
                    WORKING_DIRECTORY ../
                    USES_TERMINAL )
 
-# === clang-tidy ==================================================
+# === clang-tools =================================================
 
 if( USE_CLANG_TIDY )
     find_program( CLANG_TIDY_EXE NAMES "clang-tidy" )
@@ -61,4 +61,14 @@ if( USE_CLANG_TIDY )
     set( DO_CLANG_TIDY "${CLANG_TIDY_EXE}" "-quiet" )
     set_target_properties( base-util PROPERTIES
         CXX_CLANG_TIDY "${DO_CLANG_TIDY}" )
+endif()
+
+if( USE_IWYU )
+    find_program( IWYU_EXE NAMES "include-what-you-use" )
+    if( NOT IWYU_EXE )
+        message( FATAL_ERROR "include-what-you-use requested, but not found." )
+    endif()
+    get_filename_component( REAL_IWYU_EXE "${IWYU_EXE}" REALPATH )
+    set_target_properties( base-util PROPERTIES
+        CXX_INCLUDE_WHAT_YOU_USE "${REAL_IWYU_EXE}" )
 endif()
