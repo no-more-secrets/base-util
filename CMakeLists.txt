@@ -5,7 +5,7 @@ if( ${CMAKE_VERSION} VERSION_LESS 3.12 )
 endif()
 
 project(
-    base-util
+    base-util-driver
     VERSION 1.0
     DESCRIPTION "C++ Base [Utilities]"
     LANGUAGES CXX

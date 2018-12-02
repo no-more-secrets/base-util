@@ -8,17 +8,20 @@ ifneq (,$(findstring make,$(build-config)))
     # propagating the jobserver.  For this same reason we
     # also do not just put the whole command into a variable
     # and just define the targets once.
-    all run clean: $(build-current)
+    all clean: $(build-current)
 	    @cd $(build-current) && $(MAKE) -s $@
 else
     # Use cmake to build here because it is the preferred
     # way to go when it works for us (which it does in this
     # case).
-    all run clean: $(build-current)
+    all clean: $(build-current)
 	    @cd $(build-current) && cmake --build . --target $@
 endif
 
-test: $(build-current) all
+run: all
+	@$(build-current)/app/main
+
+test: all
 	@$(build-current)/test/tests
 
 distclean:

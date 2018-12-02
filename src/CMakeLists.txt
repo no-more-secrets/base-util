@@ -43,7 +43,9 @@ add_library(
 )
 add_library( base-util::base-util ALIAS base-util )
 
-#target_include_directories( base-util PUBLIC include )
+# This apparently defines CMAKE_INSTALL_INCLUDEDIR
+include( GNUInstallDirs )
+
 target_include_directories( base-util
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
@@ -69,7 +71,7 @@ install( DIRECTORY include/base-util DESTINATION include )
 include( CMakePackageConfigHelpers )
 write_basic_package_version_file(
     base-util-config-version.cmake
-    VERSION ${PACKAGE_VERSION}
+    VERSION ${base-util_VERSION}
     COMPATIBILITY AnyNewerVersion )
 
 install( EXPORT base-util-targets
