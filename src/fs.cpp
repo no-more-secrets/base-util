@@ -149,7 +149,11 @@ fs::path lexically_normal( fs::path const& p ) {
             // keep ..'s at the beginning of paths,  so  we  fall
             // through.
         }
-        res /= c;
+        if( !c.empty() )
+            // This could happen if p ends in a slash (at least
+            // according to cppreference; some standard libraries
+            // have that behavior and others don't).
+            res /= c;
     }
     // Result will never be empty.
     return res.empty() ? "." : res;
@@ -367,7 +371,7 @@ void touch( fs::path const& p ) {
     // The path exists, and may be either a file  or  folder,  so
     // just update the timestamp.
     auto ltp = fs::file_time_type::clock::now();
-    ZonedTimePoint ztp( ltp, tz_utc() );
+    ZonedTimePointFS ztp( ltp, tz_utc() );
     timestamp( p, ztp );
 }
 
@@ -443,12 +447,12 @@ bool rename_if_exists( fs::path const& from,
 // Windows (under MinGW) it returns  a  time  point  representing
 // local  time. So in this library we always try to call this one
 // which should always return the  same  type with the same inter-
-// pretation (ZonedTimePoint).
+// pretation (ZonedTimePointFS).
 //
 // NOTE: the different behavior of  this function under different
 // platforms could be a bug that would eventually be  fixed,  but
 // not sure.
-ZonedTimePoint timestamp( fs::path const& p ) {
+ZonedTimePointFS timestamp( fs::path const& p ) {
 
     auto ltp = fs::last_write_time( p );
 
@@ -473,13 +477,13 @@ ZonedTimePoint timestamp( fs::path const& p ) {
     // Now construct an absolute  time  point by interpreting the
     // result of last_write_time with  the  time zone represented
     // by `zone`.
-    return ZonedTimePoint( ltp, zone );
+    return ZonedTimePointFS( ltp, zone );
 }
 
 // Set  timestamp;  the  various  platforms'  implementations  of
 // last_write_time for *setting* timestamps  seem  to  agree,  so
 // this one just forwards the call to last_write_time.
-void timestamp( fs::path const& p, ZonedTimePoint const& ztp ) {
+void timestamp( fs::path const& p, ZonedTimePointFS const& ztp ) {
 #ifdef _WIN32
     // Somehow on the MinGW  implementation  (or  maybe its a Win-
     // dows thing, not sure) the last_write_time  function  takes

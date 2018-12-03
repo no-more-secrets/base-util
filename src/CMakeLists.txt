@@ -26,6 +26,15 @@ endfunction( set_warning_options )
 set( THREADS_PREFER_PTHREAD_FLAG ON )
 find_package( Threads REQUIRED )
 
+# Library containing the <filesystem> implementation.
+if( USE_LIBCXX )
+    # libc++ version
+    set( cxx-fs-lib c++fs )
+else()
+    # libstdc++ version
+    set( cxx-fs-lib stdc++fs )
+endif()
+
 add_library(
     base-util
     STATIC
@@ -55,7 +64,7 @@ target_include_directories( base-util
 
 target_compile_features( base-util PUBLIC cxx_std_17 )
 set_target_properties( base-util PROPERTIES CXX_EXTENSIONS OFF )
-target_link_libraries( base-util PUBLIC stdc++fs )
+target_link_libraries( base-util PUBLIC ${cxx-fs-lib} )
 target_link_libraries( base-util PUBLIC Threads::Threads )
 set_warning_options( base-util )
 

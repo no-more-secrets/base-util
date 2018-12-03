@@ -103,6 +103,10 @@ struct zt_point {
 
 // Standard/default specialization used in this library.
 using ZonedTimePoint = zt_point<SysTimePoint>;
+// This is when dealing with files; the duration type used may
+// differ depending on the platform.
+using ZonedTimePointFS =
+    zt_point<decltype( fs::file_time_type::clock::now() )>;
 
 /****************************************************************
 * Time formatting

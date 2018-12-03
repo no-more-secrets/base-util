@@ -140,17 +140,17 @@ bool rename_if_exists( fs::path const& from,
 // Windows (under MinGW) it returns  a  time  point  representing
 // local  time. So in this library we always try to call this one
 // which should always return the  same  type with the same inter-
-// pretation (ZonedTimePoint).
+// pretation (ZonedTimePointFS).
 //
 // NOTE: the different behavior of  this function under different
 // platforms could be a bug that would eventually be  fixed,  but
 // not sure.
-ZonedTimePoint timestamp( fs::path const& p );
+ZonedTimePointFS timestamp( fs::path const& p );
 
 // Set  timestamp;  the  various  platforms'  implementations  of
 // last_write_time for *setting* timestamps  seem  to  agree,  so
 // this one just forwards the call to last_write_time.
-void timestamp( fs::path const& p, ZonedTimePoint const& ztp );
+void timestamp( fs::path const& p, ZonedTimePointFS const& ztp );
 
 } // namespace util
 
