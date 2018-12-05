@@ -7,6 +7,11 @@ using namespace std;
 
 namespace util {
 
+// Stream here to send to nowhere.  This is kind of like /dev/null
+// except that it does not actually use the OS's /dev/null, it's
+// just an application-level black hole.
+cnull_t cnull;
+
 // Given a range size and chunk  size  this  will  partition  the
 // range into equal sized chunks of size chunk_size with the last
 // chunk possibly being smaller than  chunk_size. The result will
