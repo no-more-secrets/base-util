@@ -1,6 +1,8 @@
 .DEFAULT_GOAL := all
 build-current := .builds/current
 
+-include $(build-current)/env-vars.mk
+
 build-config := $(notdir $(realpath $(build-current)))
 ifneq (,$(findstring make,$(build-config)))
     # Here we are invoking $(MAKE) directly instead of using
