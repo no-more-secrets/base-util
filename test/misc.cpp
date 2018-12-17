@@ -57,6 +57,18 @@ TEST_CASE( "opt_util" )
     REQUIRE( res == (vector<int>{ 5, 7, 9, 0, 1 }) );
 }
 
+TEST_CASE( "sorting" )
+{
+    vector<int> v{ 4, 7, 3, 6, 4, 7, 5, 2, 4, 5, 2 };
+    auto v2 = v;
+
+    util::sort( v );
+    REQUIRE( v == vector{ 2, 2, 3, 4, 4, 4, 5, 5, 6, 7, 7 } );
+
+    util::uniq_sort( v2 );
+    REQUIRE( v2 == vector{ 2, 3, 4, 5, 6, 7 } );
+}
+
 TEST_CASE( "directed_graph" )
 {
     using DG = util::DirectedGraph<fs::path>;

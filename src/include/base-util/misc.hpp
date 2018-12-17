@@ -154,6 +154,12 @@ void remove_if( Container& c, Func f ) {
     c.erase( new_end, end( c ) );
 }
 
+// Will do an in-place sort.
+template<typename T>
+void sort( std::vector<T>& v ) {
+    std::sort( begin( v ), end( v ) );
+}
+
 // Will do an in-place sort and unique.
 template<typename T>
 void uniq_sort( std::vector<T>& v ) {

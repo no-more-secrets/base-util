@@ -1,8 +1,10 @@
 .DEFAULT_GOAL := all
 build-current := .builds/current
 
+-include $(build-current)/env-vars.mk
+
 build-config := $(notdir $(realpath $(build-current)))
-ifneq (,$(findstring make,$(build-config)))
+ifneq (,$(wildcard $(build-current)/Makefile))
     # Here we are invoking $(MAKE) directly instead of using
     # cmake because otherwise there seem to be issues with
     # propagating the jobserver.  For this same reason we
