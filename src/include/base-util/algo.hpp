@@ -111,6 +111,25 @@ void uniq_sort( std::vector<T>& v ) {
     v.erase( i, end( v ) );
 }
 
+// Will sort the vector as if the elements of the vector were
+// replaced with the results of calling key_func on each.
+template<typename T, typename Func>
+void sort_by_key( std::vector<T>& v, Func key_func ) {
+  auto cmp = [&key_func]( T const& l, T const& r ) {
+    return key_func( l ) < key_func( r );
+  };
+  std::sort( v.begin(), v.end(), cmp );
+}
+
+// Same as above, but stable.
+template<typename T, typename Func>
+void stable_sort_by_key( std::vector<T>& v, Func key_func ) {
+  auto cmp = [&key_func]( T const& l, T const& r ) {
+    return key_func( l ) < key_func( r );
+  };
+  std::stable_sort( v.begin(), v.end(), cmp );
+}
+
 // When Ranges come there may be functions that do this better
 // (such as various `group` or `group_by` functions).
 //

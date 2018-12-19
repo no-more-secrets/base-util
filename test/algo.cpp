@@ -115,13 +115,29 @@ TEST_CASE( "remove_if" )
 TEST_CASE( "sorting" )
 {
     vector<int> v{ 4, 7, 3, 6, 4, 7, 5, 2, 4, 5, 2 };
-    auto v2 = v;
-
     util::sort( v );
     REQUIRE( v == vector{ 2, 2, 3, 4, 4, 4, 5, 5, 6, 7, 7 } );
 
+    vector<int> v2{ 4, 7, 3, 6, 4, 7, 5, 2, 4, 5, 2 };
     util::uniq_sort( v2 );
     REQUIRE( v2 == vector{ 2, 3, 4, 5, 6, 7 } );
+
+    vector<int> v3{ 4, 7, 3, 6, 4, 7, 5, 2, 4, 5, 2 };
+    auto large = L( int( _ > 3 ) );
+    util::stable_sort_by_key( v3, large );
+    REQUIRE( v3 == vector{ 3, 2, 2, 4, 7, 6, 4, 7, 5, 4, 5 } );
+
+    vector<int> v4{ 4, 7, 3, 6, 4, 7, 5, 2, 4, 5, 2 };
+    auto odd = L( int( _ % 2 ) );
+    util::sort( v4 );
+    util::stable_sort_by_key( v4, odd );
+    REQUIRE( v4 == vector{ 2, 2, 4, 4, 4, 6, 3, 5, 5, 7, 7 } );
+
+    vector<int> v5{ 4, 7, 3, 6, 4, 7, 5, 2, 4, 5, 2 };
+    auto larger = L2( _2 < _1 );
+    std::sort( v5.begin(), v5.end(), larger );
+    util::stable_sort_by_key( v5, odd );
+    REQUIRE( v5 == vector{ 6, 4, 4, 4, 2, 2, 7, 7, 5, 5, 3 } );
 }
 
 TEST_CASE( "map" )
