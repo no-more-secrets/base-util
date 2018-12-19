@@ -21,37 +21,87 @@ TEST_CASE( "group_by_key" )
 
     auto v2 = vector{ 2 };
     auto r2 = group_by_key( v2, mult_of_3 );
-    REQUIRE( r2 == vector<size_t>{0} );
+    REQUIRE( r2 == vector<size_t>{} );
 
     auto v3 = vector{ 3 };
     auto r3 = group_by_key( v3, mult_of_3 );
-    REQUIRE( r3 == vector<size_t>{0} );
+    REQUIRE( r3 == vector<size_t>{} );
 
     auto v4 = vector{ 9, 9 };
     auto r4 = group_by_key( v4, mult_of_3 );
-    REQUIRE( r4 == vector<size_t>{0} );
+    REQUIRE( r4 == vector<size_t>{} );
 
     auto v5 = vector{ 4, 4 };
     auto r5 = group_by_key( v5, mult_of_3 );
-    REQUIRE( r5 == vector<size_t>{0} );
+    REQUIRE( r5 == vector<size_t>{} );
 
     auto v6 = vector{ 4, 6 };
     auto r6 = group_by_key( v6, mult_of_3 );
-    REQUIRE( r6 == vector<size_t>{0, 1} );
+    REQUIRE( r6 == vector<size_t>{1} );
 
     auto v7 = vector{ 6, 4 };
     auto r7 = group_by_key( v7, mult_of_3 );
-    REQUIRE( r7 == vector<size_t>{0, 1} );
+    REQUIRE( r7 == vector<size_t>{1} );
 
-    auto v8 = vector{
-        7, 5, 2, 9, 12, 3, 3, 3, 1, 6, 7, 9, 8, 8, 8, 3, 3 };
+    auto v8 = vector{ 4, 6, 9 };
     auto r8 = group_by_key( v8, mult_of_3 );
-    REQUIRE( r8 == vector<size_t>{0, 3, 8, 9, 10, 11, 12, 15 } );
+    REQUIRE( r8 == vector<size_t>{1} );
+
+    auto v9 = vector{ 6, 4, 9 };
+    auto r9 = group_by_key( v9, mult_of_3 );
+    REQUIRE( r9 == vector<size_t>{1, 2} );
+
+    auto v10 = vector{
+        7, 5, 2, 9, 12, 3, 3, 3, 1, 6, 7, 9, 8, 8, 8, 3, 3 };
+    auto r10 = group_by_key( v10, mult_of_3 );
+    REQUIRE( r10 == vector<size_t>{3, 8, 9, 10, 11, 12, 15 } );
 
     auto is_short = []( auto s ){ return s.size() < 4; };
-    auto v9 = vector<string>{ "hello", "world", "yes", "no" };
-    auto r9 = group_by_key( v9, is_short );
-    REQUIRE( r9 == vector<size_t>{0, 2} );
+    auto v11 = vector<string>{ "hello", "world", "yes", "no" };
+    auto r11 = group_by_key( v11, is_short );
+    REQUIRE( r11 == vector<size_t>{2} );
+}
+
+TEST_CASE( "split_on_idxs" )
+{
+    using util::split_on_idxs;
+    using Chunks = vector<vector<int>>;
+
+    auto v1 = vector<int>{};
+    auto r1 = split_on_idxs( v1, {} );
+    REQUIRE( r1 == Chunks{} );
+
+    auto v2 = vector{3};
+    auto r2 = split_on_idxs( v2, {0} );
+    REQUIRE( r2 == Chunks{{},{3}} );
+
+    auto v3 = vector{3,4};
+    auto r3 = split_on_idxs( v3, {0} );
+    REQUIRE( r3 == Chunks{{},{3,4}} );
+
+    auto v4 = vector{3,4};
+    auto r4 = split_on_idxs( v4, {1} );
+    REQUIRE( r4 == Chunks{{3},{4}} );
+
+    auto v5 = vector{3,4,5};
+    auto r5 = split_on_idxs( v5, {1} );
+    REQUIRE( r5 == Chunks{{3},{4,5}} );
+
+    auto v6 = vector{3,4,5};
+    auto r6 = split_on_idxs( v6, {0} );
+    REQUIRE( r6 == Chunks{{},{3,4,5}} );
+
+    auto v7 = vector{3,4,5};
+    auto r7 = split_on_idxs( v7, {2} );
+    REQUIRE( r7 == Chunks{{3,4},{5}} );
+
+    auto v8 = vector{3,4,5,6,7,8,9};
+    auto r8 = split_on_idxs( v8, {2,3,6} );
+    REQUIRE( r8 == Chunks{{3,4},{5},{6,7,8},{9}} );
+
+    auto v9 = vector{1,2,3,4,5,6,7,8,9,10};
+    auto r9 = split_on_idxs( v9, {0,5,8} );
+    REQUIRE( r9 == Chunks{{},{1,2,3,4,5},{6,7,8},{9,10}} );
 }
 
 TEST_CASE( "remove_if" )

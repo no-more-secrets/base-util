@@ -118,7 +118,8 @@ void uniq_sort( std::vector<T>& v ) {
 // each element using the provided function. Then it will return
 // a vector of indexes at the start of each new segment, where
 // segment is defined as a contiguous sequence of elements having
-// the same key.
+// the same key.  It will _not_ include an index for the first
+// element (this is implied).
 //
 // Note that no sorting is performed or required as a
 // precondition of this function, though in many cases the caller
@@ -129,9 +130,6 @@ std::vector<size_t> group_by_key( std::vector<T> const& v,
     std::vector<size_t> res;
     if( v.empty() )
         return res;
-    // At least one element, so we can add at least one group
-    // starting at the first element.
-    res.push_back( 0 );
     auto current_key = key_func( v[0] );
     for( size_t idx = 1; idx < v.size(); ++idx ) {
         auto key = key_func( v[idx] );
@@ -139,6 +137,41 @@ std::vector<size_t> group_by_key( std::vector<T> const& v,
             current_key = key;
             res.push_back( idx );
         }
+    }
+    return res;
+}
+
+// Given a list of indexes this function will split the vector on
+// those indexes. Each index will be the start of a new segment.
+//
+// E.g.:
+//
+//   split_on_idxs( {1,2,3,4,5,6}, {1,4} ) == {{1},{2,3,4},{5,6}}
+//
+//   split_on_idxs( {1,2,3},       {0,2} ) == {{},{1,2},{3}}
+//
+// NOTE: it is expected that the idxs vector will be sorted and
+//       not contain any duplicate elements.
+template<typename T>
+std::vector<std::vector<T>>
+split_on_idxs( std::vector<T>      const& v,
+               std::vector<size_t> const& idxs ) {
+
+    std::vector<std::vector<T>> res;
+    if( v.empty() )
+        return res;
+    size_t current = 0;
+    for( auto idx : idxs ) {
+        res.emplace_back();
+        auto& back = res.back();
+        for( ; current < idx; ++current )
+            back.push_back( v[current] );
+    }
+    if( res.size() == idxs.size() )
+        res.emplace_back();
+    while( current < v.size() ) {
+        res.back().push_back( v[current] );
+        ++current;
     }
     return res;
 }
