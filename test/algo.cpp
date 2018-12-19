@@ -9,6 +9,71 @@
 
 using namespace std;
 
+TEST_CASE( "group_by_key" )
+{
+    using util::group_by_key;
+
+    auto mult_of_3 = []( auto n ) { return n % 3 == 0; };
+
+    auto v1 = vector<int>{};
+    auto r1 = group_by_key( v1, mult_of_3 );
+    REQUIRE( r1 == vector<size_t>{} );
+
+    auto v2 = vector{ 2 };
+    auto r2 = group_by_key( v2, mult_of_3 );
+    REQUIRE( r2 == vector<size_t>{0} );
+
+    auto v3 = vector{ 3 };
+    auto r3 = group_by_key( v3, mult_of_3 );
+    REQUIRE( r3 == vector<size_t>{0} );
+
+    auto v4 = vector{ 9, 9 };
+    auto r4 = group_by_key( v4, mult_of_3 );
+    REQUIRE( r4 == vector<size_t>{0} );
+
+    auto v5 = vector{ 4, 4 };
+    auto r5 = group_by_key( v5, mult_of_3 );
+    REQUIRE( r5 == vector<size_t>{0} );
+
+    auto v6 = vector{ 4, 6 };
+    auto r6 = group_by_key( v6, mult_of_3 );
+    REQUIRE( r6 == vector<size_t>{0, 1} );
+
+    auto v7 = vector{ 6, 4 };
+    auto r7 = group_by_key( v7, mult_of_3 );
+    REQUIRE( r7 == vector<size_t>{0, 1} );
+
+    auto v8 = vector{
+        7, 5, 2, 9, 12, 3, 3, 3, 1, 6, 7, 9, 8, 8, 8, 3, 3 };
+    auto r8 = group_by_key( v8, mult_of_3 );
+    REQUIRE( r8 == vector<size_t>{0, 3, 8, 9, 10, 11, 12, 15 } );
+
+    auto is_short = []( auto s ){ return s.size() < 4; };
+    auto v9 = vector<string>{ "hello", "world", "yes", "no" };
+    auto r9 = group_by_key( v9, is_short );
+    REQUIRE( r9 == vector<size_t>{0, 2} );
+}
+
+TEST_CASE( "remove_if" )
+{
+    auto v = vector{ 7, 6, 5, 4, 3, 2, 1 };
+    auto even = L( _ % 2 == 0 );
+    util::remove_if( v, even );
+    REQUIRE( v == vector{ 7, 5, 3, 1 } );
+}
+
+TEST_CASE( "sorting" )
+{
+    vector<int> v{ 4, 7, 3, 6, 4, 7, 5, 2, 4, 5, 2 };
+    auto v2 = v;
+
+    util::sort( v );
+    REQUIRE( v == vector{ 2, 2, 3, 4, 4, 4, 5, 5, 6, 7, 7 } );
+
+    util::uniq_sort( v2 );
+    REQUIRE( v2 == vector{ 2, 3, 4, 5, 6, 7 } );
+}
+
 TEST_CASE( "map" )
 {
     vector<int> v0{ 9, 1, 8, 2, 7, 3, 6, 4, 5 };

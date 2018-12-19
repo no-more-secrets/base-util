@@ -6,7 +6,6 @@
 #include "base-util/macros.hpp"
 #include "base-util/types.hpp"
 
-#include <algorithm>
 #include <functional>
 #include <iostream>
 #include <optional>
@@ -143,29 +142,6 @@ ValT const& get_val( MapT<KeyT,ValT> const& m,
     auto found = m.find( k );
     ASSERT( found != m.end(), k << " not found in map" );
     return found->second;
-}
-
-// This  will  do  the remove/erase idiom automatically for conve-
-// nience.
-template<typename Container, typename Func>
-void remove_if( Container& c, Func f ) {
-    auto new_end = std::remove_if(
-            std::begin( c ), std::end  ( c ), f );
-    c.erase( new_end, end( c ) );
-}
-
-// Will do an in-place sort.
-template<typename T>
-void sort( std::vector<T>& v ) {
-    std::sort( begin( v ), end( v ) );
-}
-
-// Will do an in-place sort and unique.
-template<typename T>
-void uniq_sort( std::vector<T>& v ) {
-    std::sort( begin( v ), end( v ) );
-    auto i = std::unique( begin( v ), end( v ) );
-    v.erase( i, end( v ) );
 }
 
 }

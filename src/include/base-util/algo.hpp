@@ -3,6 +3,7 @@
 ****************************************************************/
 #pragma once
 
+#include <algorithm>
 #include <iterator>
 #include <vector>
 
@@ -85,6 +86,61 @@ template<typename Func, typename In>
 void map_( Func const& f, std::vector<In> const& in ) {
 
     for( auto const& e : in ) f( e );
+}
+
+// This  will  do  the remove/erase idiom automatically for conve-
+// nience.
+template<typename Container, typename Func>
+void remove_if( Container& c, Func f ) {
+    auto new_end = std::remove_if(
+            std::begin( c ), std::end  ( c ), f );
+    c.erase( new_end, end( c ) );
+}
+
+// Will do an in-place sort.
+template<typename T>
+void sort( std::vector<T>& v ) {
+    std::sort( begin( v ), end( v ) );
+}
+
+// Will do an in-place sort and unique.
+template<typename T>
+void uniq_sort( std::vector<T>& v ) {
+    std::sort( begin( v ), end( v ) );
+    auto i = std::unique( begin( v ), end( v ) );
+    v.erase( i, end( v ) );
+}
+
+// When Ranges come there may be functions that do this better
+// (such as various `group` or `group_by` functions).
+//
+// This function will scan the vector v and compute a `key` for
+// each element using the provided function. Then it will return
+// a vector of indexes at the start of each new segment, where
+// segment is defined as a contiguous sequence of elements having
+// the same key.
+//
+// Note that no sorting is performed or required as a
+// precondition of this function, though in many cases the caller
+// will want to pre-sort the vector for useful results.
+template<typename T, typename Func>
+std::vector<size_t> group_by_key( std::vector<T> const& v,
+                                  Func key_func ) {
+    std::vector<size_t> res;
+    if( v.empty() )
+        return res;
+    // At least one element, so we can add at least one group
+    // starting at the first element.
+    res.push_back( 0 );
+    auto current_key = key_func( v[0] );
+    for( size_t idx = 1; idx < v.size(); ++idx ) {
+        auto key = key_func( v[idx] );
+        if( key != current_key ) {
+            current_key = key;
+            res.push_back( idx );
+        }
+    }
+    return res;
 }
 
 } // namespace util

@@ -3,6 +3,7 @@
 ****************************************************************/
 #pragma once
 
+#include "base-util/algo.hpp"
 #include "base-util/fs.hpp"
 #include "base-util/misc.hpp"
 
