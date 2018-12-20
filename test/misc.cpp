@@ -49,11 +49,22 @@ TEST_CASE( "datetime" )
 
 TEST_CASE( "opt_util" )
 {
-    vector<optional<int>> v{
-        { 5 }, nullopt, { 7 }, { 9 }, nullopt, { 0 }, { 1 } };
+    vector<optional<string>> v{{"5"}, nullopt, {"7"}, {"9"}, nullopt, {"0"}, {"1"}};
 
     auto res = util::cat_opts( v );
-    REQUIRE( res == (vector<int>{ 5, 7, 9, 0, 1 }) );
+    REQUIRE( res == vector<string>{ "5", "7", "9", "0", "1" } );
+
+    // Do it again to make sure v wasn't moved from.
+    auto res2 = util::cat_opts( v );
+    REQUIRE( res2 == vector<string>{ "5", "7", "9", "0", "1" } );
+
+    // Now do the moved from version.
+    auto res3 = util::cat_opts( move( v ) );
+    REQUIRE( res3 == vector<string>{ "5", "7", "9", "0", "1" } );
+
+    // Make sure it was moved from.
+    REQUIRE( v == vector<optional<string>>{
+                    {""}, nullopt, {""}, {""}, nullopt, {""}, {""}});
 }
 
 TEST_CASE( "directed_graph" )
