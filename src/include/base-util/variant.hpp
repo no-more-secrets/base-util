@@ -23,12 +23,12 @@ bool holds( std::variant<Vs...> const& v, T const& val ) {
 // advised to used the below macro instead.
 template<typename T, typename... Vs>
 auto const* holds( std::variant<Vs...> const& v ) {
-  return std::get_if<T>( v );
+  return std::get_if<T>( &v );
 }
 
 template<typename T, typename... Vs>
 auto* holds( std::variant<Vs...>& v ) {
-  return std::get_if<T>( v );
+  return std::get_if<T>( &v );
 }
 
 // This is a helper for testing/extracting values from variants.
