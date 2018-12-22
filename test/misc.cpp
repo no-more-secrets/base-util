@@ -8,6 +8,7 @@
 #include "base-util/logger.hpp"
 #include "base-util/optional.hpp"
 #include "base-util/string.hpp"
+#include "base-util/variant.hpp"
 
 #include <type_traits>
 
@@ -45,6 +46,29 @@ TEST_CASE( "datetime" )
     REQUIRE( hhmm.size() == 5 );
     auto hhmm_utc = util::tz_hhmm( util::tz_utc() );
     REQUIRE( hhmm_utc == "+0000" );
+}
+
+TEST_CASE( "variant" )
+{
+    variant<int, string> v1{5};
+    variant<int, string> v2{"hello"};
+
+    REQUIRE( util::holds( v1, 5 ) );
+    REQUIRE( !util::holds( v1, 6 ) );
+    REQUIRE( !util::holds( v1, string( "world" ) ) );
+
+    bool is_int = false;
+    GET_IF( v2, int, p ) {
+        is_int = true;
+    }
+    bool is_string = false;
+    GET_IF( v2, string, p ) {
+        REQUIRE( *p == "hello" );
+        is_string = true;
+    }
+
+    REQUIRE( !is_int );
+    REQUIRE( is_string );
 }
 
 TEST_CASE( "opt_util" )
