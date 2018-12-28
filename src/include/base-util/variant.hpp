@@ -3,6 +3,7 @@
 ****************************************************************/
 #pragma once
 
+#include <type_traits>
 #include <variant>
 
 namespace util {
@@ -49,5 +50,63 @@ auto* holds( std::variant<Vs...>& v ) {
 // the if statement.
 #define GET_IF( subject, type, var ) \
   if( auto* var = std::get_if<type>( &subject ); var )
+
+// Macro for visiting/dispatching on variants using a switch-like
+// syntax. Must only be used on variants without repeating types.
+// Use like so:
+//
+//   auto v = std::variant<int, std::string, double>{ ... };
+//
+//   switch_v( v ) {
+//     case_v( int ) {
+//       cout << "int value: " << val << "\n";
+//     }
+//     case_v( std::string ) {
+//       cout << "string value: " << val << "\n";
+//     }
+//     case_v( double ) {
+//       cout << "double value: " << val << "\n";
+//     }
+//     default_v( v );
+//   }
+//
+// The curly braces are required as is the default_v.
+//
+// The default case is required and will throw a compile error if
+// the type list is not exhaustive. However, it will not trigger
+// an error when a type is extraneous.
+//
+// The bodies of the case_v's have access to all variables in the
+// surrounding scope (they capture them by reference).
+//
+// Note that, unlike a standard `switch` statement, the concept
+// of fallthrough does not work here (indeed it wouldn't make
+// sense since the `val` variable, which is available in the body
+// of the case_v, can only have one type).
+//
+// The structure of curly braces is a bit strange in these
+// macros, but that is to allow the user to write curly braces as
+// in the example above.
+#define switch_v( v ) \
+  { auto __f = [&]( auto&& val ) { if constexpr( false )
+
+#define case_v( t )                                            \
+  } else if constexpr(                                         \
+          std::is_same_v<std::decay_t<decltype( val )>, t> ) {
+
+#define default_v( v )                                           \
+  } else static_assert(                                          \
+          ::util::detail::parametrized_false_v<decltype( val )>, \
+          "non-exhaustive variant visitor type list" );          \
+  }; { std::visit( __f, v ); }
+
+namespace detail {
+
+// We must use this in the above macro instead of just "false"
+// because otherwise the static_assert will always trigger.
+template<typename T>
+inline bool constexpr parametrized_false_v = false;
+
+}
 
 } // namespace util

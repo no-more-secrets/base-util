@@ -69,6 +69,40 @@ TEST_CASE( "variant" )
 
     REQUIRE( !is_int );
     REQUIRE( is_string );
+
+    using V = std::variant<int, double, std::string>;
+
+    V v3 = 5.5;
+    bool found3 = false;
+    switch_v( v3 ) {
+      case_v( int ) {
+        found3 = false;
+      }
+      case_v( double ) {
+        found3 = true;
+      }
+      case_v( std::string ) {
+        found3 = false;
+      }
+      default_v( v3 )
+    }
+    REQUIRE( found3 );
+
+    V v4 = "hello";
+    bool found4 = false;
+    switch_v( v4 ) {
+      case_v( int ) {
+        found4= false;
+      }
+      case_v( double ) {
+        found4= false;
+      }
+      case_v( std::string ) {
+        found4= true;
+      }
+      default_v( v4 )
+    }
+    REQUIRE( found4 );
 }
 
 TEST_CASE( "opt_util" )
