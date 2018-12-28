@@ -67,7 +67,7 @@ auto* holds( std::variant<Vs...>& v ) {
 //     case_v( double ) {
 //       cout << "double value: " << val << "\n";
 //     }
-//     default_v( v );
+//     default_v;
 //   }
 //
 // The curly braces are required as is the default_v.
@@ -87,18 +87,19 @@ auto* holds( std::variant<Vs...>& v ) {
 // The structure of curly braces is a bit strange in these
 // macros, but that is to allow the user to write curly braces as
 // in the example above.
-#define switch_v( v ) \
-  { auto __f = [&]( auto&& val ) { if constexpr( false )
+#define switch_v( v )                                    \
+  { auto const& __v = v;                                 \
+    auto __f = [&]( auto&& val ) { if constexpr( false )
 
 #define case_v( t )                                            \
   } else if constexpr(                                         \
           std::is_same_v<std::decay_t<decltype( val )>, t> ) {
 
-#define default_v( v )                                           \
+#define default_v                                                \
   } else static_assert(                                          \
           ::util::detail::parametrized_false_v<decltype( val )>, \
           "non-exhaustive variant visitor type list" );          \
-  }; { std::visit( __f, v ); }
+  }; { std::visit( __f, __v ); } (void)__v
 
 namespace detail {
 

@@ -84,7 +84,7 @@ TEST_CASE( "variant" )
       case_v( std::string ) {
         found3 = false;
       }
-      default_v( v3 )
+      default_v;
     }
     REQUIRE( found3 );
 
@@ -100,7 +100,7 @@ TEST_CASE( "variant" )
       case_v( std::string ) {
         found4= true;
       }
-      default_v( v4 )
+      default_v;
     }
     REQUIRE( found4 );
 }
