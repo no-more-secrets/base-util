@@ -55,17 +55,17 @@ auto* holds( std::variant<Vs...>& v ) {
 // syntax. Must only be used on variants without repeating types.
 // Use like so:
 //
-//   auto v = std::variant<int, std::string, double>{ ... };
+//   auto v = std::variant<int, pair<int,int>, string>{ ... };
 //
 //   switch_v( v ) {
 //     case_v( int ) {
 //       cout << "int value: " << val << "\n";
 //     }
-//     case_v( std::string ) {
-//       cout << "string value: " << val << "\n";
+//     case_v_( pair<int, int>, x, y ) {
+//       cout << "x, y = " << x << ", " << y << "\n";
 //     }
-//     case_v( double ) {
-//       cout << "double value: " << val << "\n";
+//     case_v( string ) {
+//       cout << "string value: " << val << "\n";
 //     }
 //     default_v;
 //   }
@@ -75,6 +75,9 @@ auto* holds( std::variant<Vs...>& v ) {
 // The default case is required and will throw a compile error if
 // the type list is not exhaustive. However, it will not trigger
 // an error when a type is extraneous.
+//
+// The case_v_() takes additional parameters which will be bound
+// to the value using structured bindings (pattern matching).
 //
 // The bodies of the case_v's have access to all variables in the
 // surrounding scope (they capture them by reference).
@@ -94,6 +97,11 @@ auto* holds( std::variant<Vs...>& v ) {
 #define case_v( t )                                            \
   } else if constexpr(                                         \
           std::is_same_v<std::decay_t<decltype( val )>, t> ) {
+
+#define case_v_( t, ... )                                      \
+  } else if constexpr(                                         \
+          std::is_same_v<std::decay_t<decltype( val )>, t> ) { \
+      auto const& [__VA_ARGS__] = val;
 
 #define default_v                                                \
   } else static_assert(                                          \

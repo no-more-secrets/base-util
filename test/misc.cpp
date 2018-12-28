@@ -103,6 +103,24 @@ TEST_CASE( "variant" )
       default_v;
     }
     REQUIRE( found4 );
+
+    // Test the structured bindings version.
+    using A = pair<int, double>;
+    using V2 = std::variant<int, A>;
+
+    V2 v5 = A{3, 4.5};
+    bool found5 = false;
+    switch_v( v5 ) {
+      case_v( int ) {
+        found5 = false;
+      }
+      case_v_( A, x, y ) {
+        if( x == 3 && y == 4.5 )
+            found5 = true;
+      }
+      default_v;
+    }
+    REQUIRE( found5 );
 }
 
 TEST_CASE( "opt_util" )
