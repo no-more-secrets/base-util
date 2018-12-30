@@ -196,14 +196,14 @@ split_on_idxs( std::vector<T>      const& v,
     return res;
 }
 
-// Find the last occurance in the vector of an element that
+// Find the last occurance in the range of an element that
 // satisifies the given predicate. If there are none then nullopt
 // is returned. If there is one then the index from the beginning
-// of the vector is returned.
-template<typename T, typename Func>
-std::optional<size_t> find_last_if( std::vector<T> const& v, Func const& f ) {
-  for( size_t idx = v.size(); idx > 0; --idx )
-    if( f( v[idx-1] ) )
+// of the range is returned.
+template<typename Range, typename Func>
+std::optional<size_t> find_last_if( Range const& r, Func const& f ) {
+  for( size_t idx = r.size(); idx > 0; --idx )
+    if( f( r[idx-1] ) )
         return idx-1;
   return std::nullopt;
 }
