@@ -261,6 +261,46 @@ TEST_CASE( "algo" )
     REQUIRE( r25 == end( v4 ) );
 }
 
+TEST_CASE( "find" )
+{
+    using util::find_last_if;
+
+    auto odd = L( _ % 2 == 1 );
+    auto find_odd = LC( find_last_if( _, odd ) );
+
+    // empty case
+    vector<int> v1{};
+    REQUIRE( find_odd( v1 ) == nullopt );
+
+    // single element, not satisfied
+    vector v2{2};
+    REQUIRE( find_odd( v2 ) == nullopt );
+
+    // single element, satisfied
+    vector v3{5};
+    REQUIRE( find_odd( v3 ) == 0 );
+
+    // multiple elements, last satisfied
+    vector v4{ 2, 6, 8, 4, 2, 5 };
+    REQUIRE( find_odd( v4 ) == 5 );
+
+    // multiple elements, first satisfied
+    vector v5{ 5, 6, 8, 4, 2, 2 };
+    REQUIRE( find_odd( v5 ) == 0 );
+
+    // multiple elements, none satisified
+    vector v6{ 6, 8, 4, 2, 2 };
+    REQUIRE( find_odd( v6 ) == nullopt );
+
+    // multiple elements, all satisified
+    vector v7{ 5, 7, 9, 1, 3, 5};
+    REQUIRE( find_odd( v7 ) == 5 );
+
+    // multiple elements, middle satisified
+    vector v8{ 6, 8, 4, 5, 2, 2 };
+    REQUIRE( find_odd( v8 ) == 3 );
+}
+
 TEST_CASE( "chunking" )
 {
     using PType = PairVec<size_t, size_t>;
