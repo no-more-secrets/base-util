@@ -51,6 +51,8 @@ auto* holds( std::variant<Vs...>& v ) {
 #define GET_IF( subject, type, var ) \
   if( auto* var = std::get_if<type>( &subject ); var )
 
+#define if_v( subject, type, var ) GET_IF( subject, type, var )
+
 // Macro for visiting/dispatching on variants using a switch-like
 // syntax. Must only be used on variants without repeating types.
 // Use like so:
@@ -91,7 +93,7 @@ auto* holds( std::variant<Vs...>& v ) {
 // macros, but that is to allow the user to write curly braces as
 // in the example above.
 #define switch_v( v )                                    \
-  { auto const& __v = v;                                 \
+  { auto& __v = v;                                       \
     auto __f = [&]( auto&& val ) { if constexpr( false )
 
 #define case_v( t )                                            \
