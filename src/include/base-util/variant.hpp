@@ -111,6 +111,8 @@ auto* holds( std::variant<Vs...>& v ) {
           "non-exhaustive variant visitor type list" );          \
   }; { std::visit( __f, __v ); } (void)__v
 
+#define break_v return
+
 namespace detail {
 
 // We must use this in the above macro instead of just "false"
