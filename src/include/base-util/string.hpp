@@ -153,6 +153,12 @@ to_paths( std::vector<std::string> const& ss );
 /****************************************************************
 * To-String utilities
 *
+* TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+* "A function template is rarely the right solution if you need
+* to add specializations for it. An overload set tends to work
+* better and be much easier to maintain." - sbenza
+* TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+*
 * util::to_string  family of overloaded functions are intended so
 * that  a  user  can call them on any commonly-used type and they
 * will return a sensibly  formatted result. Unlike std::to_string
