@@ -111,6 +111,9 @@ auto* holds( std::variant<Vs...>& v ) {
           "non-exhaustive variant visitor type list" );          \
   }; { std::visit( __f, __v ); } (void)__v
 
+#define default_v_no_check \
+  } }; { std::visit( __f, __v ); } (void)__v
+
 #define break_v return
 
 namespace detail {
