@@ -53,6 +53,12 @@ auto* holds( std::variant<Vs...>& v ) {
 
 #define if_v( subject, type, var ) GET_IF( subject, type, var )
 
+// For convenience, just swaps the ordering of the parameters.
+template<typename Variant, typename VisitorFunc>
+auto visit( Variant& v, VisitorFunc const& func ) {
+  return std::visit( func, v );
+}
+
 // Macro for visiting/dispatching on variants using a switch-like
 // syntax. Must only be used on variants without repeating types.
 // Use like so:
