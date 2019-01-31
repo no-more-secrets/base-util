@@ -208,4 +208,43 @@ std::optional<size_t> find_last_if( Range const& r, Func const& f ) {
   return std::nullopt;
 }
 
+template<typename Range, typename Value>
+auto find( Range const& r, Value const& v ) {
+  return std::find( std::begin( r ), std::end( r ), v );
+}
+
+template<typename Range, typename Value>
+auto find_index( Range const& r, Value const& v ) {
+  return std::find( std::begin( r ), std::end( r ), v ) -
+         std::begin( r );
+}
+
+// Find the value in the range, then move to the next element,
+// cycling back to the beginning if the end is hit.
+template<typename Range, typename Value>
+auto find_subsequent_and_cycle( Range const& r, Value const& v ) {
+  if( r.size() == 0 )
+    // no elements
+    return v;
+  size_t idx = util::find_index( r, v );
+  if( idx == r.size() )
+      idx = r.size()-1;
+  idx = ( idx + 1 ) % r.size();
+  return r[idx];
+}
+
+// Find the value in the range, then move to the previous
+// element, cycling around to the end if the beginning is hit.
+template<typename Range, typename Value>
+auto find_previous_and_cycle( Range const& r, Value const& v ) {
+  if( r.size() == 0 )
+    // no elements
+    return v;
+  size_t idx = util::find_index( r, v );
+  if( idx == 0 )
+    idx = r.size();
+  --idx;
+  return r[idx];
+}
+
 } // namespace util

@@ -301,6 +301,46 @@ TEST_CASE( "find" )
     REQUIRE( find_odd( v8 ) == 3 );
 }
 
+TEST_CASE( "find and cycle" )
+{
+    using util::find_subsequent_and_cycle;
+    using util::find_previous_and_cycle;
+
+    vector<int> v1{};
+    REQUIRE( find_subsequent_and_cycle( v1, 5 ) == 5 );
+    vector v2{2};
+    REQUIRE( find_subsequent_and_cycle( v2, 5 ) == 2 );
+    vector v3{5};
+    REQUIRE( find_subsequent_and_cycle( v3, 5 ) == 5 );
+    vector v4{ 2, 6, 8, 4, 2, 5 };
+    REQUIRE( find_subsequent_and_cycle( v4, 5 ) == 2 );
+    vector v5{ 5, 6, 8, 4, 2, 2 };
+    REQUIRE( find_subsequent_and_cycle( v5, 5 ) == 6 );
+    vector v6{ 6, 8, 4, 2, 2 };
+    REQUIRE( find_subsequent_and_cycle( v6, 5 ) == 6 );
+    vector v7{ 5, 7, 9, 1, 3, 5};
+    REQUIRE( find_subsequent_and_cycle( v7, 5 ) == 7 );
+    vector v8{ 6, 8, 4, 5, 2, 2 };
+    REQUIRE( find_subsequent_and_cycle( v8, 5 ) == 2 );
+
+    vector<int> v11{};
+    REQUIRE( find_previous_and_cycle( v11, 5 ) == 5 );
+    vector v12{2};
+    REQUIRE( find_previous_and_cycle( v12, 5 ) == 2 );
+    vector v13{5};
+    REQUIRE( find_previous_and_cycle( v13, 5 ) == 5 );
+    vector v14{ 2, 6, 8, 4, 2, 5 };
+    REQUIRE( find_previous_and_cycle( v14, 5 ) == 2 );
+    vector v15{ 5, 6, 8, 4, 2, 2 };
+    REQUIRE( find_previous_and_cycle( v15, 5 ) == 2 );
+    vector v16{ 6, 8, 4, 2, 2 };
+    REQUIRE( find_previous_and_cycle( v16, 5 ) == 2 );
+    vector v17{ 5, 7, 9, 1, 3, 5};
+    REQUIRE( find_previous_and_cycle( v17, 5 ) == 5 );
+    vector v18{ 6, 8, 4, 5, 2, 2 };
+    REQUIRE( find_previous_and_cycle( v18, 5 ) == 4 );
+}
+
 TEST_CASE( "chunking" )
 {
     using PType = PairVec<size_t, size_t>;
