@@ -6,6 +6,9 @@
 *****************************************************************/
 #pragma once
 
+/****************************************************************
+** EVAL
+*****************************************************************/
 // Note about EVAL: we should not put EVAL macros in the macros
 // in this file, since the macros in this file are to be building
 // blocks and hence might be nested recursively, and this may not
@@ -27,33 +30,39 @@
 #define EVAL1( ... ) EVAL0( EVAL0( EVAL0( __VA_ARGS__ ) ) )
 #define EVAL0( ... ) __VA_ARGS__
 
-#define EVALp( ... ) EVALp9( __VA_ARGS__ )
-
-#define EVALp9( ... ) EVALp8( EVALp8( EVALp8( __VA_ARGS__ ) ) )
-#define EVALp8( ... ) EVALp7( EVALp7( EVALp7( __VA_ARGS__ ) ) )
-#define EVALp7( ... ) EVALp6( EVALp6( EVALp6( __VA_ARGS__ ) ) )
-#define EVALp6( ... ) EVALp5( EVALp5( EVALp5( __VA_ARGS__ ) ) )
-#define EVALp5( ... ) EVALp4( EVALp4( EVALp4( __VA_ARGS__ ) ) )
-#define EVALp4( ... ) EVALp3( EVALp3( EVALp3( __VA_ARGS__ ) ) )
-#define EVALp3( ... ) EVALp2( EVALp2( EVALp2( __VA_ARGS__ ) ) )
-#define EVALp2( ... ) EVALp1( EVALp1( EVALp1( __VA_ARGS__ ) ) )
-#define EVALp1( ... ) EVALp0( EVALp0( EVALp0( __VA_ARGS__ ) ) )
-#define EVALp0( ... ) __VA_ARGS__
-
+/****************************************************************
+** Evalutation Control
+*****************************************************************/
 #define ID( ... ) __VA_ARGS__
 #define EMPTY()
-
 #define DEFER( ... ) __VA_ARGS__ EMPTY()
-
 #define OBSTRUCT( ... ) __VA_ARGS__ DEFER( EMPTY )()
-
-#define HEAD( a, ... ) a
-#define HEAD_TUPLE( a ) HEAD a
-
-#define TAIL( a, ... ) __VA_ARGS__
-
 #define EXPAND( ... ) __VA_ARGS__
 
+/****************************************************************
+** List Operations
+*****************************************************************/
+#define HEAD( a, ... ) a
+#define HEAD_TUPLE( a ) HEAD a
+#define TAIL( a, ... ) __VA_ARGS__
+
+/****************************************************************
+** PP_MAP_PREPEND_NS
+*****************************************************************/
+// PP_MAP_PREPEND_NS will prepend the given string to each
+// element as a namespace.
+#define PP_MAP_PREPEND_NS( name, ... ) \
+  __VA_OPT__( PP_MAP_PREPEND_NS1( name, __VA_ARGS__ ) )
+
+#define PP_MAP_PREPEND_NS1( name, a, ... )                    \
+  name::a __VA_OPT__(, PP_MAP_PREPEND_NS1_INDIRECT EMPTY()()( \
+                           name, __VA_ARGS__ ) )
+
+#define PP_MAP_PREPEND_NS1_INDIRECT() PP_MAP_PREPEND_NS1
+
+/****************************************************************
+** JOIN_SEMIS
+*****************************************************************/
 // JOIN_SEMIS will join the parameters but with a semicolon after
 // each one (including the last).
 #define JOIN_SEMIS( ... ) \
@@ -65,6 +74,9 @@
 
 #define JOIN_SEMIS1_INDIRECT() JOIN_SEMIS1
 
+/****************************************************************
+** PP_MAP_SEMI
+*****************************************************************/
 // PP_MAP_SEMI will map the function over the list and put a
 // semicolon after each result value (including the last one).
 //
@@ -79,6 +91,9 @@
 
 #define PP_MAP_SEMI_RECURSE_INDIRECT() PP_MAP_SEMI_RECURSE
 
+/****************************************************************
+** PP_MAP_AMP
+*****************************************************************/
 // PP_MAP_AMP will map the function over the list and put
 // && between the result values (but not after the last).
 //
@@ -95,6 +110,9 @@
 
 #define PP_MAP_AMP1_RECURSE_INDIRECT() PP_MAP_AMP1_RECURSE
 
+/****************************************************************
+** PP_MAP_COMMAS
+*****************************************************************/
 // PP_MAP_COMMAS will map the function over the list and put
 // commas between the result values (but not after the last).
 //
