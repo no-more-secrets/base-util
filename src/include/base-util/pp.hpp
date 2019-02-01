@@ -33,7 +33,6 @@
 /****************************************************************
 ** Evalutation Control
 *****************************************************************/
-#define ID( ... ) __VA_ARGS__
 #define EMPTY()
 #define DEFER( ... ) __VA_ARGS__ EMPTY()
 #define OBSTRUCT( ... ) __VA_ARGS__ DEFER( EMPTY )()
@@ -42,6 +41,19 @@
 /****************************************************************
 ** List Operations
 *****************************************************************/
+#define ID( ... ) __VA_ARGS__
+#define EAT( ... ) __VA_ARGS__
+#define NO_EAT( ... )
+
+#define KEEP( ... ) __VA_ARGS__
+#define NO_KEEP( ... )
+
+// Take a list and determine if it is empty; use the first arg if
+// it is not, and the second one if it is.
+#define SWITCH_EMPTY( non_empty_case, empty_case, ... ) \
+  __VA_OPT__( non_empty_case )                          \
+  __VA_OPT__( NO_ )##KEEP( empty_case )
+
 #define HEAD( a, ... ) a
 #define HEAD_TUPLE( a ) HEAD a
 #define TAIL( a, ... ) __VA_ARGS__
@@ -61,6 +73,21 @@
 #define PP_MAP_PREPEND_NS1_INDIRECT() PP_MAP_PREPEND_NS1
 
 /****************************************************************
+** PP_MAP_PREPEND_TUPLE
+*****************************************************************/
+// PP_MAP_PREPEND_TUPLE will prepend the given string to each
+// element as a namespace.
+#define PP_MAP_PREPEND_TUPLE( what, ... ) \
+  __VA_OPT__( PP_MAP_PREPEND_TUPLE1( what, __VA_ARGS__ ) )
+
+#define PP_MAP_PREPEND_TUPLE1( what, a, ... )                \
+  ( what, EXPAND a )                                         \
+      __VA_OPT__(, PP_MAP_PREPEND_TUPLE1_INDIRECT EMPTY()()( \
+                       what, __VA_ARGS__ ) )
+
+#define PP_MAP_PREPEND_TUPLE1_INDIRECT() PP_MAP_PREPEND_TUPLE1
+
+/****************************************************************
 ** JOIN_SEMIS
 *****************************************************************/
 // JOIN_SEMIS will join the parameters but with a semicolon after
@@ -75,13 +102,38 @@
 #define JOIN_SEMIS1_INDIRECT() JOIN_SEMIS1
 
 /****************************************************************
+** JOIN_WITH
+*****************************************************************/
+// JOIN_WITH will join the parameters but with a the given thing,
+// but not after the last.
+#define JOIN_WITH( what, ... ) \
+  __VA_OPT__( JOIN_WITH1( what, __VA_ARGS__ ) )
+
+#define JOIN_WITH1( what, a, ... ) \
+  a __VA_OPT__(                    \
+      what JOIN_WITH1_INDIRECT EMPTY()()( what, __VA_ARGS__ ) )
+
+#define JOIN_WITH1_INDIRECT() JOIN_WITH1
+
+/****************************************************************
+** PP_MAP
+*****************************************************************/
+// PP_MAP will map the function over the list and emit the
+// results without any separators.
+#define PP_MAP( ... ) PP_MAP_RECURSE( __VA_ARGS__ )
+
+#define PP_MAP_RECURSE( f, ... )                     \
+  __VA_OPT__( f( HEAD( __VA_ARGS__ ) )               \
+                  PP_MAP_RECURSE_INDIRECT EMPTY()()( \
+                      f, TAIL( __VA_ARGS__ ) ) )
+
+#define PP_MAP_RECURSE_INDIRECT() PP_MAP_RECURSE
+
+/****************************************************************
 ** PP_MAP_SEMI
 *****************************************************************/
 // PP_MAP_SEMI will map the function over the list and put a
 // semicolon after each result value (including the last one).
-//
-// This one uses a head/tail approach to dealing with the edge
-// cases (zeroand one-size lists).
 #define PP_MAP_SEMI( ... ) PP_MAP_SEMI_RECURSE( __VA_ARGS__ )
 
 #define PP_MAP_SEMI_RECURSE( f, ... )                 \
@@ -96,9 +148,6 @@
 *****************************************************************/
 // PP_MAP_AMP will map the function over the list and put
 // && between the result values (but not after the last).
-//
-// This one uses a two-macro approach to dealing with the edge
-// cases (zeroand one-size lists).
 #define PP_MAP_AMP( ... ) PP_MAP_AMP_RECURSE( __VA_ARGS__ )
 
 #define PP_MAP_AMP_RECURSE( f, ... ) \
@@ -115,9 +164,6 @@
 *****************************************************************/
 // PP_MAP_COMMAS will map the function over the list and put
 // commas between the result values (but not after the last).
-//
-// This one uses a two-macro approach to dealing with the edge
-// cases (zeroand one-size lists).
 #define PP_MAP_COMMAS( ... ) PP_MAP_COMMAS_RECURSE( __VA_ARGS__ )
 
 #define PP_MAP_COMMAS_RECURSE( f, ... ) \
