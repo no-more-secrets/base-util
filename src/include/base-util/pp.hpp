@@ -17,13 +17,11 @@
 // level, then make one more wrapper around it.
 
 // Using EVAL<n>( ... ) will result in 3^n evals.
-#define EVAL( ... ) EVAL9( __VA_ARGS__ )
+//
+// WARNING: adding more stages to this will exponentially increase
+// preprocessing time.
+#define EVAL( ... ) EVAL4( __VA_ARGS__ )
 
-#define EVAL9( ... ) EVAL8( EVAL8( EVAL8( __VA_ARGS__ ) ) )
-#define EVAL8( ... ) EVAL7( EVAL7( EVAL7( __VA_ARGS__ ) ) )
-#define EVAL7( ... ) EVAL6( EVAL6( EVAL6( __VA_ARGS__ ) ) )
-#define EVAL6( ... ) EVAL5( EVAL5( EVAL5( __VA_ARGS__ ) ) )
-#define EVAL5( ... ) EVAL4( EVAL4( EVAL4( __VA_ARGS__ ) ) )
 #define EVAL4( ... ) EVAL3( EVAL3( EVAL3( __VA_ARGS__ ) ) )
 #define EVAL3( ... ) EVAL2( EVAL2( EVAL2( __VA_ARGS__ ) ) )
 #define EVAL2( ... ) EVAL1( EVAL1( EVAL1( __VA_ARGS__ ) ) )
