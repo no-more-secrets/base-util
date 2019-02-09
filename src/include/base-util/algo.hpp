@@ -208,6 +208,18 @@ std::optional<size_t> find_last_if( Range const& r, Func const& f ) {
   return std::nullopt;
 }
 
+// Find the first occurance in the range of an element that
+// satisifies the given predicate. If there are none then nullopt
+// is returned. If there is one then the index from the beginning
+// of the range is returned.
+template<typename Range, typename Func>
+std::optional<size_t> find_first_if( Range const& r, Func const& f ) {
+  for( size_t idx = 0; idx < r.size(); ++idx )
+    if( f( r[idx] ) )
+        return idx;
+  return std::nullopt;
+}
+
 template<typename Range, typename Value>
 auto find( Range const& r, Value const& v ) {
   return std::find( std::begin( r ), std::end( r ), v );
