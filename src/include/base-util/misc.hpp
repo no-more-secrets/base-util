@@ -21,6 +21,9 @@
 #define L( a )  [] ( auto const& _ ) { return a; }
 #define L_( a ) [] ( auto const& _ ) { a; }
 
+#define L0( a )  [] { return a; }
+#define L0_( a ) [] { a; }
+
 #define L2( a )  [] ( auto const& _1, auto const& _2 ) { return a; }
 #define L2_( a ) [] ( auto const& _1, auto const& _2 ) { a; }
 
