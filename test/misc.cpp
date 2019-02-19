@@ -145,6 +145,56 @@ TEST_CASE( "opt_util" )
 
 TEST_CASE( "directed_graph" )
 {
+    // Test the `cyclic` function.
+    unordered_map<fs::path, vector<fs::path>> c;
+
+    c = {};
+    REQUIRE( !util::make_graph( c ).cyclic() );
+
+    c = {
+      { "B", {} }
+    };
+    REQUIRE( !util::make_graph( c ).cyclic() );
+
+    c = {
+      { "B", { "B" } }
+    };
+    REQUIRE( util::make_graph( c ).cyclic() );
+
+    c = {
+      { "B", { "C" } },
+      { "C", { "C" } }
+    };
+    REQUIRE( util::make_graph( c ).cyclic() );
+
+    c = {
+      { "B", { "C" } },
+      { "C", { "B" } }
+    };
+    REQUIRE( util::make_graph( c ).cyclic() );
+
+    c = {
+      { "B", { "C" } },
+      { "C", { "D" } },
+      { "D", { "C","B" } }
+    };
+    REQUIRE( util::make_graph( c ).cyclic() );
+
+    c = {
+      { "B", { "D" } },
+      { "C", { "D" } },
+      { "D", {} }
+    };
+    REQUIRE( !util::make_graph( c ).cyclic() );
+
+    c = {
+      { "B", { "C" } },
+      { "C", { "D" } },
+      { "D", {} }
+    };
+    REQUIRE( !util::make_graph( c ).cyclic() );
+
+    // Test the `accessible` function.
     using DG = util::DirectedGraph<fs::path>;
 
     unordered_map<fs::path, vector<fs::path>> m{
@@ -159,6 +209,8 @@ TEST_CASE( "directed_graph" )
     };
 
     DG g = util::make_graph<fs::path>( m );
+
+    REQUIRE( g.cyclic() );
 
     vector<fs::path> v;
 
@@ -177,6 +229,44 @@ TEST_CASE( "directed_graph" )
     v = g.accessible( "G" );
     sort( begin( v ), end( v ) );
     REQUIRE( v == (vector<fs::path>{ "B", "C", "D", "E", "F", "G" }) );
+
+    unordered_map<fs::path, vector<fs::path>> m2{
+        { "B", { } },
+        { "I", { } },
+        { "F", { "B", "I" } },
+        { "C", { "D", "E" } },
+        { "D", { "E"      } },
+        { "E", { "F", "I" } },
+        { "A", { "G"      } },
+        { "G", { "C"      } },
+        { "H", { "C", "D" } }
+    };
+
+    auto g2 = util::DAG<fs::path>::make_dag( m2 );
+
+    REQUIRE( !g2.cyclic() );
+
+    // Test sorting
+    v = g2.sorted();
+    REQUIRE( v == (vector<fs::path>{"B","I","F","E","D","C","G","A","H"}) );
+
+    unordered_map<fs::path, vector<fs::path>> m3{
+        { "A", { "C", "D" } },
+        { "B", { "C", "D" } },
+        { "C", { "D", "E" } },
+        { "D", { "E", "F" } },
+        { "E", { "F", "G" } },
+        { "F", { "G"      } },
+        { "G", {} }
+    };
+
+    auto g3 = util::DAG<fs::path>::make_dag( m3 );
+
+    REQUIRE( !g3.cyclic() );
+
+    // Test sorting
+    v = g3.sorted();
+    REQUIRE( v == (vector<fs::path>{"G","F","E","D","C","A","B"}) );
 }
 
 TEST_CASE( "bimap" )

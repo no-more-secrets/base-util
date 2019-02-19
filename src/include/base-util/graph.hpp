@@ -9,6 +9,7 @@
 #include "base-util/misc.hpp"
 
 #include <map>
+#include <numeric>
 #include <unordered_map>
 #include <vector>
 
@@ -49,7 +50,10 @@ public:
     std::vector<NameT> accessible( NameT const& name,
                                    bool with_self = true ) const;
 
-private:
+    // Returns true if this graph has a cycle in it.
+    bool cyclic() const;
+
+protected:
 
     using NamesMap = BDIndexMap<NameT>;
     using Id       = size_t;
@@ -107,7 +111,7 @@ DirectedGraph<NameT> make_graph( MapT<
         edges.emplace_back( std::move( ids ) );
     }
 
-    return DirectedGraph(
+    return DirectedGraph<NameT>(
             std::move( edges ), std::move( bm ) );
 }
 
@@ -146,6 +150,118 @@ DirectedGraph<NameT>::accessible( NameT const& name,
     }
 
     return res;
+}
+
+// Check is cyclic. FIXME: This algo is VERY SLOW and needs to be
+// made more efficient.
+template<typename NameT>
+bool DirectedGraph<NameT>::cyclic() const {
+  // Must be `resize` and not `reserve`.
+  std::vector<Id> ids; ids.resize( m_names.size() );
+  std::iota( ids.begin(), ids.end(), 0 );
+  // First check if any individual nodes have cycles to
+  // themselves.
+  for( Id id : ids ) {
+    auto const& children = m_edges[id];
+    if( std::find( children.begin(), children.end(), id )
+                != children.end() )
+      return true;
+  }
+  // Now check if, for any pair of nodes in the graph A and B, A
+  // is accessible from B and B is accessible from A.
+  auto is_less = [this]( Id lhs, Id rhs ) {
+    auto children =
+        accessible( m_names.val( rhs ), /*with_self=*/false );
+    return std::find(
+        children.begin(), children.end(), m_names.val( lhs ) )
+     != children.end();
+  };
+  for( Id id1 : ids )
+    for( Id id2 : ids )
+      if( is_less( id1, id2 ) && is_less( id2, id1 ) )
+        return true;
+  return false;
+}
+
+/****************************************************************
+* Directed Acyclic Graph (DAG)
+****************************************************************/
+
+// Same as DirectedGraph except it will check (upon construction)
+// that the graph is acyclic. If not it will throw. It also has
+// some additional methods, such as `sorted()` which make sense
+// on DAGs.
+template<typename NameT>
+class DirectedAcyclicGraph : public DirectedGraph<NameT> {
+
+public:
+
+    template<typename MapT>
+    static DirectedAcyclicGraph<NameT> make_dag( MapT const& m );
+
+    // Return a list of nodes sorted in such a way that, if node
+    // A is accessible from node B then A will necessarily appear
+    // before B in the list (given that this is an acyclic graph,
+    // it is always possible to do this for all nodes in the
+    // graph). Two nodes where neither is reachable from the
+    // other will be in an unspecified order relative to
+    // eachother.  E.g., the graph:
+    //
+    //                  B --
+    //                      \
+    //                       >--> A
+    //                      /
+    //                  C --
+    //
+    // when sorted, may yield either {A,B,C} or {A,C,B};
+    std::vector<NameT> sorted() const;
+
+    using typename DirectedGraph<NameT>::NamesMap;
+    using typename DirectedGraph<NameT>::Id;
+    using typename DirectedGraph<NameT>::GraphVec;
+
+private:
+    DirectedAcyclicGraph( DirectedGraph<NameT>&& graph );
+
+};
+
+template<typename NameT>
+using DAG = DirectedAcyclicGraph<NameT>;
+
+template<typename NameT>
+DirectedAcyclicGraph<NameT>::DirectedAcyclicGraph(
+    DirectedGraph<NameT>&& graph )
+    : DirectedGraph<NameT>( std::move( graph ) )
+{
+    ASSERT_( !this->cyclic() );
+}
+
+template<typename NameT>
+template<typename MapT>
+DirectedAcyclicGraph<NameT>
+DirectedAcyclicGraph<NameT>::make_dag( MapT const& m ) {
+
+    return DirectedAcyclicGraph( make_graph( m ) );
+}
+
+// FIXME: efficiency of this method is probably subpar.
+template<typename NameT>
+std::vector<NameT>
+DirectedAcyclicGraph<NameT>::sorted() const {
+  std::vector<Id> ids; ids.resize( this->m_names.size() );
+  std::iota( ids.begin(), ids.end(), 0 );
+  auto is_less = [this]( Id lhs, Id rhs ) {
+    auto children = this->accessible( this->m_names.val( rhs ),
+                                      /*with_self=*/false );
+    return std::find(
+        children.begin(), children.end(), this->m_names.val( lhs ) )
+     != children.end();
+  };
+  std::sort( ids.begin(), ids.end(), is_less );
+  std::vector<NameT> res; res.reserve( this->m_names.size() );
+  for( Id id : ids )
+    res.push_back( this->m_names.val( id ) );
+  return res;
 }
 
 } // namespace util
