@@ -207,11 +207,11 @@ public:
     // other will be in an unspecified order relative to
     // eachother.  E.g., the graph:
     //
-    //                  B --
-    //                      \
+    //                  B ---
+    //                      |
     //                       >--> A
-    //                      /
-    //                  C --
+    //                      |
+    //                  C ---
     //
     // when sorted, may yield either {A,B,C} or {A,C,B};
     std::vector<NameT> sorted() const;
