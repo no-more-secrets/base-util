@@ -31,6 +31,9 @@
 #define LC( a )  [&]( auto const& _ ) { return a; }
 #define LC_( a ) [&]( auto const& _ ) { a; }
 
+#define LC0( a )  [&] { return a; }
+#define LC0_( a ) [&] { a; }
+
 namespace util {
 
 // Stream here to send to nowhere.  This is kind of like /dev/null
