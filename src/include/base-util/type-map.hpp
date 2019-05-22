@@ -26,22 +26,24 @@ Default  GetImpl( ... );
 template<typename M, typename T, typename... Default>
 using Get = typename decltype( GetImpl<T, Ident<Default>...>( M{} ) )::type;
 
-class NoConstruct { NoConstruct() = delete; };
-
 /****************************************************************
 ** Examples / Tests
 *****************************************************************/
 
+class NoConstruct { NoConstruct() = delete; };
+
 using M = TypeMap<
-  Pair<int,  float>,
-  Pair<void, const double>,
-  Pair<char, NoConstruct>
+  Pair<int,  float>,        // typical example
+  Pair<void, const double>, // works with void, const
+  Pair<char, NoConstruct>   // works with non-default-constructible
 >;
 
+// With no default value; will give a compile error if the key
+// type is not found in the map.
 static_assert( std::is_same_v<Get<M, void>, const double> );
 static_assert( std::is_same_v<Get<M, char>, NoConstruct> );
 static_assert( std::is_same_v<Get<M, int>,  float> );
 
-// With default value
+// With default value; will never give a compile error.
 static_assert( std::is_same_v<Get<M, void,  int>, const double> );
 static_assert( std::is_same_v<Get<M, char*, int>, int> );
