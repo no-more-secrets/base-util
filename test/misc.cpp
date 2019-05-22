@@ -8,6 +8,7 @@
 #include "base-util/logger.hpp"
 #include "base-util/optional.hpp"
 #include "base-util/string.hpp"
+#include "base-util/type-map.hpp"
 #include "base-util/variant.hpp"
 
 #include <type_traits>
@@ -19,6 +20,25 @@ using ::Catch::Matches; // regex matcher
 
 // Compile-time test that we can log IO manipulators such as endl.
 using io_manip_valid = decltype( operator<<( util::log, endl ) );
+
+// This test is purely compile time so doesn't need to be in a
+// test case, but we put it in one anyway.
+TEST_CASE( "type-map" )
+{
+  using M = TypeMap<
+    Pair<int,  float>,
+    Pair<void, const double>,
+    Pair<char, NoConstruct>
+  >;
+
+  static_assert( std::is_same_v<Get<M, void>, const double> );
+  static_assert( std::is_same_v<Get<M, char>, NoConstruct> );
+  static_assert( std::is_same_v<Get<M, int>,  float> );
+
+  // With default value
+  static_assert( std::is_same_v<Get<M, void,  int>, const double> );
+  static_assert( std::is_same_v<Get<M, char*, int>, int> );
+}
 
 TEST_CASE( "datetime" )
 {
