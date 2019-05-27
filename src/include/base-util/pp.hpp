@@ -128,6 +128,20 @@
 #define PP_MAP_RECURSE_INDIRECT() PP_MAP_RECURSE
 
 /****************************************************************
+** PP_MAP_TUPLE
+*****************************************************************/
+// PP_MAP_TUPLE will map the function over the list of tuples,
+// expanding the tuple to be the args of the function.
+#define PP_MAP_TUPLE( ... ) PP_MAP_TUPLE_RECURSE( __VA_ARGS__ )
+
+#define PP_MAP_TUPLE_RECURSE( f, ... )                     \
+  __VA_OPT__( f HEAD( __VA_ARGS__ )                        \
+                  PP_MAP_TUPLE_RECURSE_INDIRECT EMPTY()()( \
+                      f, TAIL( __VA_ARGS__ ) ) )
+
+#define PP_MAP_TUPLE_RECURSE_INDIRECT() PP_MAP_TUPLE_RECURSE
+
+/****************************************************************
 ** PP_MAP_SEMI
 *****************************************************************/
 // PP_MAP_SEMI will map the function over the list and put a
