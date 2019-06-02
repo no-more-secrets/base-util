@@ -289,7 +289,7 @@ TEST_CASE( "directed_graph" )
     REQUIRE( v == (vector<fs::path>{"G","F","E","D","C","B","A"}) );
 }
 
-TEST_CASE( "directed graph sort" )
+TEST_CASE( "directed graph sort test 1" )
 {
     vector<string> names{
         "configs",

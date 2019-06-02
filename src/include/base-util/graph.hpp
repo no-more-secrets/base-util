@@ -262,18 +262,26 @@ DirectedAcyclicGraph<NameT>::sorted() const {
      != children.end();
   };
 
-  // Standard sorting algos will not work here; this is probably
-  // due to the fact that that we can have two nodes A,B that
-  // satisfy is_less(A,B) == false && is_less(B,A) == false && (A
-  // != B). This then messes up the ability to optimize a sort by
-  // performing fewer than N^2 comparisons. Instead, the only way
-  // to order the list of nodes is to perform a comparison be-
-  // tween each and every pair of nodes. Even bubble sort won't
-  // work.
+  // Standard sorting algos (such as std::sort) will not work
+  // here; this is because they require "strict total ordering"
+  // of the elements. This means that the following must hold
+  // (see wikipedia) of the elements in the set to be sorted (S):
   //
-  // /*wont' work*/ std::sort( ids.begin(), ids.end(), is_less );
-
-  // Exhaustive sort.
+  //   * For all x in S, it is not the case that (x<x).
+  //   * For all x,y in S, (x<y) implies not (y<x).
+  //   * For all x,y,z in S, if (x<y) and (y<z) then (x<z).
+  //   * For all x,y,z in S, if x is incomparable with y (nei-
+  //     ther x<y nor y<x hold), and y is incomparable with z,
+  //     then x is incomparable with z.
+  //
+  // The third one is "transitivity" and holds. However, the
+  // fourth one, called "transitivity of incomparability" does
+  // not hold for graph nodes.
+  //
+  // /*won't work*/ std::sort( ids.begin(), ids.end(), is_less );
+  //
+  // So therefore we just do a brute force sort which is N^2. It
+  // will compare every element with every other.
   for( size_t i = 0; i < ids.size()-1; ++i )
     for( size_t j = i+1; j < ids.size(); ++j )
       if( is_less( ids[j], ids[i] ) )
