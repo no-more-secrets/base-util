@@ -268,7 +268,7 @@ TEST_CASE( "directed_graph" )
 
     // Test sorting
     v = g2.sorted();
-    REQUIRE( v == (vector<fs::path>{"B","I","F","E","D","C","G","A","H"}) );
+    REQUIRE( v == (vector<fs::path>{"B","I","F","E","D","C","G","H","A"}) );
 
     unordered_map<fs::path, vector<fs::path>> m3{
         { "A", { "C", "D" } },
@@ -286,7 +286,148 @@ TEST_CASE( "directed_graph" )
 
     // Test sorting
     v = g3.sorted();
-    REQUIRE( v == (vector<fs::path>{"G","F","E","D","C","A","B"}) );
+    REQUIRE( v == (vector<fs::path>{"G","F","E","D","C","B","A"}) );
+}
+
+TEST_CASE( "directed graph sort" )
+{
+    vector<string> names{
+        "configs",
+        "rng",
+        "sdl",
+        "fonts",
+        "app_window",
+        "midiseq",
+        "midiplayer",
+        "conductor",
+        "tunes",
+        "screen",
+        "renderer",
+        "sprites",
+        "planes",
+        "sound",
+        "images",
+        "menus",
+        "terrain"
+    };
+
+    unordered_map<string, vector<string>> m{
+        {"configs", {}},
+        {"rng",
+        {
+            "configs"
+        }},
+        {"sdl",
+        {
+            "configs" //
+        }},
+        {"fonts",
+        {
+            "configs", //
+            "sdl"      //
+        }},
+        {"app_window",
+        {
+            "configs", //
+            "sdl"      //
+        }},
+        {"screen",
+        {
+            "configs", //
+            "sdl"      //
+        }},
+        {"renderer",
+        {
+            "configs",    //
+            "app_window", //
+            "screen"      //
+        }},
+        {"sprites",
+        {
+            "configs", //
+            "sdl",     //
+            "renderer" //
+        }},
+        {"planes",
+        {
+            "configs", //
+            "sdl",     //
+            "screen",  //
+            "renderer" //
+        }},
+        {"sound",
+        {
+            "configs", //
+            "sdl"      //
+        }},
+        {"images",
+        {
+            "configs", //
+            "sdl"      //
+        }},
+        {"menus",
+        {
+            "configs",  //
+            "sdl",      //
+            "screen",   //
+            "renderer", //
+            "sprites",  //
+            "fonts"     //
+        }},
+        {"terrain",
+        {
+            "configs",  //
+            "renderer", //
+            "sprites",  //
+            "sdl"       //
+        }},
+        {"tunes",
+        {
+            "configs", //
+            "rng",     //
+        }},
+        {"midiseq",
+        {
+            "configs", //
+        }},
+        {"midiplayer",
+        {
+            "midiseq", //
+            "configs", //
+        }},
+        {"conductor",
+        {
+            "tunes",      //
+            "midiplayer", //
+            "configs",    //
+        }}};
+
+    vector<string> sorted_target{
+        "configs",
+        "midiseq",
+        "sdl",
+        "fonts",
+        "images",
+        "screen",
+        "midiplayer",
+        "rng",
+        "app_window",
+        "renderer",
+        "tunes",
+        "planes",
+        "sprites",
+        "sound",
+        "menus",
+        "terrain",
+        "conductor",
+    };
+    auto g = util::DAG<string>::make_dag( m );
+
+    REQUIRE( !g.cyclic() );
+
+    // Test sorting
+    auto v = g.sorted();
+    REQUIRE( v == sorted_target );
 }
 
 TEST_CASE( "bimap" )

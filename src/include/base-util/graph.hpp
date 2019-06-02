@@ -244,20 +244,41 @@ DirectedAcyclicGraph<NameT>::make_dag( MapT const& m ) {
     return DirectedAcyclicGraph( make_graph( m ) );
 }
 
-// FIXME: efficiency of this method is probably subpar.
+// FIXME: efficiency of this method is terrible, only use on
+// small graphs. Need to find a proper algorithm.
 template<typename NameT>
 std::vector<NameT>
 DirectedAcyclicGraph<NameT>::sorted() const {
   std::vector<Id> ids; ids.resize( this->m_names.size() );
   std::iota( ids.begin(), ids.end(), 0 );
+
+  // Compare two nodes.
   auto is_less = [this]( Id lhs, Id rhs ) {
+    if( lhs == rhs ) return false;
     auto children = this->accessible( this->m_names.val( rhs ),
                                       /*with_self=*/false );
     return std::find(
         children.begin(), children.end(), this->m_names.val( lhs ) )
      != children.end();
   };
-  std::sort( ids.begin(), ids.end(), is_less );
+
+  // Standard sorting algos will not work here; this is probably
+  // due to the fact that that we can have two nodes A,B that
+  // satisfy is_less(A,B) == false && is_less(B,A) == false && (A
+  // != B). This then messes up the ability to optimize a sort by
+  // performing fewer than N^2 comparisons. Instead, the only way
+  // to order the list of nodes is to perform a comparison be-
+  // tween each and every pair of nodes. Even bubble sort won't
+  // work.
+  //
+  // /*wont' work*/ std::sort( ids.begin(), ids.end(), is_less );
+
+  // Exhaustive sort.
+  for( size_t i = 0; i < ids.size()-1; ++i )
+    for( size_t j = i+1; j < ids.size(); ++j )
+      if( is_less( ids[j], ids[i] ) )
+        std::swap( ids[i], ids[j] );
+
   std::vector<NameT> res; res.reserve( this->m_names.size() );
   for( Id id : ids )
     res.push_back( this->m_names.val( id ) );
