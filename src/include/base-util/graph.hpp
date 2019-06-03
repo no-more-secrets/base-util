@@ -244,20 +244,49 @@ DirectedAcyclicGraph<NameT>::make_dag( MapT const& m ) {
     return DirectedAcyclicGraph( make_graph( m ) );
 }
 
-// FIXME: efficiency of this method is probably subpar.
+// FIXME: efficiency of this method is terrible, only use on
+// small graphs. Need to find a proper algorithm.
 template<typename NameT>
 std::vector<NameT>
 DirectedAcyclicGraph<NameT>::sorted() const {
   std::vector<Id> ids; ids.resize( this->m_names.size() );
   std::iota( ids.begin(), ids.end(), 0 );
+
+  // Compare two nodes.
   auto is_less = [this]( Id lhs, Id rhs ) {
+    if( lhs == rhs ) return false;
     auto children = this->accessible( this->m_names.val( rhs ),
                                       /*with_self=*/false );
     return std::find(
         children.begin(), children.end(), this->m_names.val( lhs ) )
      != children.end();
   };
-  std::sort( ids.begin(), ids.end(), is_less );
+
+  // Standard sorting algos (such as std::sort) will not work
+  // here; this is because they require "strict total ordering"
+  // of the elements. This means that the following must hold
+  // (see wikipedia) of the elements in the set to be sorted (S):
+  //
+  //   * For all x in S, it is not the case that (x<x).
+  //   * For all x,y in S, (x<y) implies not (y<x).
+  //   * For all x,y,z in S, if (x<y) and (y<z) then (x<z).
+  //   * For all x,y,z in S, if x is incomparable with y (nei-
+  //     ther x<y nor y<x hold), and y is incomparable with z,
+  //     then x is incomparable with z.
+  //
+  // The third one is "transitivity" and holds. However, the
+  // fourth one, called "transitivity of incomparability" does
+  // not hold for graph nodes.
+  //
+  // /*won't work*/ std::sort( ids.begin(), ids.end(), is_less );
+  //
+  // So therefore we just do a brute force sort which is N^2. It
+  // will compare every element with every other.
+  for( size_t i = 0; i < ids.size()-1; ++i )
+    for( size_t j = i+1; j < ids.size(); ++j )
+      if( is_less( ids[j], ids[i] ) )
+        std::swap( ids[i], ids[j] );
+
   std::vector<NameT> res; res.reserve( this->m_names.size() );
   for( Id id : ids )
     res.push_back( this->m_names.val( id ) );
