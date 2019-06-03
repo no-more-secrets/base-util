@@ -152,19 +152,16 @@ vector<fs::path> to_paths( vector<string> const& ss ) {
 // convert  back, at least approximately). So therefore, whenever
 // the  to_string methods convert a already-string-like entity to
 // a string, it will insert quotes in the string itself.
-template<>
-string to_string<string>( string const& s ) {
+string to_string( string const& s ) {
     return "\"" + s + "\"";
 }
-template<>
-string to_string<std::string_view>( string_view const& s ) {
+string to_string( string_view const& s ) {
     // Below may seem redundant, but we want to put quotes around
     // the string.
     return to_string( string( s ) );
 }
 
-template<>
-std::string to_string<Error>( Error const& e ) { return e.msg; }
+std::string to_string( Error const& e ) { return e.msg; }
 
 // NOTE:  This  puts  quotes around the string! Also, it is not a
 // template  specialization  because  for  some reason gcc always
@@ -177,8 +174,7 @@ std::string to_string( char const* s ) {
 }
 
 // NOTE: This puts single quotes around the character!
-template<>
-string to_string<char>( char const& s ) {
+string to_string( char const& s ) {
     string res( 1, s );
     return "'" + res + "'";
 }
@@ -190,8 +186,7 @@ string to_string<char>( char const& s ) {
 // Also, it will put quotes around it. To convert  a  path  to  a
 // string without quotes use the  path's  string() method (or one
 // of its variants).
-template<>
-string to_string<fs::path>( fs::path const& p ) {
+string to_string( fs::path const& p ) {
    return "\"" + p.string() + "\"";
 }
 
@@ -201,7 +196,6 @@ string to_string<fs::path>( fs::path const& p ) {
 //
 // where there is no information  about  time  zone assumed or at-
 // tached to the result.
-template<>
 string to_string( SysTimePoint const& p ) {
     return util::fmt_time( p );
 }
@@ -212,7 +206,6 @@ string to_string( SysTimePoint const& p ) {
 //
 // where the date and time are adjusted so as to output it in the
 // UTC time zone (hence the +0000 at the end).
-template<>
 string to_string( ZonedTimePoint const& p ) {
     return util::fmt_time( p, util::tz_utc() );
 }

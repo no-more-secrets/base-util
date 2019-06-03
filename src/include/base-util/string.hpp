@@ -153,12 +153,6 @@ to_paths( std::vector<std::string> const& ss );
 /****************************************************************
 * To-String utilities
 *
-* TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-* "A function template is rarely the right solution if you need
-* to add specializations for it. An overload set tends to work
-* better and be much easier to maintain." - sbenza
-* TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
-*
 * util::to_string  family of overloaded functions are intended so
 * that  a  user  can call them on any commonly-used type and they
 * will return a sensibly  formatted result. Unlike std::to_string
@@ -172,12 +166,8 @@ to_paths( std::vector<std::string> const& ss );
 * string-like entity) to a string, they will insert quotes in the
 * string itself.
 ****************************************************************/
-template<typename T>
-std::string to_string( T const& /*arg*/ );
-
 // NOTE: This puts single quotes around the character!
-template<>
-std::string to_string<char>( char const& c );
+std::string to_string( char const& c );
 
 // NOTE: These puts quotes around the string! The reason for this
 // behavior  is that we want to try to perform the to_string oper-
@@ -188,11 +178,8 @@ std::string to_string<char>( char const& c );
 // convert  back, at least approximately). So therefore, whenever
 // the  to_string methods convert a already-string-like entity to
 // a string, it will insert quotes in the string itself.
-template<>
-std::string to_string<std::string>( std::string const& s );
-template<>
-std::string to_string<std::string_view>(
-        std::string_view const& s );
+std::string to_string( std::string const& s );
+std::string to_string( std::string_view const& s );
 
 // NOTE:  This  puts  quotes around the string! Also, it is not a
 // template  specialization  because  for  some reason gcc always
@@ -209,8 +196,7 @@ std::string to_string( char const* s );
 // Also, it will put quotes around it. To convert  a  path  to  a
 // string without quotes use the  path's  string() method (or one
 // of its variants).
-template<>
-std::string to_string<fs::path>( fs::path const& p );
+std::string to_string( fs::path const& p );
 
 // Simply delegate to the wrapped type.
 template<typename T>
@@ -251,8 +237,7 @@ std::string variant_elems_to_string(
 template<typename... Args>
 std::string to_string( std::variant<Args...> const& v );
 
-template<>
-std::string to_string<Error>( Error const& e );
+std::string to_string( Error const& e );
 
 // Will do JSON-like notation. E.g. (1,"hello")
 template<typename U, typename V>
@@ -268,7 +253,6 @@ std::string to_string( std::vector<T> const& v );
 //
 // where there is no information  about  time  zone assumed or at-
 // tached to the result.
-template<>
 std::string to_string( SysTimePoint const& p );
 
 // Will output an absolute time with format:
@@ -277,8 +261,11 @@ std::string to_string( SysTimePoint const& p );
 //
 // where the date and time are adjusted so as to output it in the
 // UTC time zone (hence the +0000 at the end).
-template<>
 std::string to_string( ZonedTimePoint const& p );
+
+// Catch-all; just forwards to std::to_string.
+template<typename T>
+std::string to_string( T const& arg );
 
 template<typename T>
 std::ostream& operator<<( std::ostream&         out,
