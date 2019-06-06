@@ -9,17 +9,25 @@
 /****************************************************************
 ** EVAL
 *****************************************************************/
-// Note about EVAL: we should not put EVAL macros in the macros
-// in this file, since the macros in this file are to be building
-// blocks and hence might be nested recursively, and this may not
-// play nicely with the nested EVALs that would result. Instead,
-// one should compose the macros, then put an EVAL at the top
-// level, then make one more wrapper around it.
+// Note about EVAL usage: by default, we should not put EVAL
+// macros inside a macro definition that might be embedded in a
+// parent macro as a building block. Instead, we should fully
+// compose the macros (without EVAL) and then put one EVAL at the
+// top level. This is why we do not put EVAL in the macros in
+// this file. Another reason is that the macros in this file use
+// recursion and this may not play nicely with the nested EVALs
+// that would result. Instead, we compose the macros, then put an
+// EVAL at the top level.
+//
+// However, that said, there are a few cases that seem to arise
+// where it is necessary to put EVAL inside a macro, perhaps when
+// embedding a complicated macro that is itself composed of sub
+// macros. However, this should only be a last resort.
 
 // Using EVAL<n>( ... ) will result in 3^n evals.
 //
-// WARNING: adding more stages to this will exponentially increase
-// preprocessing time.
+// WARNING: adding more stages to this will exponentially
+// increase preprocessing time.
 #define EVAL( ... ) EVAL4( __VA_ARGS__ )
 
 #define EVAL4( ... ) EVAL3( EVAL3( EVAL3( __VA_ARGS__ ) ) )
@@ -29,12 +37,22 @@
 #define EVAL0( ... ) __VA_ARGS__
 
 /****************************************************************
+** Miscellaneous
+*****************************************************************/
+#define PP_CONST_ONE( ... ) 1
+
+/****************************************************************
 ** Evalutation Control
 *****************************************************************/
 #define EMPTY()
 #define DEFER( ... ) __VA_ARGS__ EMPTY()
 #define OBSTRUCT( ... ) __VA_ARGS__ DEFER( EMPTY )()
 #define EXPAND( ... ) __VA_ARGS__
+
+// This one can be useful when you would normally use a "##"
+// joining operator. Sometimes that can cause evaluation order
+// issues when inside a complicated macro, and this can solve it.
+#define PP_JOIN( a, b ) a##b
 
 /****************************************************************
 ** List Operations
@@ -187,3 +205,19 @@
                        f, __VA_ARGS__ ) )
 
 #define PP_MAP_COMMAS1_RECURSE_INDIRECT() PP_MAP_COMMAS1_RECURSE
+
+/****************************************************************
+** PP_MAP_PLUS
+*****************************************************************/
+// PP_MAP_PLUS will map the function over the list and put +
+// between the result values (but not after the last).
+#define PP_MAP_PLUS( ... ) PP_MAP_PLUS_RECURSE( __VA_ARGS__ )
+
+#define PP_MAP_PLUS_RECURSE( f, ... ) \
+  __VA_OPT__( PP_MAP_PLUS1_RECURSE( f, __VA_ARGS__ ) )
+
+#define PP_MAP_PLUS1_RECURSE( f, a, ... )                      \
+  f( a ) __VA_OPT__( +PP_MAP_PLUS1_RECURSE_INDIRECT EMPTY()()( \
+      f, __VA_ARGS__ ) )
+
+#define PP_MAP_PLUS1_RECURSE_INDIRECT() PP_MAP_PLUS1_RECURSE

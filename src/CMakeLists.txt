@@ -29,7 +29,13 @@ find_package( Threads REQUIRED )
 # Library containing the <filesystem> implementation.
 if( USE_LIBCXX )
     # libc++ version
-    set( cxx-fs-lib c++fs )
+    if( CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0 )
+        set( cxx-fs-lib c++fs )
+    else()
+        # In clang versions after 9.0 the filesystem library is
+        # included in libc++.
+        set( cxx-fs-lib )
+    endif()
 else()
     # libstdc++ version
     set( cxx-fs-lib stdc++fs )
