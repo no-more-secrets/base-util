@@ -106,10 +106,12 @@ auto visit( Variant& v, VisitorFunc const& func ) {
   } else if constexpr(                                         \
           std::is_same_v<std::decay_t<decltype( val )>, t> ) {
 
+// The references in the structured binding should inherit const
+// from `v`.
 #define case_v_( t, ... )                                      \
   } else if constexpr(                                         \
           std::is_same_v<std::decay_t<decltype( val )>, t> ) { \
-      auto const& [__VA_ARGS__] = val;
+      auto& [__VA_ARGS__] = val;
 
 #define default_v                                                \
   } else static_assert(                                          \
