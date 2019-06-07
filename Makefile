@@ -1,7 +1,10 @@
 .DEFAULT_GOAL := all
+builds        := .builds
 build-current := .builds/current
 
 -include $(build-current)/env-vars.mk
+
+possible_targets := all clean
 
 build-config := $(notdir $(realpath $(build-current)))
 ifneq (,$(wildcard $(build-current)/Makefile))
@@ -10,13 +13,13 @@ ifneq (,$(wildcard $(build-current)/Makefile))
     # propagating the jobserver.  For this same reason we
     # also do not just put the whole command into a variable
     # and just define the targets once.
-    all clean: $(build-current)
+    $(possible_targets): $(build-current)
 	    @cd $(build-current) && $(MAKE) -s $@
 else
     # Use cmake to build here because it is the preferred
     # way to go when it works for us (which it does in this
     # case).
-    all clean: $(build-current)
+    $(possible_targets): $(build-current)
 	    @cd $(build-current) && cmake --build . --target $@
 endif
 
@@ -26,10 +29,22 @@ run: all
 test: all
 	@$(build-current)/test/tests
 
-distclean:
+clean-target := $(if $(wildcard $(builds)),clean,)
+
+# Need to have `clean` as a dependency before removing the
+# .builds folder because some outputs of the build are in the
+# source tree and we need to clear them first.
+distclean: $(clean-target)
 	@rm -rf .builds
+
+update:
+	@git pull origin master
+	@git submodule update --init
+	@cmc rc
+	@echo
+	@$(MAKE) -s test
 
 $(build-current):
 	@cmc
 
-.PHONY: all run clean test distclean
+.PHONY: $(possible_targets) update run test
