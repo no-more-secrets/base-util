@@ -221,6 +221,12 @@ std::optional<size_t> find_first_if( Range const& r, Func const& f ) {
 }
 
 template<typename Range, typename Value>
+auto contains( Range const& r, Value const& v ) {
+  return std::find( std::begin( r ), std::end( r ), v ) !=
+         std::end( r );
+}
+
+template<typename Range, typename Value>
 auto find( Range const& r, Value const& v ) {
   return std::find( std::begin( r ), std::end( r ), v );
 }
