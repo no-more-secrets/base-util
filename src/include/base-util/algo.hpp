@@ -220,8 +220,9 @@ std::optional<size_t> find_first_if( Range const& r, Func const& f ) {
   return std::nullopt;
 }
 
-template<typename Range, typename Value>
-auto contains( Range const& r, Value const& v ) {
+template<typename Range>
+auto contains( Range const& r,
+               std::decay_t<decltype(*r.begin())> const& v ) {
   return std::find( std::begin( r ), std::end( r ), v ) !=
          std::end( r );
 }
