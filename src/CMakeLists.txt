@@ -13,7 +13,7 @@ project(
 
 # Enable all warnings and treat warnings as errors.
 function( set_warning_options target )
-	target_compile_options(
+    target_compile_options(
         ${target} PRIVATE
         # clang/GCC warnings
         $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:
@@ -67,6 +67,18 @@ target_include_directories( base-util
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}> )
+
+if( USE_LIBCXX )
+    # We need to suppress warnings/errors about the experimen-
+    # tal/filesystem going away because for some time we need to
+    # build with the libstdc++ on systems where <filesystem> does
+    # not yet exist.
+    target_compile_definitions(
+        base-util
+        PUBLIC
+        _LIBCPP_NO_EXPERIMENTAL_DEPRECATION_WARNING_FILESYSTEM
+    )
+endif()
 
 target_compile_features( base-util PUBLIC cxx_std_17 )
 set_target_properties( base-util PROPERTIES CXX_EXTENSIONS OFF )
