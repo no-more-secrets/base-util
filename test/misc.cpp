@@ -134,7 +134,7 @@ TEST_CASE( "variant" )
       case_v( int ) {
         found5 = false;
       }
-      case_v_( A, x, y ) {
+      case_v( A, x, y ) {
         if( x == 3 && y == 4.5 )
             found5 = true;
       }

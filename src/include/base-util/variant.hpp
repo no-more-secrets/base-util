@@ -3,6 +3,8 @@
 ****************************************************************/
 #pragma once
 
+#include "base-util/pp.hpp"
+
 #include <type_traits>
 #include <variant>
 
@@ -69,7 +71,7 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 //     case_v( int ) {
 //       cout << "int value: " << val << "\n";
 //     }
-//     case_v_( pair<int, int>, x, y ) {
+//     case_v( pair<int, int>, x, y ) {
 //       cout << "x, y = " << x << ", " << y << "\n";
 //     }
 //     case_v( string ) {
@@ -84,8 +86,9 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 // the type list is not exhaustive. However, it will not trigger
 // an error when a type is extraneous.
 //
-// The case_v_() takes additional parameters which will be bound
-// to the value using structured bindings (pattern matching).
+// The case_v can optionally take additional parameters which
+// will be bound to the value using structured bindings (pattern
+// matching).
 //
 // The bodies of the case_v's have access to all variables in the
 // surrounding scope (they capture them by reference).
@@ -93,7 +96,10 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 // Note that, unlike a standard `switch` statement, the concept
 // of fallthrough does not work here (indeed it wouldn't make
 // sense since the `val` variable, which is available in the body
-// of the case_v, can only have one type).
+// of the case_v, can only have one type). Another important
+// difference is that a `return` statement issued from within one
+// of the case blocks will NOT return from the surrounding
+// function, it will just act as a `break` in a normal switch.
 //
 // The structure of curly braces is a bit strange in these
 // macros, but that is to allow the user to write curly braces as
@@ -102,16 +108,18 @@ auto visit( Variant& v, VisitorFunc const& func ) {
   { auto& __v = v;                                       \
     auto __f = [&]( auto&& val ) { if constexpr( false )
 
-#define case_v( t )                                            \
+#define case_v_SINGLE( t )                                     \
   } else if constexpr(                                         \
           std::is_same_v<std::decay_t<decltype( val )>, t> ) {
 
 // The references in the structured binding should inherit const
 // from `v`.
-#define case_v_( t, ... )                                      \
+#define case_v_MULTI( t, ... )                                 \
   } else if constexpr(                                         \
           std::is_same_v<std::decay_t<decltype( val )>, t> ) { \
       auto& [__VA_ARGS__] = val;
+
+#define case_v( ... ) PP_ONE_OR_MORE_ARGS( case_v, __VA_ARGS__ )
 
 #define default_v                                                \
   } else static_assert(                                          \

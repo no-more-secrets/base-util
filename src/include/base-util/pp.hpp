@@ -75,6 +75,62 @@
 #define TAIL( a, ... ) __VA_ARGS__
 
 /****************************************************************
+** Variadic Macro Utility
+*****************************************************************/
+// The purpose of these macros is to allow defining a macro that
+// can take one or more arguments and where the first argument
+// must be extracted. Macros actually don't allow this, since if
+// one defines:
+//
+//   #define FOO( ... )
+//
+// Then one cannot extract the first argument; if one defines:
+//
+//   #define FOO( a, ... )
+//
+// Then it will give a compiler error when only a single argument
+// is passed, because, for some unknown reason, there must always
+// be at least one parameter passed for a "...".
+//
+// This is solved by the following macros.  First define these:
+//
+//   #define FOO_MULTI( s, ... ) printf( s, __VA_ARGS__ )
+//   #define FOO_SINGLE( s )     printf( s )
+//
+// Now use `PP_ONE_OR_MORE_ARGS` to define a macro that will
+// dispatch based on whether the macro is given one or
+// more-than-one argument:
+//
+//   #define FOO( ... ) PP_ONE_OR_MORE_ARGS( FOO, __VA_ARGS__ )
+//
+// Now it can be used like this:
+//
+//   FOO( "test 1\n" );
+//   FOO( "test 2: %d\n", 5 );
+//   FOO( "test 3: %d, %f\n", 5, 6.6 );
+//
+// Note that FOO must still be given at least one argument.
+
+// If the macro may be given more than ~10 parameters then this
+// will have to be increased, along with `PP_HAS_MULTI_ARGS`
+// below.
+#define PP_CHOOSE_TENTH_ARG( _1, _2, _3, _4, _5, _6, _7, _8, \
+                             _9, _10, ... )                  \
+  _10
+
+#define PP_HAS_MULTI_ARGS( ... )                                \
+  PP_CHOOSE_TENTH_ARG( __VA_ARGS__, MULTI, MULTI, MULTI, MULTI, \
+                       MULTI, MULTI, MULTI, MULTI, SINGLE,      \
+                       ERROR )
+
+#define PP_DISAMBIGUATE_MULTI_ARGS( f, has_args, ... ) \
+  PP_JOIN( f##_, has_args )( __VA_ARGS__ )
+
+#define PP_ONE_OR_MORE_ARGS( f, ... ) \
+  PP_DISAMBIGUATE_MULTI_ARGS(         \
+      f, PP_HAS_MULTI_ARGS( __VA_ARGS__ ), __VA_ARGS__ )
+
+/****************************************************************
 ** PP_MAP_PREPEND_NS
 *****************************************************************/
 // PP_MAP_PREPEND_NS will prepend the given string to each
