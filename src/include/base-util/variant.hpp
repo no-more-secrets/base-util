@@ -101,11 +101,38 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 // of the case blocks will NOT return from the surrounding
 // function, it will just act as a `break` in a normal switch.
 //
+// It can also be used to return a value:
+//
+//   auto n = switch_v( my_var ) {
+//     case_v( MyVar::state_1 ) {
+//       return 5;
+//     }
+//     case_v( MyVar::state_2, var_1 ) {
+//       if( var_1 ) return *var_1;
+//       return 6;
+//     }
+//     case_v( MyVar::state_3, var_2, var_3 ) {
+//       return (int)var_3;
+//     }
+//     default_v;
+//   }
+//
+// When using return values, `default_v` must be used since all
+// possibilities must be handled in order to produce a return
+// value in all cases. TODO: maybe have it automatically return
+// an `optional` of the return value if default_v_no_check is
+// used.
+//
+// TODO: in C++20 there will be a new overload of std::visit that
+// takes the return type as a template argument and will convert
+// any return value to that type, and this should be
+// incorporated.
+//
 // The structure of curly braces is a bit strange in these
 // macros, but that is to allow the user to write curly braces as
 // in the example above.
 #define switch_v( v )                                    \
-  { auto& __v = v;                                       \
+  [&]{ auto& __v = v;                                    \
     auto __f = [&]( auto&& val ) { if constexpr( false )
 
 #define case_v_SINGLE( t )                                     \
@@ -125,10 +152,10 @@ auto visit( Variant& v, VisitorFunc const& func ) {
   } else static_assert(                                          \
           ::util::detail::parametrized_false_v<decltype( val )>, \
           "non-exhaustive variant visitor type list" );          \
-  }; { std::visit( __f, __v ); } (void)__v
+  }; { return std::visit( __f, __v ); } }(); {
 
 #define default_v_no_check \
-  } }; { std::visit( __f, __v ); } (void)__v
+  } }; { return std::visit( __f, __v ); } }(); {
 
 #define break_v return
 

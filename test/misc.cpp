@@ -124,6 +124,20 @@ TEST_CASE( "variant" )
     }
     REQUIRE( found4 );
 
+    auto ret = switch_v( v4 ) {
+      case_v( int ) {
+        return 6;
+      }
+      case_v( double ) {
+        return 6;
+      }
+      case_v( std::string ) {
+        return 7;
+      }
+      default_v;
+    }
+    REQUIRE( ret == 7 );
+
     // Test the structured bindings version.
     using A = pair<int, double>;
     using V2 = std::variant<int, A>;
