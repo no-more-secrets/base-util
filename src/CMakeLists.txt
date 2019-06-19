@@ -80,7 +80,7 @@ if( USE_LIBCXX )
     )
 endif()
 
-target_compile_features( base-util PUBLIC cxx_std_17 )
+target_compile_features( base-util PUBLIC cxx_std_20 )
 set_target_properties( base-util PROPERTIES CXX_EXTENSIONS OFF )
 target_link_libraries( base-util PUBLIC ${cxx-fs-lib} )
 target_link_libraries( base-util PUBLIC Threads::Threads )
