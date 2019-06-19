@@ -11,6 +11,7 @@
 #include "base-util/type-map.hpp"
 #include "base-util/variant.hpp"
 
+#include <optional>
 #include <type_traits>
 
 using namespace std;
@@ -137,6 +138,21 @@ TEST_CASE( "variant" )
       default_v;
     }
     REQUIRE( ret == 7 );
+
+    // Test return type hints.
+    auto ret2 = switch_v( std::optional<int>, v4 ) {
+      case_v( int ) {
+        return nullopt;
+      }
+      case_v( double ) {
+        return {};
+      }
+      case_v( std::string ) {
+        return 7;
+      }
+      default_v;
+    }
+    REQUIRE( ret2 == 7 );
 
     // Test the structured bindings version.
     using A = pair<int, double>;
