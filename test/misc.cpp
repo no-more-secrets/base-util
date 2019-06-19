@@ -164,13 +164,52 @@ TEST_CASE( "variant" )
       case_v( int ) {
         found5 = false;
       }
-      case_v( A, x, y ) {
-        if( x == 3 && y == 4.5 )
+      case_v( A, first, second ) {
+        if( first == 3 && second == 4.5 )
             found5 = true;
       }
       default_v;
     }
     REQUIRE( found5 );
+
+    struct AA {
+      int    x;
+      string y;
+    };
+
+    struct BB {
+      double d;
+    };
+
+    struct CC {
+      int u;
+      int v;
+    };
+
+    variant<AA, BB, CC, double> v = CC{3,4};
+
+    // Test pattern matching with out-of-order params.
+    auto ret3 = switch_v( int, v ) {
+      case_v( AA ) {
+        //
+        break_v 1;
+      }
+      case_v( BB, d ) {
+        //
+        break_v d;
+      }
+      case_v( CC, v, u ) {
+        //
+        (void)u;
+        break_v v;
+      }
+      case_v( double ) {
+        //
+        break_v 10;
+      }
+      default_v;
+    };
+    REQUIRE( ret3 == 4 );
 }
 
 TEST_CASE( "opt_util" )

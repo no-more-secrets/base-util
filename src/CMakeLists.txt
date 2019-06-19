@@ -17,7 +17,7 @@ function( set_warning_options target )
         ${target} PRIVATE
         # clang/GCC warnings
         $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:
-            -Wall -Wextra -Wpedantic -Werror >
+            -Wall -Wextra -Werror >
         # MSVC warnings
         $<$<CXX_COMPILER_ID:MSVC>:
             /Wall /WX > )

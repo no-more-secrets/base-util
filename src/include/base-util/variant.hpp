@@ -125,15 +125,18 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 // ================
 //
 // The case_v can optionally take additional parameters which
-// will be bound to the value using structured bindings (pattern
-// matching).
+// must correspond to the struct field names and will be
+// available within the case_v as references to the respective
+// members. The members can be specified in any order, but all of
+// them must be specified.
 //
 //   struct Point { int x; int y; };
 //   auto v = std::variant<int, Point, string>{ ... };
 //
 //   switch_v( v ) {
 //     ...
-//     case_v( Point, x, y ) {
+//     // y,x are "out of order"; this is ok.
+//     case_v( Point, y, x ) {
 //       cout << "x, y = " << x << ", " << y << "\n";
 //     }
 //     ...
@@ -217,23 +220,31 @@ auto visit( Variant& v, VisitorFunc const& func ) {
   } else if constexpr(                                         \
           std::is_same_v<std::decay_t<decltype( val )>, t> ) {
 
+// Helpers to be used only in this header.
+#define V_UNDERSCORES( a )     PP_JOIN( __, a )
+#define V_USE_VARIABLE( a )    (void)a;
+#define V_REF_STRUCT_ELEM( a ) auto& a = val.a;
+
 // The references in the structured binding should inherit const
-// from `v`.
-#define case_v_MULTI( t, ... )                                 \
-  } else if constexpr(                                         \
-          std::is_same_v<std::decay_t<decltype( val )>, t> ) { \
-      auto& [__VA_ARGS__] = val;
-// FIXME:    ^^^^^^^^^^^ beware variables out of order!
+// from `v`. Here inside the if we generate something like this:
 //
-//           Generate something like this:
+//   // This checks number of vars.
+//   auto& [__x,__y] = val;
+//   (void)__x; (void)__y;
 //
-//           // This checks number of vars.
-//           auto& [__x,__y] = val;
-//           (void)__x; (void)__y;
+//   // These check the variable names and allow using them
+//   // independent of order:
+//   auto& x = val.x;
+//   auto& y = val.y;
 //
-//           // These allow using variables independent of order:
-//           auto& x = val.x;
-//           auto& y = val.y;
+#define case_v_MULTI( t, ... )                                      \
+  } else if constexpr(                                              \
+          std::is_same_v<std::decay_t<decltype( val )>, t> ) {      \
+      auto& [EVAL( PP_MAP_COMMAS( V_UNDERSCORES, __VA_ARGS__ ) )]   \
+          = val;                                                    \
+      EVAL( PP_MAP( V_USE_VARIABLE,                                 \
+                    PP_MAP_COMMAS( V_UNDERSCORES, __VA_ARGS__ ) ) ) \
+      EVAL( PP_MAP( V_REF_STRUCT_ELEM, __VA_ARGS__ ) )
 
 #define case_v( ... ) PP_ONE_OR_MORE_ARGS( case_v, __VA_ARGS__ )
 
