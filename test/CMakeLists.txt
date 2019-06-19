@@ -14,7 +14,7 @@ enable_testing()
 
 find_package( Catch2 REQUIRED )
 
-add_executable( tests
+add_executable( run-tests
     infra/main.cpp
     algo.cpp
     conv.cpp
@@ -24,11 +24,11 @@ add_executable( tests
     string.cpp
 )
 
-target_compile_features( tests PUBLIC cxx_std_17 )
-set_target_properties( tests PROPERTIES CXX_EXTENSIONS OFF )
-add_test( tests tests )
-set_warning_options( tests )
-target_link_libraries( tests
+target_compile_features( run-tests PUBLIC cxx_std_17 )
+set_target_properties( run-tests PROPERTIES CXX_EXTENSIONS OFF )
+#add_test( base-util-tests run-tests )
+set_warning_options( run-tests )
+target_link_libraries( run-tests
                        PRIVATE
                        base-util::base-util
                        Catch2::Catch2 )

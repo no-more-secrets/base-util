@@ -45,10 +45,14 @@ add_subdirectory( src )
 add_subdirectory( app )
 add_subdirectory( test )
 
-# Should also automatically add a dependency on main.
+# Should also automatically add a dependency on the binary.
 add_custom_target( run
                    COMMAND main
                    WORKING_DIRECTORY ../
+                   USES_TERMINAL )
+add_custom_target( test
+                   COMMAND run-tests
+                   WORKING_DIRECTORY ../../
                    USES_TERMINAL )
 
 # === clang-tools =================================================
