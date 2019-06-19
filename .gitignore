@@ -37,3 +37,4 @@
 
 # cmake
 /.builds
+/Makefile
