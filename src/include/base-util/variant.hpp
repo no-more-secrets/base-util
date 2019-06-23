@@ -62,7 +62,7 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 }
 
 /****************************************************************
-* switch_v
+* Variant Pattern Matchers
 ****************************************************************/
 // Macro for visiting/dispatching on variants using a switch-like
 // syntax. Must only be used on variants without repeating types.
@@ -73,32 +73,32 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 //   struct Point { int x; int y; };
 //   auto v = std::variant<int, Point, string>{ ... };
 //
-//   switch_v( v ) {
-//     case_v( int ) {
+//   switch_( v ) {
+//     case_( int ) {
 //       cout << "int value: " << val << "\n";
 //     }
-//     case_v( Point ) {
+//     case_( Point ) {
 //       cout << "x, y = " << val.x << ", " << val.y << "\n";
 //     }
-//     case_v( string ) {
+//     case_( string ) {
 //       cout << "string value: " << val << "\n";
 //     }
-//     default_v;
+//     switch_exhaustive;
 //   }
 //
-// The curly braces are required as is the default_v.
+// The curly braces are required as is the switch_exhaustive.
 //
 // The default case is required and will throw a compile error if
 // the type list is not exhaustive. FIXME: however, it will not
 // trigger an error when a type is extraneous.
 //
-// The bodies of the case_v's have access to all variables in the
+// The bodies of the case_'s have access to all variables in the
 // surrounding scope (they capture them by reference).
 //
 // Important: Note that, unlike a standard `switch` statement,
 // the concept of fallthrough does not work here (indeed it
 // wouldn't make sense since the `val` variable, which is avail-
-// able in the body of the case_v, can only have one type). An-
+// able in the body of the case_, can only have one type). An-
 // other important difference is that a `return` statement issued
 // from within one of the case blocks will NOT return from the
 // surrounding function, it will just act as a `break` in a
@@ -108,35 +108,35 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 // ====================
 //
 // If only a subset of the variant's types need to be handled
-// then one can use `default_v_no_check` (FIXME: improve name) to
-// avoid requiring that all cases be handled:
+// then one can use `switch_exhaustive` to avoid requiring that
+// all cases be handled:
 //
 //   struct Point { int x; int y; };
 //   auto v = std::variant<int, Point, string>{ ... };
 //
-//   switch_v( v ) {
-//     case_v( string ) {
+//   switch_( v ) {
+//     case_( string ) {
 //       cout << "string value: " << val << "\n";
 //     }
-//     default_v_no_check;
+//     switch_exhaustive;
 //   }
 //
 // PATTERN MATCHING
 // ================
 //
-// The case_v can optionally take additional parameters which
-// must correspond to the struct field names and will be
-// available within the case_v as references to the respective
-// members. The members can be specified in any order, but all of
-// them must be specified.
+// The case_ can optionally take additional parameters which must
+// correspond to the struct field names and will be available
+// within the case_ as references to the respective members. The
+// members can be specified in any order, but all of them must be
+// specified.
 //
 //   struct Point { int x; int y; };
 //   auto v = std::variant<int, Point, string>{ ... };
 //
-//   switch_v( v ) {
+//   switch_( v ) {
 //     ...
 //     // y,x are "out of order"; this is ok.
-//     case_v( Point, y, x ) {
+//     case_( Point, y, x ) {
 //       cout << "x, y = " << x << ", " << y << "\n";
 //     }
 //     ...
@@ -145,53 +145,95 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 // RETURNING VALUES
 // ================
 //
-//   auto n = switch_v( my_var ) {
-//     case_v( MyVar::state_1 ) {
-//       return 5;
+// The `switch_` macro prevents the user from attempting to re-
+// turn (or return values); it is intended only for side effects.
+// To yield a value from a variant switch_ you should instead use
+// the `matcher_` and `result_` macros:
+//
+//   auto n = matcher_( my_var ) {
+//     case_( MyVar::state_1 ) {
+//       result_ 5;
 //     }
-//     case_v( MyVar::state_2, var_1 ) {
-//       if( var_1 ) return *var_1;
-//       return 6;
+//     case_( MyVar::state_2, var_1 ) {
+//       if( var_1 ) break_ *var_1;
+//       result_ 6;
 //     }
-//     case_v( MyVar::state_3, var_2, var_3 ) {
-//       return (int)var_3;
+//     case_( MyVar::state_3, var_2, var_3 ) {
+//       result_ (int)var_3;
 //     }
-//     default_v;
+//     matcher_exhaustive;
 //   }
 //
-// When using return values, `default_v` must be used since all
-// possibilities must be handled in order to produce a return
-// value in all cases. TODO: maybe have it automatically return
-// an `optional` of the return value if default_v_no_check is
-// used.
+// We use `result_` instead of `return` to return values; the
+// former is simply an alias for the latter, but should be used
+// because it helps to drive home to the reader that the return
+// statement is not returning from the outter scope (as would
+// happen by returning in a real switch block) but instead is
+// just yield a value from the `matcher_` statement. This is also
+// why the `switch_` macro prevents returning at all.
+//
+// When using return values, `switch_exhaustive` must be used
+// since all possibilities must be handled in order to produce a
+// return value in all cases. TODO: maybe have it automatically
+// return an `optional` of the return value if switch_exhaustive
+// is used.
 //
 // RETURN TYPE HINTS
 // =================
 //
 // When returning types such as std::optional<int> it can be de-
-// sirable to have the individual case_v functions return e.g.
+// sirable to have the individual case_ functions return e.g.
 // ints or nullopts, i.e., things that can be converted to
 // std::optional<int>. However, if we do this, we get compiler
-// errors since each of the case_v functions have different re-
-// turn types. To fix this we can specify what the return type
-// should be by passing it as the first argument to the switch_v
-// macro:
+// errors since each of the case_ functions have different return
+// types. To fix this we can specify what the return type should
+// be by passing it as the third argument to the matcher_ macro:
 //
-//   auto n = switch_v( std::optional<int>, my_var ) {
-//     case_v( MyVar::state_1 ) {
-//       return 5;
+//   auto n = matcher_( my_var, ->, std::optional<int> ) {
+//     case_( MyVar::state_1 ) {
+//       break_ 5;
 //     }
-//     case_v( MyVar::state_2, var_1 ) {
-//       if( var_1 ) return *var_1;
-//       return std::nullopt;
+//     case_( MyVar::state_2, var_1 ) {
+//       if( var_1 ) break_ *var_1;
+//       break_ std::nullopt;
 //     }
-//     case_v( MyVar::state_3, var_2, var_3 ) {
-//       return (int)var_3;
+//     case_( MyVar::state_3, var_2, var_3 ) {
+//       break_ (int)var_3;
 //     }
-//     default_v;
+//     matcher_exhaustive;
 //   }
 //
 // which would not compile without specifying the return type.
+//
+// The second macro argument is just a dummy and can be filled
+// with the -> operator to make the appearance reminiscent of
+// C++'s syntax for specifying trailing return types.
+//
+// variant_function
+// ================
+//
+// A variant on the above (no pun intended) that works better for
+// defining free-standing functions that pattern match on variant
+// values is the `variant_function` macro. Use it like so:
+//
+//   struct A {};
+//   variant<int, string, A> v = A{};
+//
+//   auto to_string = variant_function( item, ->, std::string ) {
+//     case_( int ) return std::to_string( item );
+//     case_( string ) return item;
+//     case_( A ) return "A";
+//     variant_function_exhaustive;
+//   };
+//
+// where the second/third arguments to the variant_function,
+// specifying return type, are optional.
+//
+// Note that this example demonstrates that the case_ statements
+// (and indeed case_ statements also) do not need parenthases.
+// Also, we use naked `return` keywords because the effect of
+// those statements is equivalent to returning from the outter
+// context, unlike from within a `switch_` or `matcher_` block.
 //
 // CLOSING THOUGHTS
 // ================
@@ -200,30 +242,92 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 // takes the return type as a template argument and will convert
 // any return value to that type, which might be useful here, al-
 // though currently we don't seem to need this given the
-// two-argument switch_v macro.
+// two-argument switch_ macro.
 //
 // The structure of curly braces is a bit strange in these
 // macros, but that is to allow the user to write curly braces as
 // in the example above.
 //
-#define switch_v_MULTI( ret_type, v )                               \
-  [&]{ auto& __v = v;                                               \
-    auto __f = [&]( auto&& val ) -> ret_type { if constexpr( false )
+/////////////////////////////////////////////////////////////////
 
-#define switch_v_SINGLE( v )                             \
-  [&]{ auto& __v = v;                                    \
-    auto __f = [&]( auto&& val ) { if constexpr( false )
+/*                      === switch_v ===                       */
 
-#define switch_v( ... ) PP_ONE_OR_MORE_ARGS( switch_v, __VA_ARGS__ )
+#define switch_v( v )                                           \
+  [&]{ auto& __v = v;                                           \
+    auto __f = [&]( auto&& val ) ->                             \
+          ::util::detail::switch_ret_do_not_use_t {             \
+        auto& __val = val;                                      \
+        if constexpr( false )
 
-#define case_v_SINGLE( t )                                     \
-  } else if constexpr(                                         \
-          std::is_same_v<std::decay_t<decltype( val )>, t> ) {
+#define switch_exhaustive                                       \
+  } else static_assert(                                         \
+        ::util::detail::parametrized_false_v<decltype( __val )>,\
+        "non-exhaustive variant visitor type list" );           \
+  return ::util::detail::VSRDNU;                                \
+  }; { return std::visit( __f, __v ); } }(); {
+
+#define switch_non_exhaustive                                   \
+  } return ::util::detail::VSRDNU; };                           \
+  { return std::visit( __f, __v ); } }(); {
+
+/*                     === matcher_v ===                       */
+
+#define matcher_v_MULTI( v, _, ret_type )                       \
+  [&]{ auto& __v = v;                                           \
+    auto __f = [&]( auto&& val ) -> ret_type {                  \
+        auto& __val = val;                                      \
+        if constexpr( false )
+
+#define matcher_v_SINGLE( v )                                   \
+  [&]{ auto& __v = v;                                           \
+       auto __f = [&]( auto&& val ) {                           \
+         auto& __val = val;                                     \
+         if constexpr( false )
+
+#define matcher_v( ... )                                        \
+        PP_ONE_OR_MORE_ARGS( matcher_v, __VA_ARGS__ )
+
+#define matcher_exhaustive                                      \
+  } else static_assert(                                         \
+        ::util::detail::parametrized_false_v<decltype( __val )>,\
+        "non-exhaustive variant visitor type list" );           \
+  }; { return std::visit( __f, __v ); } }(); {
+
+#define matcher_non_exhaustive                                  \
+  }; { return std::visit( __f, __v ); }(); {
+
+/*                 === variant_function ===                    */
+
+#define variant_function_MULTI( val, _, ret_type )              \
+  []( auto& v ){ auto& __v = v;                                 \
+    auto __f = [&]( auto&& __val ) -> ret_type {                \
+        auto& val = __val;                                      \
+        if constexpr( false )
+
+#define variant_function_SINGLE( val )                          \
+  []( auto& v ){ auto& __v = v;                                 \
+    auto __f = [&]( auto&& val ) {                              \
+        auto& val = __val;                                      \
+        if constexpr( false )
+
+#define variant_function( ... )                                 \
+        PP_ONE_OR_MORE_ARGS( variant_function, __VA_ARGS__ )
+
+#define variant_function_exhaustive                             \
+  } else static_assert(                                         \
+        ::util::detail::parametrized_false_v<decltype( __val )>,\
+        "non-exhaustive variant visitor type list" );           \
+  }; { return std::visit( __f, __v ); }
+
+#define variant_function_non_exhaustive                         \
+  } }; { return std::visit( __f, __v ); }
+
+/*                       === case_v ===                        */
 
 // Helpers to be used only in this header.
 #define V_UNDERSCORES( a )     PP_JOIN( __, a )
 #define V_USE_VARIABLE( a )    (void)a;
-#define V_REF_STRUCT_ELEM( a ) auto& a = val.a;
+#define V_REF_STRUCT_ELEM( a ) auto& a = __val.a;
 
 // The references in the structured binding should inherit const
 // from `v`. Here inside the if we generate something like this:
@@ -239,27 +343,43 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 //
 #define case_v_MULTI( t, ... )                                      \
   } else if constexpr(                                              \
-          std::is_same_v<std::decay_t<decltype( val )>, t> ) {      \
+          std::is_same_v<std::decay_t<decltype( __val )>, t> ) {    \
       auto& [EVAL( PP_MAP_COMMAS( V_UNDERSCORES, __VA_ARGS__ ) )]   \
-          = val;                                                    \
+          = __val;                                                  \
       EVAL( PP_MAP( V_USE_VARIABLE,                                 \
                     PP_MAP_COMMAS( V_UNDERSCORES, __VA_ARGS__ ) ) ) \
       EVAL( PP_MAP( V_REF_STRUCT_ELEM, __VA_ARGS__ ) )
 
+#define case_v_SINGLE( t )                                          \
+  } else if constexpr(                                              \
+          std::is_same_v<std::decay_t<decltype( __val )>, t> ) {
+
 #define case_v( ... ) PP_ONE_OR_MORE_ARGS( case_v, __VA_ARGS__ )
 
-#define default_v                                                \
-  } else static_assert(                                          \
-          ::util::detail::parametrized_false_v<decltype( val )>, \
-          "non-exhaustive variant visitor type list" );          \
-  }; { return std::visit( __f, __v ); } }(); {
+/*                     === break/return ===                        */
 
-#define default_v_no_check \
-  } }; { return std::visit( __f, __v ); } }(); {
+#define break_v  return ::util::detail::switch_ret_do_not_use_t{}
+#define result_v return
 
-#define break_v return
+/*                    === terse keywords ===                       */
+
+// If these are conflicting with symbols in other headers then
+// define this in the relevant translation unit before including
+// this header.
+#ifndef RN_NO_DEFINE_SHORT_V_KEYWORDS
+#  define  switch_( ... )  switch_v( __VA_ARGS__ )
+#  define matcher_( ... ) matcher_v( __VA_ARGS__ )
+#  define    case_( ... )    case_v( __VA_ARGS__ )
+#  define   break_          break_v
+#  define  result_         result_v
+#endif
 
 namespace detail {
+
+struct switch_ret_do_not_use_t {
+  explicit constexpr switch_ret_do_not_use_t() {}
+};
+inline constexpr switch_ret_do_not_use_t VSRDNU{};
 
 // We must use this in the above macro instead of just "false"
 // because otherwise the static_assert will always trigger.

@@ -105,7 +105,7 @@ TEST_CASE( "variant" )
       case_v( std::string ) {
         found3 = false;
       }
-      default_v;
+      switch_exhaustive;
     }
     REQUIRE( found3 );
 
@@ -121,36 +121,36 @@ TEST_CASE( "variant" )
       case_v( std::string ) {
         found4= true;
       }
-      default_v;
+      switch_exhaustive;
     }
     REQUIRE( found4 );
 
-    auto ret = switch_v( v4 ) {
+    auto ret = matcher_v( v4 ) {
       case_v( int ) {
-        return 6;
+        result_v 6;
       }
       case_v( double ) {
-        return 6;
+        result_v 6;
       }
       case_v( std::string ) {
-        return 7;
+        result_v 7;
       }
-      default_v;
+      matcher_exhaustive;
     }
     REQUIRE( ret == 7 );
 
     // Test return type hints.
-    auto ret2 = switch_v( std::optional<int>, v4 ) {
+    auto ret2 = matcher_v( v4, ->, std::optional<int> ) {
       case_v( int ) {
-        return nullopt;
+        result_v nullopt;
       }
       case_v( double ) {
-        return {};
+        result_v {};
       }
       case_v( std::string ) {
-        return 7;
+        result_v 7;
       }
-      default_v;
+      matcher_exhaustive;
     }
     REQUIRE( ret2 == 7 );
 
@@ -168,7 +168,7 @@ TEST_CASE( "variant" )
         if( first == 3 && second == 4.5 )
             found5 = true;
       }
-      default_v;
+      switch_exhaustive;
     }
     REQUIRE( found5 );
 
@@ -186,30 +186,42 @@ TEST_CASE( "variant" )
       int v;
     };
 
-    variant<AA, BB, CC, double> v = CC{3,4};
+    variant<AA, BB, CC, double> v6 = CC{3,4};
 
     // Test pattern matching with out-of-order params.
-    auto ret3 = switch_v( int, v ) {
+    auto ret3 = matcher_v( v6, ->, int ) {
       case_v( AA ) {
         //
-        break_v 1;
+        result_v 1;
       }
       case_v( BB, d ) {
         //
-        break_v d;
+        result_v d;
       }
       case_v( CC, v, u ) {
         //
         (void)u;
-        break_v v;
+        result_v v;
       }
       case_v( double ) {
         //
-        break_v 10;
+        result_v 10;
       }
-      default_v;
+      matcher_exhaustive;
     };
     REQUIRE( ret3 == 4 );
+
+    struct Z {};
+
+    auto tostring = variant_function( item, ->, std::string ) {
+      case_v( int )    return std::to_string( item );
+      case_v( string ) return item;
+      case_v( Z )      return "Z";
+      variant_function_exhaustive;
+    };
+
+    variant<int, string, Z> v7 = Z{};
+    REQUIRE( tostring( v7 ) == "Z" );
 }
 
 TEST_CASE( "opt_util" )
