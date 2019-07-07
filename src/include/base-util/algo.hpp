@@ -266,4 +266,13 @@ auto find_previous_and_cycle( Range const& r, Value const& v ) {
   return r[idx];
 }
 
+template<typename Range, typename Pred>
+int count_if( Range&& r, Pred const& func ) {
+  return int(
+    std::count_if( std::begin( r ),
+                   std::end( r ),
+                   func )
+  );
+}
+
 } // namespace util
