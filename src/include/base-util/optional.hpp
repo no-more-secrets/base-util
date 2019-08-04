@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <optional>
+#include <type_traits>
 
 namespace util {
 
@@ -50,6 +51,15 @@ std::vector<T> cat_opts( std::vector<std::optional<T>> const& opts ) {
             res.push_back( *o );
 
     return res;
+}
+
+template<typename Pred, typename T>
+auto fmap( Pred const& f, std::optional<T> const& o ) {
+  using OutputT = std::decay_t<decltype( f( *o ) )>;
+  std::optional<OutputT> res;
+  if( o.has_value() )
+      res.emplace( f( *o ) );
+  return res;
 }
 
 } // namespace util

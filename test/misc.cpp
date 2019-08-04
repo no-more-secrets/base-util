@@ -242,6 +242,19 @@ TEST_CASE( "opt_util" )
     // Make sure it was moved from.
     REQUIRE( v == vector<optional<string>>{
                     {""}, nullopt, {""}, {""}, nullopt, {""}, {""}});
+
+    optional<int> o;
+    auto to_str = []( int ) { return string("n"); };
+
+    o = nullopt;
+    REQUIRE( !util::fmap( to_str, o ).has_value() );
+
+    o = 5;
+    auto new_o = util::fmap( to_str, o );
+    static_assert( is_same_v<decay_t<decltype(*new_o)>, string> );
+
+    REQUIRE( new_o.has_value() );
+    REQUIRE( new_o.value() == "n" );
 }
 
 TEST_CASE( "directed_graph" )
