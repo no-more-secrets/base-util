@@ -233,9 +233,12 @@ auto find( Range const& r, Value const& v ) {
 }
 
 template<typename Range, typename Value>
-auto find_index( Range const& r, Value const& v ) {
-  return std::find( std::begin( r ), std::end( r ), v ) -
-         std::begin( r );
+std::optional<int> find_index( Range const& r, Value const& v ) {
+  std::optional<int> res;
+  auto it = std::find( std::begin( r ), std::end( r ), v );
+  if( it != std::end( r ) )
+      res = static_cast<int>( it - std::begin( r ) );
+  return res;
 }
 
 // Find the value in the range, then move to the next element,
@@ -245,7 +248,7 @@ auto find_subsequent_and_cycle( Range const& r, Value const& v ) {
   if( r.size() == 0 )
     // no elements
     return v;
-  size_t idx = util::find_index( r, v );
+  size_t idx = util::find_index( r, v ).value_or( r.size() );
   if( idx == r.size() )
       idx = r.size()-1;
   idx = ( idx + 1 ) % r.size();
@@ -259,7 +262,7 @@ auto find_previous_and_cycle( Range const& r, Value const& v ) {
   if( r.size() == 0 )
     // no elements
     return v;
-  size_t idx = util::find_index( r, v );
+  size_t idx = util::find_index( r, v ).value_or( r.size() );
   if( idx == 0 )
     idx = r.size();
   --idx;

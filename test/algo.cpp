@@ -352,6 +352,23 @@ TEST_CASE( "find and cycle" )
     REQUIRE( find_previous_and_cycle( v18, 5 ) == 4 );
 }
 
+TEST_CASE( "find index" )
+{
+    using util::find_index;
+
+    vector<int> v1{};
+    REQUIRE( !find_index( v1, 5 ).has_value() );
+    vector v2{2};
+    REQUIRE( !find_index( v2, 5 ).has_value() );
+    vector v3{5};
+    REQUIRE( find_index( v3, 5 ) == 0 );
+    vector v4{ 2, 6, 8, 4, 2, 5 };
+    REQUIRE( !find_index( v4, 10 ).has_value() );
+    REQUIRE( find_index( v4, 4 ) == 3 );
+    REQUIRE( find_index( v4, 2 ) == 0 );
+    REQUIRE( find_index( v4, 5 ) == 5 );
+}
+
 TEST_CASE( "chunking" )
 {
     using PType = PairVec<size_t, size_t>;
