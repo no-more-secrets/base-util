@@ -147,8 +147,8 @@
 /****************************************************************
 ** PP_MAP_PREPEND_TUPLE
 *****************************************************************/
-// PP_MAP_PREPEND_TUPLE will prepend the given string to each
-// element as a namespace.
+// PP_MAP_PREPEND_TUPLE will prepend `what` to each element,
+// which themselves must be tuples.
 #define PP_MAP_PREPEND_TUPLE( what, ... ) \
   __VA_OPT__( PP_MAP_PREPEND_TUPLE1( what, __VA_ARGS__ ) )
 
@@ -158,6 +158,22 @@
                        what, __VA_ARGS__ ) )
 
 #define PP_MAP_PREPEND_TUPLE1_INDIRECT() PP_MAP_PREPEND_TUPLE1
+
+/****************************************************************
+** PP_MAP_PREPEND2_TUPLE
+*****************************************************************/
+// PP_MAP_PREPEND2_TUPLE will prepend `what1` and `what2` to each
+// element, which themselves must be tuples.
+#define PP_MAP_PREPEND2_TUPLE( what1, what2, ... ) \
+  __VA_OPT__(                                      \
+      PP_MAP_PREPEND2_TUPLE1( what1, what2, __VA_ARGS__ ) )
+
+#define PP_MAP_PREPEND2_TUPLE1( what1, what2, a, ... )        \
+  ( what1, what2, EXPAND a )                                  \
+      __VA_OPT__(, PP_MAP_PREPEND2_TUPLE1_INDIRECT EMPTY()()( \
+                       what1, what2, __VA_ARGS__ ) )
+
+#define PP_MAP_PREPEND2_TUPLE1_INDIRECT() PP_MAP_PREPEND2_TUPLE1
 
 /****************************************************************
 ** JOIN_SEMIS
@@ -186,6 +202,23 @@
       what JOIN_WITH1_INDIRECT EMPTY()()( what, __VA_ARGS__ ) )
 
 #define JOIN_WITH1_INDIRECT() JOIN_WITH1
+
+/****************************************************************
+** JOIN_WITH_TUPLE_EXPAND
+*****************************************************************/
+// Will take a tuple, remove the parenthesis, and append the
+// contents to each array element (including the last), joining
+// the results with commas.
+#define JOIN_WITH_TUPLE_EXPAND( what, ... ) \
+  __VA_OPT__( JOIN_WITH_TUPLE_EXPAND1( what, __VA_ARGS__ ) )
+
+#define JOIN_WITH_TUPLE_EXPAND1( what, a, ... )     \
+  a EXPAND what __VA_OPT__(                         \
+      , JOIN_WITH_TUPLE_EXPAND1_INDIRECT EMPTY()()( \
+            what, __VA_ARGS__ ) )
+
+#define JOIN_WITH_TUPLE_EXPAND1_INDIRECT() \
+  JOIN_WITH_TUPLE_EXPAND1
 
 /****************************************************************
 ** PP_MAP
