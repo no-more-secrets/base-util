@@ -51,3 +51,19 @@
     }   STRING_JOIN( obj, __LINE__ );                          \
     STRING_JOIN( register_, __LINE__ )::                       \
         STRING_JOIN( register_, __LINE__ )()
+
+// Hopefully, if someone else defines this, it will be defined
+// equivalently, since this seems to be a standard thing.
+#ifndef FWD
+#  define FWD( ... ) \
+    ::std::forward<decltype( __VA_ARGS__ )>( __VA_ARGS__ )
+#endif
+
+// To take an expression and forward it through a lambda in a way
+// that propagates noexcept'ness, return type, and result, one
+// must duplicate the expression three times.
+#define THREE_TIMES( ... )            \
+  noexcept( noexcept( __VA_ARGS__ ) ) \
+      ->decltype( __VA_ARGS__ ) {     \
+    return __VA_ARGS__;               \
+  }

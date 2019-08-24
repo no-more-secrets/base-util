@@ -255,6 +255,58 @@ TEST_CASE( "opt_util" )
 
     REQUIRE( new_o.has_value() );
     REQUIRE( new_o.value() == "n" );
+
+    int x = 5;
+
+    auto to_int_ref_nonconst = [&]( int ) -> int& { return x; };
+    o = nullopt;
+    auto new_o2 = util::fmap( to_int_ref_nonconst, o );
+    REQUIRE( !new_o2.has_value() );
+    static_assert( is_same_v<decltype(new_o2),
+            std::optional<std::reference_wrapper<int>>> );
+    o = 6;
+    new_o2 = util::fmap( to_int_ref_nonconst, o );
+    REQUIRE( new_o2.has_value() );
+    REQUIRE( new_o2->get() == 5 );
+    auto new_o3 = o | util::infix::fmap( to_int_ref_nonconst );
+    static_assert( is_same_v<decltype(new_o3),
+            std::optional<std::reference_wrapper<int>>> );
+    REQUIRE( new_o3.has_value() );
+    REQUIRE( new_o3->get() == 5 );
+
+    auto to_int_ref_const = [&]( int ) -> int const& { return x; };
+    o = nullopt;
+    auto new_o4 = util::fmap( to_int_ref_const, o );
+    REQUIRE( !new_o4.has_value() );
+    static_assert( is_same_v<decltype(new_o4),
+            std::optional<std::reference_wrapper<int const>>> );
+    o = 6;
+    new_o4 = util::fmap( to_int_ref_const, o );
+    REQUIRE( new_o4.has_value() );
+    REQUIRE( new_o4->get() == 5 );
+    auto new_o5 = o | util::infix::fmap( to_int_ref_const );
+    static_assert( is_same_v<decltype(new_o5),
+            std::optional<std::reference_wrapper<int const>>> );
+    REQUIRE( new_o5.has_value() );
+    REQUIRE( new_o5->get() == 5 );
+
+    auto to_maybe_int = []( int n ) -> std::optional<int> {
+        if( n == 1 )
+            return std::nullopt;
+        else
+            return std::optional<int>( 4 );
+    };
+    o = nullopt;
+    auto maybe_new_o = util::fmap_join( to_maybe_int, o );
+    static_assert( is_same_v<decltype(maybe_new_o), std::optional<int>> );
+    REQUIRE( !maybe_new_o.has_value() );
+    o = 1;
+    maybe_new_o = util::fmap_join( to_maybe_int, o );
+    REQUIRE( !maybe_new_o.has_value() );
+    o = 2;
+    maybe_new_o = util::fmap_join( to_maybe_int, o );
+    REQUIRE( maybe_new_o.has_value() );
+    REQUIRE( maybe_new_o == 4 );
 }
 
 TEST_CASE( "directed_graph" )
