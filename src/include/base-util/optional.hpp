@@ -5,6 +5,7 @@
 
 #include "base-util/macros.hpp"
 #include "base-util/misc.hpp"
+#include "base-util/mp.hpp"
 
 #include <iostream>
 #include <optional>
@@ -111,46 +112,47 @@ std::vector<T> cat_opts(
 //    which is never reference (even if it is holding a reference
 //    wrapper).
 
+template<typename Pred, typename T>
+using OptInvokeResult =
+    std::optional<std::invoke_result_t<Pred, T>>;
+
 // For predicates that return by value.
 template<typename Pred, typename T>
 auto fmap( Pred&& f, std::optional<T> const& o )
-    -> std::enable_if_t<                          //
-        std::is_invocable_v<Pred, T> &&           //
-            !std::is_rvalue_reference_v<          //
-                std::invoke_result_t<Pred, T>> && //
-            !std::is_lvalue_reference_v<          //
-                std::invoke_result_t<Pred, T>>,   //
-        std::optional<                            //
-            std::invoke_result_t<Pred, T>>        //
-        >                                         //
+    -> std::enable_if_t<                        //
+        mp::all_of_v<                           //
+            std::is_invocable_v<Pred, T>,       //
+            !std::is_rvalue_reference_v<        //
+                std::invoke_result_t<Pred, T>>, //
+            !std::is_lvalue_reference_v<        //
+                std::invoke_result_t<Pred, T>>  //
+            >,                                  //
+        OptInvokeResult<Pred, T>                //
+        >                                       //
 {
-  using OutputT = std::invoke_result_t<Pred, T>;
-  std::optional<OutputT> res;
+  OptInvokeResult<Pred, T> res;
   if( o.has_value() )
     res.emplace( std::forward<Pred>( f )( *o ) );
   return res;
 }
 
+template<typename Pred, typename T>
+using OptRefInvokeResult = std::optional<std::reference_wrapper<
+    std::remove_reference_t<std::invoke_result_t<Pred, T>>>>;
+
 // For predicates that return an lvalue reference.
-template<typename Pred, typename T,
-         typename =                                    //
-         std::enable_if_t<                             //
-             std::is_invocable_v<Pred, T> &&           //
-                 std::is_lvalue_reference_v<           //
-                     std::invoke_result_t<Pred, T>>,   //
-             std::optional<                            //
-                 std::reference_wrapper<               //
-                     std::remove_reference_t<          //
-                         std::invoke_result_t<Pred, T> //
-                         >                             //
-                     >                                 //
-                 >                                     //
-             >                                         //
-         >
-auto fmap( Pred&& f, std::optional<T> const& o ) {
-  using OutputT = std::reference_wrapper<
-      std::remove_reference_t<std::invoke_result_t<Pred, T>>>;
-  std::optional<OutputT> res;
+template<typename Pred, typename T>
+auto fmap( Pred&& f, std::optional<T> const& o )
+    -> std::enable_if_t<                       //
+        mp::all_of_v<                          //
+            std::is_invocable_v<Pred, T>,      //
+            std::is_lvalue_reference_v<        //
+                std::invoke_result_t<Pred, T>> //
+            >,                                 //
+        OptRefInvokeResult<Pred, T>            //
+        >                                      //
+{
+  OptRefInvokeResult<Pred, T> res;
   if( o.has_value() )
     res.emplace( std::forward<Pred>( f )( *o ) );
   return res;
@@ -162,36 +164,34 @@ constexpr bool is_optional_v = false;
 template<typename T>
 constexpr bool is_optional_v<std::optional<T>> = true;
 
+template<typename Pred, typename T>
+using OptInvokeResultValue = std::optional<      //
+    std::decay_t<                                //
+        decltype(                                //
+            std::declval<                        //
+                std::invoke_result_t<Pred, T>>() //
+                .value()                         //
+            )                                    //
+        >                                        //
+    >;
+
 // For predicates that return optionals. This will collapse the
 // optionals (a la >>=).
 template<typename Pred, typename T>
-auto fmap_join( Pred&& f, std::optional<T> const& o ) ->    //
-    std::enable_if_t<                                       //
-        std::is_invocable_v<Pred, T> &&                     //
-            is_optional_v<std::invoke_result_t<Pred, T>> && //
-            !std::is_rvalue_reference_v<                    //
-                std::invoke_result_t<Pred, T>> &&           //
-            !std::is_lvalue_reference_v<                    //
-                std::invoke_result_t<Pred, T>>,             //
-        std::optional<                                      //
-            std::decay_t<                                   //
-                decltype(                                   //
-                    std::declval<                           //
-                        std::invoke_result_t<Pred, T>>()    //
-                        .value()                            //
-                    )                                       //
-                >                                           //
-            >                                               //
-        >                                                   //
+auto fmap_join( Pred&& f, std::optional<T> const& o ) ->  //
+    std::enable_if_t<                                     //
+        mp::all_of_v<                                     //
+            std::is_invocable_v<Pred, T>,                 //
+            is_optional_v<std::invoke_result_t<Pred, T>>, //
+            !std::is_rvalue_reference_v<                  //
+                std::invoke_result_t<Pred, T>>,           //
+            !std::is_lvalue_reference_v<                  //
+                std::invoke_result_t<Pred, T>>            //
+            >,                                            //
+        OptInvokeResultValue<Pred, T>                     //
+        >                                                 //
 {
-  using OutputT = std::decay_t<                //
-      decltype(                                //
-          std::declval<                        //
-              std::invoke_result_t<Pred, T>>() //
-              .value()                         //
-          )                                    //
-      >;
-  std::optional<OutputT> res;
+  OptInvokeResultValue<Pred, T> res;
   if( o.has_value() ) {
     auto intermediate = std::forward<Pred>( f )( *o );
     if( intermediate.has_value() )
