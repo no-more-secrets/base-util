@@ -307,6 +307,28 @@ TEST_CASE( "opt_util" )
     maybe_new_o = util::fmap_join( to_maybe_int, o );
     REQUIRE( maybe_new_o.has_value() );
     REQUIRE( maybe_new_o == 4 );
+
+    optional<bool> o_bool = false;
+    REQUIRE( (o_bool | util::infix::maybe_truish_to_bool) == false );
+    o_bool = true;
+    REQUIRE( (o_bool | util::infix::maybe_truish_to_bool) == true );
+    o_bool = nullopt;
+    REQUIRE( (o_bool | util::infix::maybe_truish_to_bool) == false );
+
+    optional<int> o_int = 0;
+    REQUIRE( (o_int | util::infix::maybe_truish_to_bool) == false );
+    o_int = 5;
+    REQUIRE( (o_int | util::infix::maybe_truish_to_bool) == true );
+    o_int = nullopt;
+    REQUIRE( (o_int | util::infix::maybe_truish_to_bool) == false );
+
+    double d = 4.0;
+    auto jr = util::just_ref( d );
+    static_assert( is_same_v<decltype( jr ),
+                   std::optional<std::reference_wrapper<double const>>> );
+    REQUIRE( jr.has_value() );
+    REQUIRE( *jr == 4.0 );
+    REQUIRE( jr->get() == 4.0 );
 }
 
 TEST_CASE( "directed_graph" )

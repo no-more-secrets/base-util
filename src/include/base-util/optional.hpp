@@ -200,6 +200,23 @@ auto fmap_join( Pred&& f, std::optional<T> const& o ) ->  //
   return res;
 }
 
+template<typename T>
+bool maybe_truish_to_bool( std::optional<T> const& o ) {
+  return o.has_value() ? bool( *o ) : false;
+}
+
+template<typename T>
+std::optional<std::decay_t<T>> just( T&& value ) {
+  return std::optional<std::decay_t<T>>( FWD( value ) );
+}
+
+template<typename T>
+auto just_ref( T const& value ) {
+  return std::optional<
+      std::reference_wrapper<std::decay_t<T> const>>(
+      FWD( value ) );
+}
+
 namespace infix {
 namespace detail {
 
@@ -209,21 +226,38 @@ struct infix_f : F {
     : F{FWD( f )} {}
 };
 
+template<typename F>
+struct infix : F {
+  constexpr infix( F&& f ) noexcept( noexcept( F{FWD( f )} ) )
+    : F{FWD( f )} {}
+};
+
 template<typename T, typename F>
 constexpr auto operator|( std::optional<T> const& o,
-                          infix_f<F>&& f ) THREE_TIMES( f( o ) )
+                          infix_f<F>&& f ) THREE_TIMES( f( o ) );
+
+template<typename T, typename F>
+constexpr auto operator|( std::optional<T> const& o,
+                          infix<F> const&         f )
+    THREE_TIMES( f( o ) );
 
 } // namespace detail
 
-#define OPT_DEFINE_INFIX( name )                        \
+#define OPT_DEFINE_INFIX_FUNC( name )                   \
   template<typename Func>                               \
   constexpr auto name( Func&& f ) {                     \
     return detail::infix_f{[&]( auto&& o ) THREE_TIMES( \
         ::util::name( FWD( f ), FWD( o ) ) )};          \
   }
 
-OPT_DEFINE_INFIX( fmap )
-OPT_DEFINE_INFIX( fmap_join )
+#define OPT_DEFINE_INFIX( name )              \
+  inline constexpr auto name = detail::infix{ \
+      []( auto&& o ) THREE_TIMES( ::util::name( FWD( o ) ) )};
+
+OPT_DEFINE_INFIX( maybe_truish_to_bool )
+
+OPT_DEFINE_INFIX_FUNC( fmap )
+OPT_DEFINE_INFIX_FUNC( fmap_join )
 
 } // namespace infix
 
