@@ -5,7 +5,6 @@
 
 #include "base-util/macros.hpp"
 #include "base-util/misc.hpp"
-#include "base-util/mp.hpp"
 
 #include <iostream>
 #include <optional>
@@ -119,16 +118,14 @@ using OptInvokeResult =
 // For predicates that return by value.
 template<typename Pred, typename T>
 auto fmap( Pred&& f, std::optional<T> const& o )
-    -> std::enable_if_t<                        //
-        mp::all_of_v<                           //
-            std::is_invocable_v<Pred, T>,       //
-            !std::is_rvalue_reference_v<        //
-                std::invoke_result_t<Pred, T>>, //
-            !std::is_lvalue_reference_v<        //
-                std::invoke_result_t<Pred, T>>  //
-            >,                                  //
-        OptInvokeResult<Pred, T>                //
-        >                                       //
+    -> std::enable_if_t<                          //
+        std::is_invocable_v<Pred, T> &&           //
+            !std::is_rvalue_reference_v<          //
+                std::invoke_result_t<Pred, T>> && //
+            !std::is_lvalue_reference_v<          //
+                std::invoke_result_t<Pred, T>>,   //
+        OptInvokeResult<Pred, T>                  //
+        >                                         //
 {
   OptInvokeResult<Pred, T> res;
   if( o.has_value() )
@@ -143,14 +140,12 @@ using OptRefInvokeResult = std::optional<std::reference_wrapper<
 // For predicates that return an lvalue reference.
 template<typename Pred, typename T>
 auto fmap( Pred&& f, std::optional<T> const& o )
-    -> std::enable_if_t<                       //
-        mp::all_of_v<                          //
-            std::is_invocable_v<Pred, T>,      //
-            std::is_lvalue_reference_v<        //
-                std::invoke_result_t<Pred, T>> //
-            >,                                 //
-        OptRefInvokeResult<Pred, T>            //
-        >                                      //
+    -> std::enable_if_t<                        //
+        std::is_invocable_v<Pred, T> &&         //
+            std::is_lvalue_reference_v<         //
+                std::invoke_result_t<Pred, T>>, //
+        OptRefInvokeResult<Pred, T>             //
+        >                                       //
 {
   OptRefInvokeResult<Pred, T> res;
   if( o.has_value() )
@@ -178,18 +173,16 @@ using OptInvokeResultValue = std::optional<      //
 // For predicates that return optionals. This will collapse the
 // optionals (a la >>=).
 template<typename Pred, typename T>
-auto fmap_join( Pred&& f, std::optional<T> const& o ) ->  //
-    std::enable_if_t<                                     //
-        mp::all_of_v<                                     //
-            std::is_invocable_v<Pred, T>,                 //
-            is_optional_v<std::invoke_result_t<Pred, T>>, //
-            !std::is_rvalue_reference_v<                  //
-                std::invoke_result_t<Pred, T>>,           //
-            !std::is_lvalue_reference_v<                  //
-                std::invoke_result_t<Pred, T>>            //
-            >,                                            //
-        OptInvokeResultValue<Pred, T>                     //
-        >                                                 //
+auto fmap_join( Pred&& f, std::optional<T> const& o ) ->    //
+    std::enable_if_t<                                       //
+        std::is_invocable_v<Pred, T> &&                     //
+            is_optional_v<std::invoke_result_t<Pred, T>> && //
+            !std::is_rvalue_reference_v<                    //
+                std::invoke_result_t<Pred, T>> &&           //
+            !std::is_lvalue_reference_v<                    //
+                std::invoke_result_t<Pred, T>>,             //
+        OptInvokeResultValue<Pred, T>                       //
+        >                                                   //
 {
   OptInvokeResultValue<Pred, T> res;
   if( o.has_value() ) {
