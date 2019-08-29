@@ -310,8 +310,24 @@ auto visit( Variant& v, VisitorFunc const& func ) {
         auto& val = __val;                                      \
         if constexpr( false )
 
+#define variant_function_c_MULTI( val, _, ret_type )            \
+  [&]( auto& v ){ auto& __v = v;                                \
+    auto __f = [&]( auto&& __val ) -> ret_type {                \
+        auto& val = __val;                                      \
+        if constexpr( false )
+
+#define variant_function_c_SINGLE( val )                        \
+  [&]( auto& v ){ auto& __v = v;                                \
+    auto __f = [&]( auto&& val ) {                              \
+        auto& val = __val;                                      \
+        if constexpr( false )
+
 #define variant_function( ... )                                 \
         PP_ONE_OR_MORE_ARGS( variant_function, __VA_ARGS__ )
+
+// Version that captures.
+#define variant_function_c( ... )                               \
+        PP_ONE_OR_MORE_ARGS( variant_function_c, __VA_ARGS__ )
 
 #define variant_function_exhaustive                             \
   } else static_assert(                                         \
