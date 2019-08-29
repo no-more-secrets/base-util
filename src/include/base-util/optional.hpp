@@ -118,15 +118,12 @@ using OptInvokeResult =
 // For predicates that return by value.
 template<typename Pred, typename T>
 auto fmap( Pred&& f, std::optional<T> const& o )
-    -> std::enable_if_t<                          //
-        std::is_invocable_v<Pred, T> &&           //
-            !std::is_rvalue_reference_v<          //
-                std::invoke_result_t<Pred, T>> && //
-            !std::is_lvalue_reference_v<          //
-                std::invoke_result_t<Pred, T>>,   //
-        OptInvokeResult<Pred, T>                  //
-        >                                         //
-{
+    -> std::enable_if_t<std::is_invocable_v<Pred, T> &&
+                            !std::is_rvalue_reference_v<
+                                std::invoke_result_t<Pred, T>> &&
+                            !std::is_lvalue_reference_v<
+                                std::invoke_result_t<Pred, T>>,
+                        OptInvokeResult<Pred, T>> {
   OptInvokeResult<Pred, T> res;
   if( o.has_value() )
     res.emplace( std::forward<Pred>( f )( *o ) );
@@ -140,13 +137,10 @@ using OptRefInvokeResult = std::optional<std::reference_wrapper<
 // For predicates that return an lvalue reference.
 template<typename Pred, typename T>
 auto fmap( Pred&& f, std::optional<T> const& o )
-    -> std::enable_if_t<                        //
-        std::is_invocable_v<Pred, T> &&         //
-            std::is_lvalue_reference_v<         //
-                std::invoke_result_t<Pred, T>>, //
-        OptRefInvokeResult<Pred, T>             //
-        >                                       //
-{
+    -> std::enable_if_t<std::is_invocable_v<Pred, T> &&
+                            std::is_lvalue_reference_v<
+                                std::invoke_result_t<Pred, T>>,
+                        OptRefInvokeResult<Pred, T>> {
   OptRefInvokeResult<Pred, T> res;
   if( o.has_value() )
     res.emplace( std::forward<Pred>( f )( *o ) );
@@ -160,30 +154,21 @@ template<typename T>
 constexpr bool is_optional_v<std::optional<T>> = true;
 
 template<typename Pred, typename T>
-using OptInvokeResultValue = std::optional<      //
-    std::decay_t<                                //
-        decltype(                                //
-            std::declval<                        //
-                std::invoke_result_t<Pred, T>>() //
-                .value()                         //
-            )                                    //
-        >                                        //
-    >;
+using OptInvokeResultValue = std::optional<std::decay_t<decltype(
+    std::declval<std::invoke_result_t<Pred, T>>().value() )>>;
 
 // For predicates that return optionals. This will collapse the
 // optionals (a la >>=).
 template<typename Pred, typename T>
-auto fmap_join( Pred&& f, std::optional<T> const& o ) ->    //
-    std::enable_if_t<                                       //
-        std::is_invocable_v<Pred, T> &&                     //
-            is_optional_v<std::invoke_result_t<Pred, T>> && //
-            !std::is_rvalue_reference_v<                    //
-                std::invoke_result_t<Pred, T>> &&           //
-            !std::is_lvalue_reference_v<                    //
-                std::invoke_result_t<Pred, T>>,             //
-        OptInvokeResultValue<Pred, T>                       //
-        >                                                   //
-{
+auto fmap_join( Pred&& f, std::optional<T> const& o )
+    -> std::enable_if_t<
+        std::is_invocable_v<Pred, T> &&
+            is_optional_v<std::invoke_result_t<Pred, T>> &&
+            !std::is_rvalue_reference_v<
+                std::invoke_result_t<Pred, T>> &&
+            !std::is_lvalue_reference_v<
+                std::invoke_result_t<Pred, T>>,
+        OptInvokeResultValue<Pred, T>> {
   OptInvokeResultValue<Pred, T> res;
   if( o.has_value() ) {
     auto intermediate = std::forward<Pred>( f )( *o );
