@@ -4,13 +4,21 @@
 #pragma once
 
 #include <optional>
+#include <type_traits>
 
 namespace bu {
 
-// Does the set contain the given key.
+// Does the set contain the given key. If not, returns nullopt.
+// If so, returns the iterator to the location.
 template<typename ContainerT, typename KeyT>
-bool has_key( ContainerT const& s, KeyT const& k ) {
-  return s.find( k ) != s.end();
+[[nodiscard]] auto has_key( ContainerT&& s, KeyT const& k ) {
+  std::optional<decltype(
+      std::forward<ContainerT>( s ).find( k ) )>
+      res;
+  if( auto it = std::forward<ContainerT>( s ).find( k );
+      it != std::forward<ContainerT>( s ).end() )
+    res = it;
+  return res;
 }
 
 // The idea of this function is that it will test the given key's
@@ -28,32 +36,29 @@ bool has_key( ContainerT const& s, KeyT const& k ) {
 // map, for reasons of managing lifetime of the object (key) re-
 // ferred to.
 template<typename ContainerT, typename KeyT>
-std::optional<std::reference_wrapper<KeyT const>> key_safe(
-    ContainerT const& m, KeyT const& k ) {
-  auto found = m.find( k );
-  if( found == m.end() ) return std::nullopt;
+auto key_safe( ContainerT const& m, KeyT const& k ) {
+  std::optional<std::reference_wrapper<KeyT const>> res;
+  if( auto found = m.find( k ); found != m.end() )
+    res = found->first;
   // Must return the one in the container, not the one passed in
   // as an argument, that's the idea here.
-  return found->first;
+  return res;
 }
 
 // Get a reference to a value in a map. Since the key may not ex-
 // ist, we return an optional. But since we want a reference to
 // the object, we return an optional of a reference wrapper,
-// since containers can't hold references. I think the reference
-// wrapper returned here should only allow const references to be
-// extracted.
-template<typename KeyT, typename ValT,
-         // typename... to allow for maps that may have addi-
-         // tional template parameters (but which we don't care
-         // about here).
-         template<typename KeyT_, typename ValT_, typename...>
-         typename MapT>
-std::optional<std::reference_wrapper<ValT const>> val_safe(
-    MapT<KeyT, ValT> const& m, KeyT const& k ) {
-  auto found = m.find( k );
-  if( found == m.end() ) return std::nullopt;
-  return found->second;
+// since containers can't hold references.
+template<typename MapT, typename KeyT>
+[[nodiscard]] auto val_safe( MapT&& m, KeyT const& k ) {
+  std::optional<
+      std::reference_wrapper<const std::remove_reference_t<
+          decltype( std::forward<MapT>( m ).at( k ) )>>>
+      res;
+  if( auto found = std::forward<MapT>( m ).find( k );
+      found != std::forward<MapT>( m ).end() )
+    res.emplace( found->second );
+  return res;
 }
 
 } // namespace bu
