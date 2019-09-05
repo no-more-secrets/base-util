@@ -27,9 +27,9 @@ using io_manip_valid = decltype( operator<<( util::log, endl ) );
 TEST_CASE( "type-map" )
 {
   using M = TypeMap<
-    Pair<int,  float>,
-    Pair<void, const double>,
-    Pair<char, NoConstruct>
+    KV<int,  float>,
+    KV<void, const double>,
+    KV<char, NoConstruct>
   >;
 
   static_assert( std::is_same_v<Get<M, void>, const double> );

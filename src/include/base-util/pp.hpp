@@ -48,12 +48,20 @@
 #define EMPTY()
 #define DEFER( ... ) __VA_ARGS__ EMPTY()
 #define OBSTRUCT( ... ) __VA_ARGS__ DEFER( EMPTY )()
-#define EXPAND( ... ) __VA_ARGS__
 
 // This one can be useful when you would normally use a "##"
 // joining operator. Sometimes that can cause evaluation order
 // issues when inside a complicated macro, and this can solve it.
 #define PP_JOIN( a, b ) a##b
+
+/****************************************************************
+** Tuple Operations
+*****************************************************************/
+#define EXPAND( ... ) __VA_ARGS__
+
+#define PREPEND_TUPLE( what, tuple ) ( what, EXPAND tuple )
+#define PREPEND_TUPLE2( what1, what2, tuple ) \
+  ( what1, what2, EXPAND tuple )
 
 /****************************************************************
 ** List Operations
@@ -248,6 +256,26 @@
                       f, TAIL( __VA_ARGS__ ) ) )
 
 #define PP_MAP_TUPLE_RECURSE_INDIRECT() PP_MAP_TUPLE_RECURSE
+
+/****************************************************************
+** PP_MAP_TUPLE_COMMAS
+*****************************************************************/
+// PP_MAP_TUPLE_COMMAS will map the function over the list of tu-
+// ples, expanding the tuple to be the args of the function, sep-
+// arating results with commas.
+#define PP_MAP_TUPLE_COMMAS( ... ) \
+  PP_MAP_TUPLE_COMMAS_RECURSE( __VA_ARGS__ )
+
+#define PP_MAP_TUPLE_COMMAS_RECURSE( f, ... ) \
+  __VA_OPT__( PP_MAP_TUPLE_COMMAS1_RECURSE( f, __VA_ARGS__ ) )
+
+#define PP_MAP_TUPLE_COMMAS1_RECURSE( f, a, ... )        \
+  f a __VA_OPT__(                                        \
+      , PP_MAP_TUPLE_COMMAS1_RECURSE_INDIRECT EMPTY()()( \
+            f, __VA_ARGS__ ) )
+
+#define PP_MAP_TUPLE_COMMAS1_RECURSE_INDIRECT() \
+  PP_MAP_TUPLE_COMMAS1_RECURSE
 
 /****************************************************************
 ** PP_MAP_SEMI
