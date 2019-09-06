@@ -62,6 +62,8 @@
 #define PREPEND_TUPLE( what, tuple ) ( what, EXPAND tuple )
 #define PREPEND_TUPLE2( what1, what2, tuple ) \
   ( what1, what2, EXPAND tuple )
+#define PREPEND_TUPLE3( what1, what2, what3, tuple ) \
+  ( what1, what2, what3, EXPAND tuple )
 
 /****************************************************************
 ** List Operations
@@ -183,6 +185,22 @@
                        what1, what2, __VA_ARGS__ ) )
 
 #define PP_MAP_PREPEND2_TUPLE1_INDIRECT() PP_MAP_PREPEND2_TUPLE1
+
+/****************************************************************
+** PP_MAP_PREPEND3_TUPLE
+*****************************************************************/
+// PP_MAP_PREPEND3_TUPLE will prepend the "whats" to each ele-
+// ment, which themselves must be tuples.
+#define PP_MAP_PREPEND3_TUPLE( what1, what2, what3, ... )  \
+  __VA_OPT__( PP_MAP_PREPEND3_TUPLE1( what1, what2, what3, \
+                                      __VA_ARGS__ ) )
+
+#define PP_MAP_PREPEND3_TUPLE1( what1, what2, what3, a, ... ) \
+  ( what1, what2, what3, EXPAND a )                           \
+      __VA_OPT__(, PP_MAP_PREPEND3_TUPLE1_INDIRECT EMPTY()()( \
+                       what1, what2, what3, __VA_ARGS__ ) )
+
+#define PP_MAP_PREPEND3_TUPLE1_INDIRECT() PP_MAP_PREPEND3_TUPLE1
 
 /****************************************************************
 ** JOIN_SEMIS
