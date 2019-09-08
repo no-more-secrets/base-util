@@ -31,6 +31,9 @@
 #define LC( a )  [&]( auto const& _ ) { return a; }
 #define LC_( a ) [&]( auto const& _ ) { a; }
 
+#define LC2( a )  [&] ( auto const& _1, auto const& _2 ) { return a; }
+#define LC2_( a ) [&] ( auto const& _1, auto const& _2 ) { a; }
+
 #define LC0( a )  [&] { return a; }
 #define LC0_( a ) [&] { a; }
 
