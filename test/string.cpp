@@ -9,7 +9,7 @@ using namespace std;
 
 TEST_CASE( "from_string" )
 {
-    REQUIRE_THROWS( util::stoi( "" ) );
+    REQUIRE( !util::stoi( "" ).has_value() );
 
     REQUIRE( util::stoi( "0"      ) ==  0   );
     REQUIRE( util::stoi( "1"      ) ==  1   );

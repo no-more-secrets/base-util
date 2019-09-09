@@ -3,7 +3,7 @@ set shiftwidth=2
 set tabstop=2
 
 " Automatically format the C++ source files just before saving.
-autocmd BufWritePre *.hpp,*.cpp call ClangFormatAll()
+"autocmd BufWritePre *.hpp,*.cpp call ClangFormatAll()
 
 " Get the folder in which this file resides.
 let s:path = expand( '<sfile>:p:h' )
