@@ -1,6 +1,8 @@
 /****************************************************************
 ** Type Map
 *****************************************************************/
+#pragma once
+
 // Map from type to type, possibly with default.
 
 #include <type_traits>
