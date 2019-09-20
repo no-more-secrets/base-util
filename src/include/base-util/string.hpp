@@ -169,6 +169,9 @@ to_paths( std::vector<std::string> const& ss );
 // NOTE: This puts single quotes around the character!
 std::string to_string( char const& c );
 
+std::string to_string( int i );
+std::string to_string( double d );
+
 // NOTE: These puts quotes around the string! The reason for this
 // behavior  is that we want to try to perform the to_string oper-
 // ation  (in general) such that it has some degree of reversibil-
@@ -262,10 +265,6 @@ std::string to_string( SysTimePoint const& p );
 // where the date and time are adjusted so as to output it in the
 // UTC time zone (hence the +0000 at the end).
 std::string to_string( ZonedTimePoint const& p );
-
-// Catch-all; just forwards to std::to_string.
-template<typename T>
-std::string to_string( T const& arg );
 
 template<typename T>
 std::ostream& operator<<( std::ostream&         out,

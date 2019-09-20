@@ -180,6 +180,14 @@ string to_string( char const& s ) {
     return "'" + res + "'";
 }
 
+std::string to_string( int i ) {
+  return std::to_string( i );
+}
+
+std::string to_string( double d ) {
+  return std::to_string( d );
+}
+
 // Note two important things about this function: 1) it will will
 // force the string to be converted to a std::string  by  calling
 // its string() member function,  despite  the  fact that on some
