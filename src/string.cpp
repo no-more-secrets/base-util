@@ -75,6 +75,28 @@ vector<string_view> split_strip_any( string_view sv,
     return res;
 }
 
+optional<string> common_prefix( vector<string> const& strings ) {
+  optional<string> res;
+  if( strings.empty() ) return res;
+  int min_size = std::numeric_limits<int>::max();
+  for( auto const& s : strings )
+    min_size = std::min( min_size, int( s.size() ) );
+  int max_prefix_size = min_size;
+  string prefix; prefix.reserve( max_prefix_size );
+  int curr_pos = 0;
+  while( curr_pos < max_prefix_size ) {
+    char proposed_next_char = strings[0][curr_pos];
+    for( auto const& s : strings )
+      if( s[curr_pos] != proposed_next_char )
+        goto finished;
+    prefix.push_back( proposed_next_char );
+    ++curr_pos;
+  }
+finished:
+  res = prefix;
+  return res;
+}
+
 // Split  a  string, strip all elements, and remove empty strings
 // from result.
 vector<string_view> split_strip( string_view sv, char c ) {

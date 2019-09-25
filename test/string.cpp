@@ -20,6 +20,52 @@ TEST_CASE( "from_string" )
     REQUIRE( util::stoi( "-0"     ) ==  0   );
 }
 
+TEST_CASE( "common_prefix" )
+{
+    using util::common_prefix;
+    vector<string> v;
+
+    v = {};
+    REQUIRE_FALSE( common_prefix( v ).has_value() );
+
+    v = {""};
+    REQUIRE( common_prefix( v ) == "" );
+    v = {"", ""};
+    REQUIRE( common_prefix( v ) == "" );
+    v = {"a", ""};
+    REQUIRE( common_prefix( v ) == "" );
+    v = {"", "a"};
+    REQUIRE( common_prefix( v ) == "" );
+    v = {"", "ab"};
+    REQUIRE( common_prefix( v ) == "" );
+    v = {"ab", ""};
+    REQUIRE( common_prefix( v ) == "" );
+    v = {"a", "b"};
+    REQUIRE( common_prefix( v ) == "" );
+    v = {"ab", "bb"};
+    REQUIRE( common_prefix( v ) == "" );
+    v = {"a", "a"};
+    REQUIRE( common_prefix( v ) == "a" );
+    v = {"aa", "ab"};
+    REQUIRE( common_prefix( v ) == "a" );
+    v = {"aa", "aa"};
+    REQUIRE( common_prefix( v ) == "aa" );
+    v = {"ab", "ab"};
+    REQUIRE( common_prefix( v ) == "ab" );
+    v = {"ab", "ab", "a"};
+    REQUIRE( common_prefix( v ) == "a" );
+    v = {"ab", "", "ab"};
+    REQUIRE( common_prefix( v ) == "" );
+    v = {"abcd", "abvd", "abcd"};
+    REQUIRE( common_prefix( v ) == "ab" );
+    v = {"abcd", "abcd", "abcd"};
+    REQUIRE( common_prefix( v ) == "abcd" );
+    v = {"abcd.efg", "abcd.efh", "abcd.ehf"};
+    REQUIRE( common_prefix( v ) == "abcd.e" );
+    v = {"abcd.efg", "abc", "abcd.efghi"};
+    REQUIRE( common_prefix( v ) == "abc" );
+}
+
 TEST_CASE( "split_join" )
 {
     SVVec v_{ "" };

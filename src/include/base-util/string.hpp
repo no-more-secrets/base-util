@@ -117,6 +117,9 @@ std::vector<std::string_view> split_strip_any(
 
 using IsStrOkFunc = std::function<bool( std::string_view )>;
 
+std::optional<std::string> common_prefix(
+    std::vector<std::string> const& strings );
+
 // Will wrap the text using the is_ok callback. The callback
 // should return true if the string given to it has an acceptible
 // length. It is assumed that if the function returns false for a
