@@ -76,7 +76,7 @@ void copy_file( fs::path const& from, fs::path const& to ) {
 }
 
 // Read a text file into a string in its entirety.
-string read_file_str( fs::path const& p ) {
+string read_file_as_string( fs::path const& p ) {
 
     ifstream in( p.string() );
     ASSERT( in.good(), "failed to open file " << p );

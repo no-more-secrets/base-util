@@ -14,8 +14,8 @@ using namespace std;
 
 TEST_CASE( "url_encode" )
 {
-    auto s_inp  = util::read_file_str( data_common/"encode-inp.txt"  );
-    auto s_base = util::read_file_str( data_common/"encode-base.txt" );
+    auto s_inp  = util::read_file_as_string( data_common/"encode-inp.txt"  );
+    auto s_base = util::read_file_as_string( data_common/"encode-base.txt" );
 
     auto s_enc = net::url_encode( s_inp );
 
