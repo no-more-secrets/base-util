@@ -3,6 +3,9 @@
 *****************************************************************/
 #pragma once
 
+// C++ standard library
+#include <optional>
+
 namespace mp {
 
 template<bool...>
@@ -22,5 +25,11 @@ static_assert( and_v<true, true> == true );
 static_assert( and_v<false, false> == false );
 static_assert( and_v<true, true, true> == true );
 static_assert( and_v<true, true, false> == false );
+
+template<typename T>
+constexpr bool is_optional_v = false;
+
+template<typename T>
+constexpr bool is_optional_v<std::optional<T>> = true;
 
 } // namespace mp

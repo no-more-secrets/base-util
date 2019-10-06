@@ -55,17 +55,6 @@
 #define PP_JOIN( a, b ) a##b
 
 /****************************************************************
-** Tuple Operations
-*****************************************************************/
-#define EXPAND( ... ) __VA_ARGS__
-
-#define PREPEND_TUPLE( what, tuple ) ( what, EXPAND tuple )
-#define PREPEND_TUPLE2( what1, what2, tuple ) \
-  ( what1, what2, EXPAND tuple )
-#define PREPEND_TUPLE3( what1, what2, what3, tuple ) \
-  ( what1, what2, what3, EXPAND tuple )
-
-/****************************************************************
 ** List Operations
 *****************************************************************/
 #define ID( ... ) __VA_ARGS__
@@ -159,6 +148,26 @@
   PP_DISAMBIGUATE_MULTI_ARGS(         \
       f, PP_HAS_MULTI_ARGS_3( __VA_ARGS__ ), __VA_ARGS__ )
 
+/****************************************************************
+** Tuple Operations
+*****************************************************************/
+#define EXPAND( ... ) __VA_ARGS__
+
+#define PREPEND_TUPLE( what, tuple ) ( what, EXPAND tuple )
+#define PREPEND_TUPLE2( what1, what2, tuple ) \
+  ( what1, what2, EXPAND tuple )
+#define PREPEND_TUPLE3( what1, what2, what3, tuple ) \
+  ( what1, what2, what3, EXPAND tuple )
+
+#define PAIR_TAKE_FIRST( a, b ) a
+#define PAIR_TAKE_SECOND( a, b ) b
+
+#define TUPLE_TAKE_FIRST( a, ... ) a
+
+#define TUPLE_TAKE_SECOND_SINGLE( a, b ) b
+#define TUPLE_TAKE_SECOND_MULTI( a, b, ... ) b
+#define TUPLE_TAKE_SECOND( ... ) \
+  PP_N_OR_MORE_ARGS_2( __VA_ARGS__ )
 /****************************************************************
 ** PP_MAP_PREPEND_NS
 *****************************************************************/

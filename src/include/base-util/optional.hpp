@@ -5,6 +5,7 @@
 
 #include "base-util/macros.hpp"
 #include "base-util/misc.hpp"
+#include "base-util/mp.hpp"
 
 #include <iostream>
 #include <optional>
@@ -147,12 +148,6 @@ auto fmap( Pred&& f, std::optional<T> const& o )
   return res;
 }
 
-template<typename T>
-constexpr bool is_optional_v = false;
-
-template<typename T>
-constexpr bool is_optional_v<std::optional<T>> = true;
-
 template<typename Pred, typename T>
 using OptInvokeResultValue = std::optional<std::decay_t<decltype(
     std::declval<std::invoke_result_t<Pred, T>>().value() )>>;
@@ -163,7 +158,7 @@ template<typename Pred, typename T>
 auto fmap_join( Pred&& f, std::optional<T> const& o )
     -> std::enable_if_t<
         std::is_invocable_v<Pred, T> &&
-            is_optional_v<std::invoke_result_t<Pred, T>> &&
+            mp::is_optional_v<std::invoke_result_t<Pred, T>> &&
             !std::is_rvalue_reference_v<
                 std::invoke_result_t<Pred, T>> &&
             !std::is_lvalue_reference_v<
