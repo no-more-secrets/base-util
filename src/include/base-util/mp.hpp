@@ -32,4 +32,10 @@ constexpr bool is_optional_v = false;
 template<typename T>
 constexpr bool is_optional_v<std::optional<T>> = true;
 
+template<typename T, typename...>
+constexpr bool is_vector_v = false;
+
+template<typename T, typename... Args>
+constexpr bool is_vector_v<std::vector<T, Args...>> = true;
+
 } // namespace mp
