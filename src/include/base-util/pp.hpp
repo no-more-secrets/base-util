@@ -230,6 +230,24 @@
 #define PP_MAP_PREPEND3_TUPLE1_INDIRECT() PP_MAP_PREPEND3_TUPLE1
 
 /****************************************************************
+** PP_MAP_PREPEND4_TUPLE
+*****************************************************************/
+// PP_MAP_PREPEND4_TUPLE will prepend the "whats" to each ele-
+// ment, which themselves must be tuples.
+#define PP_MAP_PREPEND4_TUPLE( what1, what2, what3, what4, \
+                               ... )                       \
+  __VA_OPT__( PP_MAP_PREPEND4_TUPLE1( what1, what2, what3, \
+                                      what4, __VA_ARGS__ ) )
+
+#define PP_MAP_PREPEND4_TUPLE1( what1, what2, what3, what4, a, \
+                                ... )                          \
+  ( what1, what2, what3, what4, EXPAND a ) __VA_OPT__(         \
+      , PP_MAP_PREPEND4_TUPLE1_INDIRECT EMPTY()()(             \
+            what1, what2, what3, what4, __VA_ARGS__ ) )
+
+#define PP_MAP_PREPEND4_TUPLE1_INDIRECT() PP_MAP_PREPEND4_TUPLE1
+
+/****************************************************************
 ** JOIN_SEMIS
 *****************************************************************/
 // JOIN_SEMIS will join the parameters but with a semicolon after
