@@ -107,13 +107,6 @@ std::string to_string( std::vector<T> const& v ) {
     return "[" + join( res, "," ) + "]";
 }
 
-// Default  version uses std::to_string which is only defined for
-// a few primitive types.
-template<typename T>
-std::string to_string( T const& arg ) {
-    return std::to_string( arg );
-}
-
 template<typename T>
 std::ostream& operator<<( std::ostream&         out,
                           std::vector<T> const& v ) {

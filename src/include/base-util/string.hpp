@@ -117,6 +117,9 @@ std::vector<std::string_view> split_strip_any(
 
 using IsStrOkFunc = std::function<bool( std::string_view )>;
 
+std::optional<std::string> common_prefix(
+    std::vector<std::string> const& strings );
+
 // Will wrap the text using the is_ok callback. The callback
 // should return true if the string given to it has an acceptible
 // length. It is assumed that if the function returns false for a
@@ -168,6 +171,9 @@ to_paths( std::vector<std::string> const& ss );
 ****************************************************************/
 // NOTE: This puts single quotes around the character!
 std::string to_string( char const& c );
+
+std::string to_string( int i );
+std::string to_string( double d );
 
 // NOTE: These puts quotes around the string! The reason for this
 // behavior  is that we want to try to perform the to_string oper-
@@ -263,10 +269,6 @@ std::string to_string( SysTimePoint const& p );
 // UTC time zone (hence the +0000 at the end).
 std::string to_string( ZonedTimePoint const& p );
 
-// Catch-all; just forwards to std::to_string.
-template<typename T>
-std::string to_string( T const& arg );
-
 template<typename T>
 std::ostream& operator<<( std::ostream&         out,
                           std::vector<T> const& v );
@@ -284,7 +286,8 @@ constexpr int default_base{10}; // base 10 is decimal
 // This is to replace std::stoi -- it will enforce that the input
 // string is not empty and  that  the parsing consumes the entire
 // string.
-int stoi( std::string const& s, int base = default_base );
+std::optional<int> stoi( std::string const& s,
+                         int base = default_base );
 
 } // namespace util
 

@@ -262,7 +262,7 @@ TEST_CASE( "read_write_file" )
     auto v = util::read_file_lines( f );
     REQUIRE( v == (StrVec{ "line 1", "line 2", "line 3" }) );
 
-    auto s = util::read_file_str( f );
+    auto s = util::read_file_as_string( f );
     REQUIRE( s == "line 1\nline 2\nline 3" );
 
     // read file as vector of char.

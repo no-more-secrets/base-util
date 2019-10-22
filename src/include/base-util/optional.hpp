@@ -119,17 +119,12 @@ using OptInvokeResult =
 // For predicates that return by value.
 template<typename Pred, typename T>
 auto fmap( Pred&& f, std::optional<T> const& o )
-    -> std::enable_if_t<                        //
-        mp::all_of_v<                           //
-            std::is_invocable_v<Pred, T>,       //
-            !std::is_rvalue_reference_v<        //
-                std::invoke_result_t<Pred, T>>, //
-            !std::is_lvalue_reference_v<        //
-                std::invoke_result_t<Pred, T>>  //
-            >,                                  //
-        OptInvokeResult<Pred, T>                //
-        >                                       //
-{
+    -> std::enable_if_t<std::is_invocable_v<Pred, T> &&
+                            !std::is_rvalue_reference_v<
+                                std::invoke_result_t<Pred, T>> &&
+                            !std::is_lvalue_reference_v<
+                                std::invoke_result_t<Pred, T>>,
+                        OptInvokeResult<Pred, T>> {
   OptInvokeResult<Pred, T> res;
   if( o.has_value() )
     res.emplace( std::forward<Pred>( f )( *o ) );
@@ -143,54 +138,32 @@ using OptRefInvokeResult = std::optional<std::reference_wrapper<
 // For predicates that return an lvalue reference.
 template<typename Pred, typename T>
 auto fmap( Pred&& f, std::optional<T> const& o )
-    -> std::enable_if_t<                       //
-        mp::all_of_v<                          //
-            std::is_invocable_v<Pred, T>,      //
-            std::is_lvalue_reference_v<        //
-                std::invoke_result_t<Pred, T>> //
-            >,                                 //
-        OptRefInvokeResult<Pred, T>            //
-        >                                      //
-{
+    -> std::enable_if_t<std::is_invocable_v<Pred, T> &&
+                            std::is_lvalue_reference_v<
+                                std::invoke_result_t<Pred, T>>,
+                        OptRefInvokeResult<Pred, T>> {
   OptRefInvokeResult<Pred, T> res;
   if( o.has_value() )
     res.emplace( std::forward<Pred>( f )( *o ) );
   return res;
 }
 
-template<typename T>
-constexpr bool is_optional_v = false;
-
-template<typename T>
-constexpr bool is_optional_v<std::optional<T>> = true;
-
 template<typename Pred, typename T>
-using OptInvokeResultValue = std::optional<      //
-    std::decay_t<                                //
-        decltype(                                //
-            std::declval<                        //
-                std::invoke_result_t<Pred, T>>() //
-                .value()                         //
-            )                                    //
-        >                                        //
-    >;
+using OptInvokeResultValue = std::optional<std::decay_t<decltype(
+    std::declval<std::invoke_result_t<Pred, T>>().value() )>>;
 
 // For predicates that return optionals. This will collapse the
 // optionals (a la >>=).
 template<typename Pred, typename T>
-auto fmap_join( Pred&& f, std::optional<T> const& o ) ->  //
-    std::enable_if_t<                                     //
-        mp::all_of_v<                                     //
-            std::is_invocable_v<Pred, T>,                 //
-            is_optional_v<std::invoke_result_t<Pred, T>>, //
-            !std::is_rvalue_reference_v<                  //
-                std::invoke_result_t<Pred, T>>,           //
-            !std::is_lvalue_reference_v<                  //
-                std::invoke_result_t<Pred, T>>            //
-            >,                                            //
-        OptInvokeResultValue<Pred, T>                     //
-        >                                                 //
-{
+auto fmap_join( Pred&& f, std::optional<T> const& o )
+    -> std::enable_if_t<
+        std::is_invocable_v<Pred, T> &&
+            mp::is_optional_v<std::invoke_result_t<Pred, T>> &&
+            !std::is_rvalue_reference_v<
+                std::invoke_result_t<Pred, T>> &&
+            !std::is_lvalue_reference_v<
+                std::invoke_result_t<Pred, T>>,
+        OptInvokeResultValue<Pred, T>> {
   OptInvokeResultValue<Pred, T> res;
   if( o.has_value() ) {
     auto intermediate = std::forward<Pred>( f )( *o );
@@ -198,6 +171,23 @@ auto fmap_join( Pred&& f, std::optional<T> const& o ) ->  //
       res.emplace( std::move( *intermediate ) );
   }
   return res;
+}
+
+template<typename T>
+bool maybe_truish_to_bool( std::optional<T> const& o ) {
+  return o.has_value() ? bool( *o ) : false;
+}
+
+template<typename T>
+std::optional<std::decay_t<T>> just( T&& value ) {
+  return std::optional<std::decay_t<T>>( FWD( value ) );
+}
+
+template<typename T>
+auto just_ref( T const& value ) {
+  return std::optional<
+      std::reference_wrapper<std::decay_t<T> const>>(
+      FWD( value ) );
 }
 
 namespace infix {
@@ -209,21 +199,38 @@ struct infix_f : F {
     : F{FWD( f )} {}
 };
 
+template<typename F>
+struct infix : F {
+  constexpr infix( F&& f ) noexcept( noexcept( F{FWD( f )} ) )
+    : F{FWD( f )} {}
+};
+
 template<typename T, typename F>
 constexpr auto operator|( std::optional<T> const& o,
-                          infix_f<F>&& f ) THREE_TIMES( f( o ) )
+                          infix_f<F>&& f ) THREE_TIMES( f( o ) );
+
+template<typename T, typename F>
+constexpr auto operator|( std::optional<T> const& o,
+                          infix<F> const&         f )
+    THREE_TIMES( f( o ) );
 
 } // namespace detail
 
-#define OPT_DEFINE_INFIX( name )                        \
+#define OPT_DEFINE_INFIX_FUNC( name )                   \
   template<typename Func>                               \
   constexpr auto name( Func&& f ) {                     \
     return detail::infix_f{[&]( auto&& o ) THREE_TIMES( \
         ::util::name( FWD( f ), FWD( o ) ) )};          \
   }
 
-OPT_DEFINE_INFIX( fmap )
-OPT_DEFINE_INFIX( fmap_join )
+#define OPT_DEFINE_INFIX( name )              \
+  inline constexpr auto name = detail::infix{ \
+      []( auto&& o ) THREE_TIMES( ::util::name( FWD( o ) ) )};
+
+OPT_DEFINE_INFIX( maybe_truish_to_bool )
+
+OPT_DEFINE_INFIX_FUNC( fmap )
+OPT_DEFINE_INFIX_FUNC( fmap_join )
 
 } // namespace infix
 

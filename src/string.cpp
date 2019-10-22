@@ -6,6 +6,7 @@
 #include "base-util/string.hpp"
 
 #include <algorithm>
+#include <optional>
 
 using namespace std;
 
@@ -72,6 +73,28 @@ vector<string_view> split_strip_any( string_view sv,
             begin( res ), end( res ), L( _.empty() ) );
     res.erase( new_end, end( res ) );
     return res;
+}
+
+optional<string> common_prefix( vector<string> const& strings ) {
+  optional<string> res;
+  if( strings.empty() ) return res;
+  int min_size = std::numeric_limits<int>::max();
+  for( auto const& s : strings )
+    min_size = std::min( min_size, int( s.size() ) );
+  int max_prefix_size = min_size;
+  string prefix; prefix.reserve( max_prefix_size );
+  int curr_pos = 0;
+  while( curr_pos < max_prefix_size ) {
+    char proposed_next_char = strings[0][curr_pos];
+    for( auto const& s : strings )
+      if( s[curr_pos] != proposed_next_char )
+        goto finished;
+    prefix.push_back( proposed_next_char );
+    ++curr_pos;
+  }
+finished:
+  res = prefix;
+  return res;
 }
 
 // Split  a  string, strip all elements, and remove empty strings
@@ -179,6 +202,14 @@ string to_string( char const& s ) {
     return "'" + res + "'";
 }
 
+std::string to_string( int i ) {
+  return std::to_string( i );
+}
+
+std::string to_string( double d ) {
+  return std::to_string( d );
+}
+
 // Note two important things about this function: 1) it will will
 // force the string to be converted to a std::string  by  calling
 // its string() member function,  despite  the  fact that on some
@@ -217,12 +248,17 @@ string to_string( ZonedTimePoint const& p ) {
 // This is to replace std::stoi -- it will enforce that the input
 // string is not empty and  that  the parsing consumes the entire
 // string.
-int stoi( string const& s, int base ) {
-    ASSERT( !s.empty(), "cannot convert empty string to int" );
-    size_t written;
-    auto res = stoi( s, &written, base );
-    ASSERT( written == s.size(), "failed to parse entire string "
-            << quoted( s ) << " into an integer." );
+optional<int> stoi( string const& s, int base ) {
+    optional<int> res;
+    if( !s.empty() ) {
+        size_t written;
+        try {
+            auto n = ::std::stoi( s, &written, base );
+            if( written == s.size() )
+                res = n;
+        }
+        catch( std::exception const& ) {}
+    }
     return res;
 }
 

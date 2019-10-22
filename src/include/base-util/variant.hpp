@@ -108,8 +108,8 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 // ====================
 //
 // If only a subset of the variant's types need to be handled
-// then one can use `switch_exhaustive` to avoid requiring that
-// all cases be handled:
+// then one can use `default_switch` to avoid requiring that all
+// cases be handled:
 //
 //   struct Point { int x; int y; };
 //   auto v = std::variant<int, Point, string>{ ... };
@@ -118,8 +118,13 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 //     case_( string ) {
 //       cout << "string value: " << val << "\n";
 //     }
-//     switch_exhaustive;
+//     default_switch( {
+//       cout << "default action.\n";
+//     } );
 //   }
+//
+// Likewise, for matcher_, one can use `default_matcher` and re-
+// turn a default value.
 //
 // PATTERN MATCHING
 // ================
@@ -266,6 +271,11 @@ auto visit( Variant& v, VisitorFunc const& func ) {
   return ::util::detail::VSRDNU;                                \
   }; { return std::visit( __f, __v ); } }(); {
 
+#define default_switch( ... )                                   \
+  } else { __VA_ARGS__ }                                        \
+  return ::util::detail::VSRDNU;                                \
+  }; { return std::visit( __f, __v ); } }(); {
+
 #define switch_non_exhaustive                                   \
   } return ::util::detail::VSRDNU; };                           \
   { return std::visit( __f, __v ); } }(); {
@@ -293,7 +303,8 @@ auto visit( Variant& v, VisitorFunc const& func ) {
         "non-exhaustive variant visitor type list" );           \
   }; { return std::visit( __f, __v ); } }(); {
 
-#define matcher_non_exhaustive                                  \
+#define default_matcher( ... )                                  \
+  } else { __VA_ARGS__ }                                        \
   }; { return std::visit( __f, __v ); }(); {
 
 /*                 === variant_function ===                    */
@@ -310,8 +321,24 @@ auto visit( Variant& v, VisitorFunc const& func ) {
         auto& val = __val;                                      \
         if constexpr( false )
 
+#define variant_function_c_MULTI( val, _, ret_type )            \
+  [&]( auto& v ){ auto& __v = v;                                \
+    auto __f = [&]( auto&& __val ) -> ret_type {                \
+        auto& val = __val;                                      \
+        if constexpr( false )
+
+#define variant_function_c_SINGLE( val )                        \
+  [&]( auto& v ){ auto& __v = v;                                \
+    auto __f = [&]( auto&& val ) {                              \
+        auto& val = __val;                                      \
+        if constexpr( false )
+
 #define variant_function( ... )                                 \
         PP_ONE_OR_MORE_ARGS( variant_function, __VA_ARGS__ )
+
+// Version that captures.
+#define variant_function_c( ... )                               \
+        PP_ONE_OR_MORE_ARGS( variant_function_c, __VA_ARGS__ )
 
 #define variant_function_exhaustive                             \
   } else static_assert(                                         \
@@ -319,8 +346,9 @@ auto visit( Variant& v, VisitorFunc const& func ) {
         "non-exhaustive variant visitor type list" );           \
   }; { return std::visit( __f, __v ); }
 
-#define variant_function_non_exhaustive                         \
-  } }; { return std::visit( __f, __v ); }
+#define default_variant_function( def )                         \
+  } else { def; }                                               \
+  }; { return std::visit( __f, __v ); }
 
 /*                       === case_v ===                        */
 
