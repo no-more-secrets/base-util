@@ -36,6 +36,7 @@ public:
     // Get results for an even in the given units.  If  either  a
     // start or end time for the event has  not  been  registered
     // then these will throw.
+    int64_t microseconds( std::string_view name ) const;
     int64_t milliseconds( std::string_view name ) const;
     int64_t seconds     ( std::string_view name ) const;
     int64_t minutes     ( std::string_view name ) const;

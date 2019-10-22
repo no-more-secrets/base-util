@@ -32,6 +32,14 @@ void StopWatch::stop( string_view name ) {
 // Get results for an even in the given units. If either a  start
 // or  end  time for the event has not been registered then these
 // will throw.
+int64_t StopWatch::microseconds( string_view name ) const {
+  ASSERT_( event_complete( name ) );
+  string n( name );
+  return chrono::duration_cast<chrono::microseconds>(
+             end_times.at( n ) - start_times.at( n ) )
+      .count();
+}
+
 int64_t StopWatch::milliseconds( string_view name ) const {
     ASSERT_( event_complete( name ) );
     string n( name );
@@ -63,6 +71,7 @@ string StopWatch::human( string_view name ) const {
     auto m  = minutes( name );
     auto s  = seconds( name );
     auto ms = milliseconds( name );
+    auto us = microseconds( name );
 
     constexpr int64_t seconds_in_minute{60};
     constexpr int64_t millis_in_second{1000};
@@ -78,9 +87,11 @@ string StopWatch::human( string_view name ) const {
         if( s < small_enough_seconds_for_millis )
             out << "." << ms % millis_in_second;
         out << "s";
-    }
-    else
+    } else if( ms > 10 ) {
         out << ms << "ms";
+    } else {
+        out << us << "us";
+    }
     return out.str();
 }
 
