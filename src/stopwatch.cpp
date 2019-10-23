@@ -68,35 +68,38 @@ int64_t StopWatch::minutes( string_view name ) const {
 // Gets the results for an event  and  then formats them in a way
 // that is most readable given the duration.
 string StopWatch::human( string_view name ) const {
-    ASSERT_( event_complete( name ) );
-    ostringstream out;
-    // Each  of  these represent the same time, just in different
-    // units.
-    auto m  = minutes( name );
-    auto s  = seconds( name );
-    auto ms = milliseconds( name );
-    auto us = microseconds( name );
+  ASSERT_( event_complete( name ) );
+  ostringstream out;
+  // Each  of  these represent the same time, just in different
+  // units.
+  auto m  = minutes( name );
+  auto s  = seconds( name );
+  auto ms = milliseconds( name );
+  auto us = microseconds( name );
 
-    constexpr int64_t seconds_in_minute{60};
-    constexpr int64_t millis_in_second{1000};
+  constexpr int64_t seconds_in_minute{ 60 };
+  constexpr int64_t millis_in_second{ 1000 };
+  constexpr int64_t micros_in_millis{ 1000 };
 
-    // When time is less than this number of seconds then we will
-    // include milliseconds.
-    constexpr int64_t small_enough_seconds_for_millis{10};
+  constexpr int64_t small_enough_for_millis{ 10 };
+  constexpr int64_t small_enough_for_micros{ 10 };
 
-    if( m > 0 )
-        out << m << "m" << s % seconds_in_minute << "s";
-    else if( s > 0 ) {
-        out << s;
-        if( s < small_enough_seconds_for_millis )
-            out << "." << ms % millis_in_second;
-        out << "s";
-    } else if( ms > 10 ) {
-        out << ms << "ms";
-    } else {
-        out << us << "us";
-    }
-    return out.str();
+  if( m > 0 )
+    out << m << "m" << s % seconds_in_minute << "s";
+  else if( s > 0 ) {
+    out << s;
+    if( s < small_enough_for_millis )
+      out << "." << ms % millis_in_second;
+    out << "s";
+  } else if( ms > 0 ) {
+    out << ms;
+    if( ms < small_enough_for_micros )
+      out << "." << us % micros_in_millis;
+    out << "ms";
+  } else {
+    out << us << "us";
+  }
+  return out.str();
 }
 
 // Get a list of all results in human readable form.
