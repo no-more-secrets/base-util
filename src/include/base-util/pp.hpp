@@ -41,6 +41,7 @@
 *****************************************************************/
 #define PP_CONST_ONE( ... ) 1
 #define PP_ADD_TYPENAME( ... ) typename __VA_ARGS__
+#define SINGLETON_TUPLE( a ) ( a )
 
 /****************************************************************
 ** Evalutation Control
