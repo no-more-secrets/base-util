@@ -305,7 +305,7 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 
 #define default_matcher( ... )                                  \
   } else { __VA_ARGS__ }                                        \
-  }; { return std::visit( __f, __v ); }(); {
+  }; { return std::visit( __f, __v ); } }(); {
 
 /*                 === variant_function ===                    */
 
