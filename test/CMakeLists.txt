@@ -12,8 +12,6 @@ endfunction( set_warning_options )
 
 enable_testing()
 
-find_package( Catch2 REQUIRED )
-
 add_executable( run-tests
     infra/main.cpp
     algo.cpp
@@ -31,4 +29,4 @@ set_warning_options( run-tests )
 target_link_libraries( run-tests
                        PRIVATE
                        base-util::base-util
-                       Catch2::Catch2 )
+                       Catch2 )

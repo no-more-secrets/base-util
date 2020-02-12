@@ -45,6 +45,20 @@ add_subdirectory( src )
 add_subdirectory( app )
 add_subdirectory( test )
 
+# === external dependencies =======================================
+
+# We don't want this variable set when we import the externs be-
+# cause it will cause trouble; it may be enabled from the pre-
+# vious CMake run because we do enable tests us.
+set( BUILD_TESTING OFF )
+
+# ... add_subdirectory's here...
+
+set( BUILD_TESTING ON ) # Catch2 will actually do this as well.
+add_subdirectory( extern/Catch2        EXCLUDE_FROM_ALL )
+
+# === custom targets ==============================================
+
 # Should also automatically add a dependency on the binary.
 add_custom_target( run
                    COMMAND main
