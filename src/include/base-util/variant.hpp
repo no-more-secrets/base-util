@@ -153,23 +153,23 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 // The `switch_` macro prevents the user from attempting to re-
 // turn (or return values); it is intended only for side effects.
 // To yield a value from a variant switch_ you should instead use
-// the `matcher_` and `result_` macros:
+// the `matcher_` and `resu1t` macros:
 //
 //   auto n = matcher_( my_var ) {
 //     case_( MyVar::state_1 ) {
-//       result_ 5;
+//       resu1t 5;
 //     }
 //     case_( MyVar::state_2, var_1 ) {
 //       if( var_1 ) break_ *var_1;
-//       result_ 6;
+//       resu1t 6;
 //     }
 //     case_( MyVar::state_3, var_2, var_3 ) {
-//       result_ (int)var_3;
+//       resu1t (int)var_3;
 //     }
 //     matcher_exhaustive;
 //   }
 //
-// We use `result_` instead of `return` to return values; the
+// We use `resu1t` instead of `return` to return values; the
 // former is simply an alias for the latter, but should be used
 // because it helps to drive home to the reader that the return
 // statement is not returning from the outter scope (as would
@@ -399,7 +399,7 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 #  define matcher_( ... ) matcher_v( __VA_ARGS__ )
 #  define    case_( ... )    case_v( __VA_ARGS__ )
 #  define   break_          break_v
-#  define  result_         result_v
+#  define   resu1t         result_v
 #endif
 
 namespace detail {
