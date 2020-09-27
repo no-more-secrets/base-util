@@ -10,7 +10,6 @@ using namespace std;
 TEST_CASE( "from_string" )
 {
     REQUIRE( !util::stoi( "" ).has_value() );
-
     REQUIRE( util::stoi( "0"      ) ==  0   );
     REQUIRE( util::stoi( "1"      ) ==  1   );
     REQUIRE( util::stoi( "222"    ) ==  222 );
@@ -21,13 +20,12 @@ TEST_CASE( "from_string" )
     REQUIRE( !util::stoi( "1 a"     ).has_value() );
 
     REQUIRE( !util::from_chars<int>( "" ).has_value() );
-
     REQUIRE( util::from_chars<int>( "0"      ) ==  0   );
     REQUIRE( util::from_chars<int>( "1"      ) ==  1   );
     REQUIRE( util::from_chars<int>( "222"    ) ==  222 );
     REQUIRE( util::from_chars<int>( "0",  16 ) ==  0   );
     REQUIRE( util::from_chars<int>( "10", 16 ) ==  16  );
-    REQUIRE( util::from_chars<long>( "-10"    ) == -10  );
+    REQUIRE( util::from_chars<int>( "-10"    ) == -10  );
     REQUIRE( util::from_chars<int>( "-0"     ) ==  0   );
     REQUIRE( !util::from_chars<int>( "1 a"     ).has_value() );
 }
