@@ -9,6 +9,7 @@
 #include "base-util/types.hpp"
 
 #include <cctype>
+#include <charconv>
 #include <experimental/filesystem>
 #include <optional>
 #include <string>
@@ -282,6 +283,20 @@ std::ostream& operator<<( std::ostream&          out,
 ****************************************************************/
 
 constexpr int default_base{10}; // base 10 is decimal
+
+// This is to replace std::from_chars for integers -- it will en-
+// force that the input string is not empty and that the parsing
+// consumes the entire string.
+template<typename Integral>
+std::optional<Integral> from_chars( std::string_view sv,
+                               int base = default_base ) {
+  std::optional<Integral> res{Integral{0}};
+  std::from_chars_result fc_res =
+    std::from_chars( sv.begin(), sv.end(), *res, base );
+  if( fc_res.ec != std::errc{} || fc_res.ptr != sv.end() )
+    res.reset();
+  return res;
+}
 
 // This is to replace std::stoi -- it will enforce that the input
 // string is not empty and  that  the parsing consumes the entire
