@@ -9,6 +9,7 @@
 #include "base-util/types.hpp"
 
 #include <cctype>
+#include <charconv>
 #include <experimental/filesystem>
 #include <optional>
 #include <string>
@@ -295,18 +296,12 @@ std::optional<int> stoi( std::string const& s,
 template<typename Integral>
 std::optional<Integral> from_chars( std::string_view sv,
                                int base = default_base ) {
-  // FIXME: when we're ready for <charconv> uncomment the follow-
-  // ing. Otherwise, just use the stoi.
-  //std::optional<Integral> res{Integral{0}};
-  //std::from_chars_result fc_res =
-  //  std::from_chars( sv.begin(), sv.end(), *res, base );
-  //if( fc_res.ec != std::errc{} || fc_res.ptr != sv.end() )
-  //  res.reset();
-  //return res;
-
-  // -- Remove the below once <charconv> is ready --
-  static_assert(std::is_same_v<Integral, int>);
-  return stoi( std::string(sv), base );
+  std::optional<Integral> res{Integral{0}};
+  std::from_chars_result fc_res =
+    std::from_chars( sv.begin(), sv.end(), *res, base );
+  if( fc_res.ec != std::errc{} || fc_res.ptr != sv.end() )
+    res.reset();
+  return res;
 }
 
 } // namespace util
