@@ -76,22 +76,22 @@ void copy_file( fs::path const& from, fs::path const& to ) {
 }
 
 // Read a text file into a string in its entirety.
-string read_file_as_string( fs::path const& p ) {
+optional<string> read_file_as_string( fs::path const& p ) {
 
     ifstream in( p.string() );
-    ASSERT( in.good(), "failed to open file " << p );
+    if( !in.good() ) return nullopt;
 
     // Try to avoid having to resize/reallocate the string by  re-
     // serving enough space.
     auto size = fs::file_size( p );
 
-    string res; res.reserve( size );
+    optional<string> res; res.emplace(); res->reserve( size );
 
     bool first = true; // used to know whether to put a newline.
 
     for( string line; getline( in, line ); ) {
-        if( !first) res += "\n";
-        res += line;
+        if( !first) *res += "\n";
+        *res += line;
         first = false;
     }
 
@@ -102,9 +102,9 @@ string read_file_as_string( fs::path const& p ) {
     // CRLF  line  endings will be collapsed to one byte and also
     // sometimes the final line ending  can  be  dropped  by  get-
     // line().
-    ASSERT( res.size() <= size,
-            "estimate of string size incorrect; res.size()"
-            " == " << res.size() << ", size == " << size );
+    ASSERT( res->size() <= size,
+            "estimate of string size incorrect; res->size()"
+            " == " << res->size() << ", size == " << size );
 
     return res; // hoping for NRVO here
 }

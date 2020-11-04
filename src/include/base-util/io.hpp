@@ -6,6 +6,8 @@
 #include "base-util/fs.hpp"
 #include "base-util/types.hpp"
 
+#include <optional>
+
 namespace util {
 
 // Read  a  file in its entirety into a vector of chars. This may
@@ -29,7 +31,8 @@ void write_file( fs::path const& p, std::vector<char> const& v );
 void copy_file( fs::path const& from, fs::path const& to );
 
 // Read a text file into a string in its entirety.
-std::string read_file_as_string( fs::path const& p );
+std::optional<std::string>
+read_file_as_string( fs::path const& p );
 
 // Read  a text file into a string in its entirety and then split
 // it into lines.

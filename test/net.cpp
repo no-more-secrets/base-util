@@ -16,11 +16,13 @@ TEST_CASE( "url_encode" )
 {
     auto s_inp  = util::read_file_as_string( data_common/"encode-inp.txt"  );
     auto s_base = util::read_file_as_string( data_common/"encode-base.txt" );
+    REQUIRE( s_inp.has_value() );
+    REQUIRE( s_base.has_value() );
 
-    auto s_enc = net::url_encode( s_inp );
+    auto s_enc = net::url_encode( *s_inp );
 
-    REQUIRE( s_enc.size() == s_base.size() );
-    REQUIRE( s_enc == s_base );
+    REQUIRE( s_enc.size() == s_base->size() );
+    REQUIRE( s_enc == *s_base );
 
     // Test encoding of key/value pairs from vector.
     vector<tuple<string, string>> kv1{
