@@ -3,6 +3,7 @@
 ****************************************************************/
 #pragma once
 
+#include "base-util/mp.hpp"
 #include "base-util/pp.hpp"
 
 #include <type_traits>
@@ -257,11 +258,23 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 
 /*                      === switch_v ===                       */
 
+// The val0 is a variable that we would use inside the case_
+// statement to refer to the value of the current alternative,
+// but instead we call it val0 because we will later define a
+// `val` for this purpose. The reason is because the `val0` is
+// declared with `auto&&` and so the language intelligence has a
+// hard time determining the type of it when hovering over a
+// variable in an editor. So as mentioned we will define a `val`
+// (in the case_ macro) with an explicit type which we will know
+// at that point (which does not depend on any auto parameters)
+// that will solve this issue.
 #define switch_v( v )                                           \
   [&]{ auto& __v = v;                                           \
-    auto __f = [&]( auto&& val ) ->                             \
+    constexpr bool __is_it_const =                              \
+      std::is_const_v<std::remove_reference_t<decltype(__v)>>;  \
+    auto __f = [&]( auto&& val0 ) ->                            \
           ::util::detail::switch_ret_do_not_use_t {             \
-        auto& __val = val;                                      \
+        auto& __val = val0;                                     \
         if constexpr( false )
 
 #define switch_exhaustive                                       \
@@ -284,14 +297,18 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 
 #define matcher_v_MULTI( v, _, ret_type )                       \
   [&]{ auto& __v = v;                                           \
-    auto __f = [&]( auto&& val ) -> ret_type {                  \
-        auto& __val = val;                                      \
+    constexpr bool __is_it_const =                              \
+      std::is_const_v<std::remove_reference_t<decltype(__v)>>;  \
+    auto __f = [&]( auto&& val0 ) -> ret_type {                 \
+        auto& __val = val0;                                     \
         if constexpr( false )
 
 #define matcher_v_SINGLE( v )                                   \
   [&]{ auto& __v = v;                                           \
-       auto __f = [&]( auto&& val ) {                           \
-         auto& __val = val;                                     \
+    constexpr bool __is_it_const =                              \
+      std::is_const_v<std::remove_reference_t<decltype(__v)>>;  \
+       auto __f = [&]( auto&& val0 ) {                          \
+         auto& __val = val0;                                    \
          if constexpr( false )
 
 #define matcher_v( ... )                                        \
@@ -311,24 +328,32 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 
 #define variant_function_MULTI( val, _, ret_type )              \
   []( auto& v ){ auto& __v = v;                                 \
+    constexpr bool __is_it_const =                              \
+      std::is_const_v<std::remove_reference_t<decltype(__v)>>;  \
     auto __f = [&]( auto&& __val ) -> ret_type {                \
         auto& val = __val;                                      \
         if constexpr( false )
 
 #define variant_function_SINGLE( val )                          \
   []( auto& v ){ auto& __v = v;                                 \
+    constexpr bool __is_it_const =                              \
+      std::is_const_v<std::remove_reference_t<decltype(__v)>>;  \
     auto __f = [&]( auto&& val ) {                              \
         auto& val = __val;                                      \
         if constexpr( false )
 
 #define variant_function_c_MULTI( val, _, ret_type )            \
   [&]( auto& v ){ auto& __v = v;                                \
+    constexpr bool __is_it_const =                              \
+      std::is_const_v<std::remove_reference_t<decltype(__v)>>;  \
     auto __f = [&]( auto&& __val ) -> ret_type {                \
         auto& val = __val;                                      \
         if constexpr( false )
 
 #define variant_function_c_SINGLE( val )                        \
   [&]( auto& v ){ auto& __v = v;                                \
+    constexpr bool __is_it_const =                              \
+      std::is_const_v<std::remove_reference_t<decltype(__v)>>;  \
     auto __f = [&]( auto&& val ) {                              \
         auto& val = __val;                                      \
         if constexpr( false )
@@ -372,6 +397,7 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 #define case_v_MULTI( t, ... )                                      \
   } else if constexpr(                                              \
           std::is_same_v<std::decay_t<decltype( __val )>, t> ) {    \
+      (void)__is_it_const;                                          \
       auto& [EVAL( PP_MAP_COMMAS( V_UNDERSCORES, __VA_ARGS__ ) )]   \
           = __val;                                                  \
       EVAL( PP_MAP( V_USE_VARIABLE,                                 \
@@ -380,7 +406,9 @@ auto visit( Variant& v, VisitorFunc const& func ) {
 
 #define case_v_SINGLE( t )                                          \
   } else if constexpr(                                              \
-          std::is_same_v<std::decay_t<decltype( __val )>, t> ) {
+          std::is_same_v<std::decay_t<decltype( __val )>, t> ) {    \
+      using val_t = mp::const_if_t<t, __is_it_const>;               \
+      val_t& val = __val; (void)val;
 
 #define case_v( ... ) PP_ONE_OR_MORE_ARGS( case_v, __VA_ARGS__ )
 
