@@ -1,6 +1,6 @@
 /****************************************************************
-* Type aliases
-****************************************************************/
+ * Type aliases
+ ****************************************************************/
 #pragma once
 
 // TODO: need to figure out how to forward declare the relevant
@@ -10,16 +10,16 @@
 // to save typing.
 
 #include <chrono>
-#include <experimental/filesystem>
+#include <filesystem>
 #include <functional>
 #include <optional>
-#include <utility>
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <utility>
 #include <vector>
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 using OptStr      = std::optional<std::string>;
 using OptPath     = std::optional<fs::path>;
@@ -37,7 +37,7 @@ template<typename T>
 using CRef = std::reference_wrapper<T const>;
 
 template<typename T>
-using OptRef  = std::optional<std::reference_wrapper<T>>;
+using OptRef = std::optional<std::reference_wrapper<T>>;
 
 template<typename T>
 using OptCRef = std::optional<std::reference_wrapper<T const>>;

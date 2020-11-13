@@ -5,6 +5,7 @@
 
 // C++ standard library
 #include <optional>
+#include <vector>
 
 namespace mp {
 
