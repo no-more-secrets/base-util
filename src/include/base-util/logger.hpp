@@ -3,8 +3,6 @@
 ****************************************************************/
 #pragma once
 
-#include "base-util/non-copyable.hpp"
-
 #include <iostream>
 #include <type_traits>
 
@@ -12,9 +10,14 @@ namespace util {
 
 /* This is a singleton class, the object of which will represent
  * the global logger object. */
-struct Logger : public singleton {
+struct Logger {
 
 public:
+    Logger( Logger const& )            = delete;
+    Logger& operator=( Logger const& ) = delete;
+    Logger( Logger&& )                 = delete;
+    Logger& operator=( Logger&& )      = delete;
+
     // Get the global logger instance.
     static Logger& logger() noexcept;
 

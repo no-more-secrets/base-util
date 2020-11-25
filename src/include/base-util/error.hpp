@@ -3,8 +3,6 @@
 ****************************************************************/
 #pragma once
 
-#include "base-util/non-copyable.hpp"
-
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -15,7 +13,12 @@ namespace util {
 /* Error: this struct  is  essentially  just  a  wrapper around a
  * string  for  the purpose of distinguishing it type-wise from a
  * string and to prevent implicit construction. */
-struct Error : public movable_only {
+struct Error {
+    Error( Error const& )            = delete;
+    Error& operator=( Error const& ) = delete;
+    Error( Error&& )                 = default;
+    Error& operator=( Error&& )      = default;
+
     explicit Error() = default;
     explicit Error( std::string_view sv ) : msg( sv ) {}
     bool operator==( Error const& rhs ) const

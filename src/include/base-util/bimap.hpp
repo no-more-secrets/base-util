@@ -4,7 +4,6 @@
 #pragma once
 
 #include "base-util/algo.hpp"
-#include "base-util/non-copyable.hpp"
 #include "base-util/misc.hpp"
 
 #include <algorithm>
@@ -38,9 +37,13 @@ namespace util {
 * not need to be sorted in any way.
 ****************************************************************/
 template<typename KeyT, typename ValT>
-class BiMapFixed : util::movable_only {
+class BiMapFixed {
 
 public:
+    BiMapFixed( BiMapFixed const& )            = delete;
+    BiMapFixed& operator=( BiMapFixed const& ) = delete;
+    BiMapFixed( BiMapFixed&& )                 = default;
+    BiMapFixed& operator=( BiMapFixed&& )      = default;
 
     using value_type = std::tuple<KeyT, ValT>;
 
@@ -239,9 +242,14 @@ KeyT const& BiMapFixed<KeyT, ValT>::key( ValT const& val ) const {
 *
 * Values are returned as optional references.
 ****************************************************************/
-template<typename T> class BDIndexMap : util::movable_only {
+template<typename T> class BDIndexMap {
 
 public:
+    BDIndexMap( BDIndexMap const& )            = delete;
+    BDIndexMap& operator=( BDIndexMap const& ) = delete;
+    BDIndexMap( BDIndexMap&& )                 = default;
+    BDIndexMap& operator=( BDIndexMap&& )      = default;
+
     // NOTE: the contained data must be a vector of unique items;
     // if what you are passing in does not meet that  requirement
     // then  set  the is_uniq_sorted flag to false and it will be

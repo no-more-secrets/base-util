@@ -6,7 +6,6 @@
 #include "base-util/bimap.hpp"
 #include "base-util/keyval.hpp"
 #include "base-util/macros.hpp"
-#include "base-util/non-copyable.hpp"
 
 #include <map>
 #include <numeric>
@@ -22,8 +21,13 @@ using ::bu::val_safe;
 *****************************************************************/
 
 template<typename NameT>
-class DirectedGraph : util::movable_only {
+class DirectedGraph {
 public:
+  DirectedGraph( DirectedGraph const& )            = delete;
+  DirectedGraph& operator=( DirectedGraph const& ) = delete;
+  DirectedGraph( DirectedGraph&& )                 = default;
+  DirectedGraph& operator=( DirectedGraph&& )      = default;
+
   template<typename NameT_,
            // typename... to allow for maps that may have
            // additional template parameters (but  which  we
