@@ -63,8 +63,8 @@ public:
 
     // Returns an optional  of  reference,  so  no copying/moving
     // should happen here.
-    OptRef<ValT const> val_safe( KeyT const& key ) const;
-    OptRef<KeyT const> key_safe( ValT const& val ) const;
+    bu::OptRef<ValT const> val_safe( KeyT const& key ) const;
+    bu::OptRef<KeyT const> key_safe( ValT const& val ) const;
 
     // These variants will throw exceptions when key/val  is  not
     // found.
@@ -168,7 +168,7 @@ BiMapFixed<KeyT, ValT>::BiMapFixed(
 // Returns  an optional of reference, so no copying/moving should
 // happen here.
 template<typename KeyT, typename ValT>
-OptRef<ValT const>
+bu::OptRef<ValT const>
 BiMapFixed<KeyT, ValT>::val_safe( KeyT const& key ) const {
 
     auto i = util::lower_bound(
@@ -188,7 +188,7 @@ BiMapFixed<KeyT, ValT>::val_safe( KeyT const& key ) const {
 }
 
 template<typename KeyT, typename ValT>
-OptRef<KeyT const>
+bu::OptRef<KeyT const>
 BiMapFixed<KeyT, ValT>::key_safe( ValT const& val ) const {
 
     auto i = util::lower_bound(
@@ -263,7 +263,7 @@ public:
 
     // Returns an optional  of  reference,  so  no copying/moving
     // should happen here.
-    OptRef<T const>       val_safe( size_t   n   ) const;
+    bu::OptRef<T const>   val_safe( size_t   n   ) const;
     std::optional<size_t> key_safe( T const& val ) const;
 
     // These variants will throw exceptions when key/val  is  not
@@ -307,7 +307,7 @@ size_t BDIndexMap<T>::key( T const& val ) const {
 }
 
 template<typename T>
-OptRef<T const> BDIndexMap<T>::val_safe( size_t n ) const {
+bu::OptRef<T const> BDIndexMap<T>::val_safe( size_t n ) const {
 
     if( n >= m_data.size() )
         return std::nullopt;
