@@ -266,7 +266,6 @@ TEST_CASE( "find" )
     using util::find_last_if;
 
     auto odd = L( _ % 2 == 1 );
-    auto even = L( _ % 2 == 0 );
     auto find_odd = LC( find_last_if( _, odd ) );
 
     // empty case
