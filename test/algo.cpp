@@ -264,52 +264,42 @@ TEST_CASE( "algo" )
 TEST_CASE( "find" )
 {
     using util::find_last_if;
-    using util::find_first_if;
 
     auto odd = L( _ % 2 == 1 );
     auto even = L( _ % 2 == 0 );
     auto find_odd = LC( find_last_if( _, odd ) );
-    auto find_even = LC( find_first_if( _, even ) );
 
     // empty case
     vector<int> v1{};
     REQUIRE( find_odd( v1 ) == nullopt );
-    REQUIRE( find_even( v1 ) == nullopt );
 
     // single element
     vector v2{2};
     REQUIRE( find_odd( v2 ) == nullopt );
-    REQUIRE( find_even( v2 ) == 0 );
 
     // single element
     vector v3{5};
     REQUIRE( find_odd( v3 ) == 0 );
-    REQUIRE( find_even( v3 ) == nullopt );
 
     // multiple elements, last satisfied
     vector v4{ 2, 6, 8, 4, 2, 5 };
     REQUIRE( find_odd( v4 ) == 5 );
-    REQUIRE( find_even( v4 ) == 0 );
 
     // multiple elements, first satisfied
     vector v5{ 5, 6, 8, 4, 2, 2 };
     REQUIRE( find_odd( v5 ) == 0 );
-    REQUIRE( find_even( v5 ) == 1 );
 
     // multiple elements, none satisified
     vector v6{ 6, 8, 4, 2, 2 };
     REQUIRE( find_odd( v6 ) == nullopt );
-    REQUIRE( find_even( v6 ) == 0 );
 
     // multiple elements, all satisified
     vector v7{ 5, 7, 9, 1, 3, 5};
     REQUIRE( find_odd( v7 ) == 5 );
-    REQUIRE( find_even( v7 ) == nullopt );
 
     // multiple elements, middle satisified
     vector v8{ 6, 8, 4, 5, 2, 2 };
     REQUIRE( find_odd( v8 ) == 3 );
-    REQUIRE( find_even( v8 ) == 0 );
 }
 
 TEST_CASE( "find and cycle" )

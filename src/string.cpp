@@ -241,25 +241,4 @@ string to_string( ZonedTimePoint const& p ) {
     return util::fmt_time( p, util::tz_utc() );
 }
 
-/****************************************************************
-* From-String utilities
-****************************************************************/
-
-// This is to replace std::stoi -- it will enforce that the input
-// string is not empty and  that  the parsing consumes the entire
-// string.
-optional<int> stoi( string const& s, int base ) {
-    optional<int> res;
-    if( !s.empty() ) {
-        size_t written;
-        try {
-            auto n = ::std::stoi( s, &written, base );
-            if( written == s.size() )
-                res = n;
-        }
-        catch( std::exception const& ) {}
-    }
-    return res;
-}
-
 } // namespace util
