@@ -19,7 +19,7 @@ void dos2unix( Container& c,
     std::enable_if_t<std::is_same_v<
         typename Container::iterator::value_type, char>>*
             /*unused*/ = nullptr ) {
-    util::remove_if( c, L( _ == 0x0d ) );
+    util::remove_if( c, []( auto const& _ ){ return _ == 0x0d; } );
 }
 
 // This  function  will  simply search for any 0x0A character and

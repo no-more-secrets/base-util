@@ -70,7 +70,8 @@ vector<string_view> split_strip_any( string_view sv,
     auto res = split_on_any( sv, chars );
     transform( begin( res ), end( res ), begin( res ), strip );
     auto new_end = std::remove_if(
-            begin( res ), end( res ), L( _.empty() ) );
+            begin( res ), end( res ),
+            []( auto const& _ ){ return _.empty(); } );
     res.erase( new_end, end( res ) );
     return res;
 }

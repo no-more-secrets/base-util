@@ -172,7 +172,10 @@ bu::OptRef<ValT const>
 BiMapFixed<KeyT, ValT>::val_safe( KeyT const& key ) const {
 
     auto i = util::lower_bound(
-                m_by_key, LC( std::get<0>( _.get() ) < key ) );
+                m_by_key,
+                [&]( auto const& _) {
+                  return std::get<0>( _.get() ) < key;
+                } );
 
     // Make sure that the key was found.
     if( i != std::end( m_by_key ) ) {
@@ -192,7 +195,10 @@ bu::OptRef<KeyT const>
 BiMapFixed<KeyT, ValT>::key_safe( ValT const& val ) const {
 
     auto i = util::lower_bound(
-                m_by_val, LC( std::get<1>( _.get() ) < val ) );
+                m_by_val,
+                [&]( auto const& _ ) {
+                  return std::get<1>( _.get() ) < val;
+                } );
 
     // Make sure that the value was found.
     if( i != std::end( m_by_val ) ) {
