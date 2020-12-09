@@ -107,7 +107,7 @@ TEST_CASE( "split_on_idxs" )
 TEST_CASE( "remove_if" )
 {
     auto v = vector{ 7, 6, 5, 4, 3, 2, 1 };
-    auto even = L( _ % 2 == 0 );
+    auto even = []( auto const& _ ) { return _ % 2 == 0; };
     util::remove_if( v, even );
     REQUIRE( v == vector{ 7, 5, 3, 1 } );
 }
@@ -123,18 +123,18 @@ TEST_CASE( "sorting" )
     REQUIRE( v2 == vector{ 2, 3, 4, 5, 6, 7 } );
 
     vector<int> v3{ 4, 7, 3, 6, 4, 7, 5, 2, 4, 5, 2 };
-    auto large = L( int( _ > 3 ) );
+    auto large = []( auto const& _ ) { return int( _ > 3 ); };
     util::stable_sort_by_key( v3, large );
     REQUIRE( v3 == vector{ 3, 2, 2, 4, 7, 6, 4, 7, 5, 4, 5 } );
 
     vector<int> v4{ 4, 7, 3, 6, 4, 7, 5, 2, 4, 5, 2 };
-    auto odd = L( int( _ % 2 ) );
+    auto odd = []( auto const& _ ) { return int( _ % 2 ); };
     util::sort( v4 );
     util::stable_sort_by_key( v4, odd );
     REQUIRE( v4 == vector{ 2, 2, 4, 4, 4, 6, 3, 5, 5, 7, 7 } );
 
     vector<int> v5{ 4, 7, 3, 6, 4, 7, 5, 2, 4, 5, 2 };
-    auto larger = L2( _2 < _1 );
+    auto larger = [&]( auto const& _1, auto const& _2 ){ return _2 < _1; } ;
     std::sort( v5.begin(), v5.end(), larger );
     util::stable_sort_by_key( v5, odd );
     REQUIRE( v5 == vector{ 6, 4, 4, 4, 2, 2, 7, 7, 5, 5, 3 } );
@@ -144,7 +144,7 @@ TEST_CASE( "map" )
 {
     vector<int> v0{ 9, 1, 8, 2, 7, 3, 6, 4, 5 };
 
-    auto v0_res = util::map( L( _ + 2 ), v0 );
+    auto v0_res = util::map( []( auto const& _ ) { return _ + 2; }, v0 );
 
     REQUIRE( v0_res.size() == v0.size() );
 
@@ -197,31 +197,31 @@ TEST_CASE( "algo" )
     vector<int> v1{};
 
     // Test with empty vector
-    auto r1 = util::lower_bound( v1, LC( find_n( 5, _ ) ) );
-    auto r2 = util::lower_bound( v1, LC( find_n( 0, _ ) ) );
+    auto r1 = util::lower_bound( v1, [&]( auto const& _ ){ return find_n( 5, _ ); } );
+    auto r2 = util::lower_bound( v1, [&]( auto const& _ ){ return find_n( 0, _ ); } );
     REQUIRE( r1 == end( v1 ) );
     REQUIRE( r2 == end( v1 ) );
 
     // Test with vector with one element.
     vector v2{ 4 };
 
-    auto r3 = util::lower_bound( v2, LC( find_n( 5, _ ) ) );
-    auto r4 = util::lower_bound( v2, LC( find_n( 3, _ ) ) );
-    auto r5 = util::lower_bound( v2, LC( find_n( 4, _ ) ) );
+    auto r3 = util::lower_bound( v2, [&]( auto const& _ ){ return find_n( 5, _ ); } );
+    auto r4 = util::lower_bound( v2, [&]( auto const& _ ){ return find_n( 3, _ ); } );
+    auto r5 = util::lower_bound( v2, [&]( auto const& _ ){ return find_n( 4, _ ); } );
     REQUIRE( r3 == end( v2 ) );
     REQUIRE( r4 != end( v2 ) ); REQUIRE( *r4 == 4 );
     REQUIRE( r5 != end( v2 ) ); REQUIRE( *r5 == 4 );
 
     // Test with vector with two elements.
     vector v3{ 4, 10 };
-    auto r6  = util::lower_bound( v3, LC( find_n( 0,  _ ) ) );
-    auto r7  = util::lower_bound( v3, LC( find_n( 3,  _ ) ) );
-    auto r8  = util::lower_bound( v3, LC( find_n( 4,  _ ) ) );
-    auto r9  = util::lower_bound( v3, LC( find_n( 5,  _ ) ) );
-    auto r10 = util::lower_bound( v3, LC( find_n( 9,  _ ) ) );
-    auto r11 = util::lower_bound( v3, LC( find_n( 10, _ ) ) );
-    auto r12 = util::lower_bound( v3, LC( find_n( 11, _ ) ) );
-    auto r13 = util::lower_bound( v3, LC( find_n( 12, _ ) ) );
+    auto r6  = util::lower_bound( v3, [&]( auto const& _ ){ return find_n( 0,  _ ); } );
+    auto r7  = util::lower_bound( v3, [&]( auto const& _ ){ return find_n( 3,  _ ); } );
+    auto r8  = util::lower_bound( v3, [&]( auto const& _ ){ return find_n( 4,  _ ); } );
+    auto r9  = util::lower_bound( v3, [&]( auto const& _ ){ return find_n( 5,  _ ); } );
+    auto r10 = util::lower_bound( v3, [&]( auto const& _ ){ return find_n( 9,  _ ); } );
+    auto r11 = util::lower_bound( v3, [&]( auto const& _ ){ return find_n( 10, _ ); } );
+    auto r12 = util::lower_bound( v3, [&]( auto const& _ ){ return find_n( 11, _ ); } );
+    auto r13 = util::lower_bound( v3, [&]( auto const& _ ){ return find_n( 12, _ ); } );
     REQUIRE( r6  != end( v3 ) ); REQUIRE( *r6 ==  4  );
     REQUIRE( r7  != end( v3 ) ); REQUIRE( *r7 ==  4  );
     REQUIRE( r8  != end( v3 ) ); REQUIRE( *r8 ==  4  );
@@ -234,18 +234,18 @@ TEST_CASE( "algo" )
     // Test with vector with many elements.
     vector v4{ 0, 4, 7, 9, 55, 102, 103, 104, 200 };
 
-    auto r14 = util::lower_bound( v4, LC( find_n( -1,    _ ) ) );
-    auto r15 = util::lower_bound( v4, LC( find_n(  0,    _ ) ) );
-    auto r16 = util::lower_bound( v4, LC( find_n(  4,    _ ) ) );
-    auto r17 = util::lower_bound( v4, LC( find_n(  5,    _ ) ) );
-    auto r18 = util::lower_bound( v4, LC( find_n(  101,  _ ) ) );
-    auto r19 = util::lower_bound( v4, LC( find_n(  102,  _ ) ) );
-    auto r20 = util::lower_bound( v4, LC( find_n(  103,  _ ) ) );
-    auto r21 = util::lower_bound( v4, LC( find_n(  104,  _ ) ) );
-    auto r22 = util::lower_bound( v4, LC( find_n(  105,  _ ) ) );
-    auto r23 = util::lower_bound( v4, LC( find_n(  106,  _ ) ) );
-    auto r24 = util::lower_bound( v4, LC( find_n(  200,  _ ) ) );
-    auto r25 = util::lower_bound( v4, LC( find_n(  220,  _ ) ) );
+    auto r14 = util::lower_bound( v4, [&]( auto const& _ ){ return find_n( -1,    _ ); } );
+    auto r15 = util::lower_bound( v4, [&]( auto const& _ ){ return find_n(  0,    _ ); } );
+    auto r16 = util::lower_bound( v4, [&]( auto const& _ ){ return find_n(  4,    _ ); } );
+    auto r17 = util::lower_bound( v4, [&]( auto const& _ ){ return find_n(  5,    _ ); } );
+    auto r18 = util::lower_bound( v4, [&]( auto const& _ ){ return find_n(  101,  _ ); } );
+    auto r19 = util::lower_bound( v4, [&]( auto const& _ ){ return find_n(  102,  _ ); } );
+    auto r20 = util::lower_bound( v4, [&]( auto const& _ ){ return find_n(  103,  _ ); } );
+    auto r21 = util::lower_bound( v4, [&]( auto const& _ ){ return find_n(  104,  _ ); } );
+    auto r22 = util::lower_bound( v4, [&]( auto const& _ ){ return find_n(  105,  _ ); } );
+    auto r23 = util::lower_bound( v4, [&]( auto const& _ ){ return find_n(  106,  _ ); } );
+    auto r24 = util::lower_bound( v4, [&]( auto const& _ ){ return find_n(  200,  _ ); } );
+    auto r25 = util::lower_bound( v4, [&]( auto const& _ ){ return find_n(  220,  _ ); } );
 
     REQUIRE( r14 != end( v4 ) ); REQUIRE( *r14 == 0   );
     REQUIRE( r15 != end( v4 ) ); REQUIRE( *r15 == 0   );
@@ -265,8 +265,8 @@ TEST_CASE( "find" )
 {
     using util::find_last_if;
 
-    auto odd = L( _ % 2 == 1 );
-    auto find_odd = LC( find_last_if( _, odd ) );
+    auto odd = []( auto const& _ ) { return _ % 2 == 1; };
+    auto find_odd = [&]( auto const& _ ){ return find_last_if( _, odd ); };
 
     // empty case
     vector<int> v1{};
