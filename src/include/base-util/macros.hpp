@@ -7,11 +7,15 @@
 #include <iomanip>
 #include <iostream>
 
+#ifndef TO_STRING
 #define TO_STR1NG(x) #x
 #define TO_STRING(x) TO_STR1NG(x)
+#endif
 
+#ifndef STRING_JOIN
 #define STRING_JO1N(arg1, arg2) arg1 ## arg2
 #define STRING_JOIN(arg1, arg2) STRING_JO1N(arg1, arg2)
+#endif
 
 // ASSERT will fail if  the  argument  is  false. It is important
 // that  this  macro should NOT evaluate `b` unless `a` fails the
