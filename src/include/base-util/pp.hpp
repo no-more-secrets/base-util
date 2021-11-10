@@ -58,7 +58,7 @@
 /****************************************************************
 ** List Operations
 *****************************************************************/
-#define ID( ... ) __VA_ARGS__
+#define PP_REMOVE_PARENS( ... ) __VA_ARGS__
 #define EAT( ... ) __VA_ARGS__
 #define NO_EAT( ... )
 
@@ -160,8 +160,8 @@
 #define PREPEND_TUPLE3( what1, what2, what3, tuple ) \
   ( what1, what2, what3, EXPAND tuple )
 
-#define PAIR_TAKE_FIRST( a, b ) a
-#define PAIR_TAKE_SECOND( a, b ) b
+#define PP_PAIR_TAKE_FIRST( a, b ) a
+#define PP_PAIR_TAKE_SECOND( a, b ) b
 
 #define TUPLE_TAKE_FIRST( a, ... ) a
 
