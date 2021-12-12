@@ -116,27 +116,27 @@
 // If the macro may be given more than ~10 parameters then this
 // will have to be increased, along with `PP_HAS_MULTI_ARGS*`
 // below.
-#define PP_CHOOSE_TENTH_ARG( _1, _2, _3, _4, _5, _6, _7, _8, \
-                             _9, _10, ... )                  \
-  _10
+#define PP_CHOOSE_TWELFTH_ARG( _1, _2, _3, _4, _5, _6, _7, _8, \
+                               _9, _10, _11, _12, ... )        \
+  _12
 
 #define PP_DISAMBIGUATE_MULTI_ARGS( f, has_args, ... ) \
   PP_JOIN( f##_, has_args )( __VA_ARGS__ )
 
-#define PP_HAS_MULTI_ARGS_1( ... )                              \
-  PP_CHOOSE_TENTH_ARG( __VA_ARGS__, MULTI, MULTI, MULTI, MULTI, \
-                       MULTI, MULTI, MULTI, MULTI, SINGLE,      \
-                       ERROR )
+#define PP_HAS_MULTI_ARGS_1( ... )                          \
+  PP_CHOOSE_TWELFTH_ARG( __VA_ARGS__, MULTI, MULTI, MULTI,  \
+                         MULTI, MULTI, MULTI, MULTI, MULTI, \
+                         MULTI, MULTI, SINGLE, ERROR )
 
-#define PP_HAS_MULTI_ARGS_2( a, ... )                           \
-  PP_CHOOSE_TENTH_ARG( __VA_ARGS__, MULTI, MULTI, MULTI, MULTI, \
-                       MULTI, MULTI, MULTI, MULTI, SINGLE,      \
-                       ERROR )
+#define PP_HAS_MULTI_ARGS_2( a, ... )                       \
+  PP_CHOOSE_TWELFTH_ARG( __VA_ARGS__, MULTI, MULTI, MULTI,  \
+                         MULTI, MULTI, MULTI, MULTI, MULTI, \
+                         MULTI, MULTI, SINGLE, ERROR )
 
-#define PP_HAS_MULTI_ARGS_3( a, b, ... )                        \
-  PP_CHOOSE_TENTH_ARG( __VA_ARGS__, MULTI, MULTI, MULTI, MULTI, \
-                       MULTI, MULTI, MULTI, MULTI, SINGLE,      \
-                       ERROR )
+#define PP_HAS_MULTI_ARGS_3( a, b, ... )                    \
+  PP_CHOOSE_TWELFTH_ARG( __VA_ARGS__, MULTI, MULTI, MULTI,  \
+                         MULTI, MULTI, MULTI, MULTI, MULTI, \
+                         MULTI, MULTI, SINGLE, ERROR )
 
 #define PP_ONE_OR_MORE_ARGS( f, ... ) \
   PP_DISAMBIGUATE_MULTI_ARGS(         \
