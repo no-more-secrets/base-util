@@ -152,24 +152,3 @@ ZonedTimePointFS timestamp( fs::path const& p );
 void timestamp( fs::path const& p, ZonedTimePointFS const& ztp );
 
 } // namespace util
-
-// It seems that, at the time of this writing, std::hash has  not
-// been given a specialization for fs::path, so  we  will  inject
-// one into the std namespace so that we can use it as the key in
-// unordered maps. This is simple to do  because  the  filesystem
-// library does already provide the hash_value method which  does
-// the actual hashing of a path. Note that two paths' hashes will
-// be  equal when equality is satisfied, so e.g. A//B is the same
-// as A/B. If one is  added  in  the  future  then this may start
-// causing compilation failures, in which  case it should just be
-// deleted.
-namespace std {
-
-template<>
-struct hash<fs::path> {
-  auto operator()( fs::path const& p ) const noexcept {
-    return fs::hash_value( p );
-  }
-};
-
-} // namespace std
