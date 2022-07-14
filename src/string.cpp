@@ -122,16 +122,16 @@ vector<string> wrap_text_fn( string_view text,
     } else {
         if( line.empty() )
             // word on its own line.
-            res.emplace_back( move( proposed ) );
+            res.emplace_back( std::move( proposed ) );
         else {
             // push current line and put new word on next line.
-            res.emplace_back( move( line ) );
+            res.emplace_back( std::move( line ) );
             line = word;
         }
     }
   }
   if( !line.empty() )
-      res.emplace_back( move( line ) );
+      res.emplace_back( std::move( line ) );
   return res;
 }
 
