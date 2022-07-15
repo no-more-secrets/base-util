@@ -41,7 +41,7 @@ TEST_CASE( "url_encode" )
     REQUIRE( net::url_encode_kv( kv1 ) == target );
 
     // Test another, map-like container.
-    util::BiMapFixed<string, string> bm( move( kv1 ) );
+    util::BiMapFixed<string, string> bm( std::move( kv1 ) );
 
     // This container will yield elements sorted by key.
     target = "empty-val=&"

@@ -80,7 +80,7 @@ TEST_CASE( "opt_util" )
     REQUIRE( res2 == vector<string>{ "5", "7", "9", "0", "1" } );
 
     // Now do the moved from version.
-    auto res3 = util::cat_opts( move( v ) );
+    auto res3 = util::cat_opts( std::move( v ) );
     REQUIRE( res3 == vector<string>{ "5", "7", "9", "0", "1" } );
 
     // Make sure it was moved from.
@@ -464,7 +464,7 @@ TEST_CASE( "bimap" )
         "AAAA",
     };
 
-    BM bm( move( data ) );
+    BM bm( std::move( data ) );
 
     REQUIRE( bm.size() == size_t( 8 ) );
 
@@ -502,7 +502,7 @@ TEST_CASE( "bimap" )
 
     // First empty map.
     vector<tuple<string, int>> v0{};
-    util::BiMapFixed bmf0( move( v0 ) );
+    util::BiMapFixed bmf0( std::move( v0 ) );
     REQUIRE( bmf0.size() == 0 );
     REQUIRE( !bmf0.val_safe( "xxx" ) );
     REQUIRE( !bmf0.key_safe( 1     ) );
@@ -525,7 +525,7 @@ TEST_CASE( "bimap" )
     };
 
     // This will move from the vector!
-    util::BiMapFixed bmf1( move( v1 ) );
+    util::BiMapFixed bmf1( std::move( v1 ) );
 
     REQUIRE( bmf1.size() == 13 );
     auto r1 = bmf1.val_safe( "xxx" );

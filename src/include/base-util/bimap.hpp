@@ -145,7 +145,7 @@ void BiMapFixed<KeyT, ValT>::initialize( bool sorted ) {
 template<typename KeyT, typename ValT>
 BiMapFixed<KeyT, ValT>::BiMapFixed(
     std::vector<value_type>&& data,
-    bool sorted ) : m_by_key(), m_by_val(), m_data( move( data ) )
+    bool sorted ) : m_by_key(), m_by_val(), m_data( std::move( data ) )
 {
     initialize( sorted );
 }
@@ -285,7 +285,7 @@ private:
 template<typename T>
 BDIndexMap<T>::BDIndexMap( std::vector<T>&& data,
                            bool is_uniq_sorted )
-    : m_data( move( data ) ) {
+    : m_data( std::move( data ) ) {
 
     if( !is_uniq_sorted )
         util::uniq_sort( m_data );
