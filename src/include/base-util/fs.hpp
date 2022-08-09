@@ -9,10 +9,14 @@
 #include <filesystem>
 
 // Case-insensitive file system?
-#if( _WIN32 || __APPLE__ )
+#ifdef _WIN32
 #  define CASE_INSENSITIVE_FS() 1
 #else
-#  define CASE_INSENSITIVE_FS() 0
+#  ifdef __APPLE__
+#    define CASE_INSENSITIVE_FS() 1
+#  else
+#    define CASE_INSENSITIVE_FS() 0
+#  endif
 #endif
 
 namespace fs = std::filesystem;
