@@ -177,7 +177,10 @@ vector<fs::path> to_paths( vector<string> const& ss ) {
 // the  to_string methods convert a already-string-like entity to
 // a string, it will insert quotes in the string itself.
 string to_string( string const& s ) {
-    return "\"" + s + "\"";
+    string res =  "\"";
+    res += s;
+    res += "\"";
+    return res;
 }
 string to_string( string_view const& s ) {
     // Below may seem redundant, but we want to put quotes around
@@ -194,7 +197,10 @@ std::string to_string( Error const& e ) { return e.msg; }
 // is not doing what we want). But  having this one causes gcc to
 // select it when we give it a string literal.
 std::string to_string( char const* s ) {
-    return "\"" + string( s ) + "\"";
+    string res = "\"";
+    res += string( s );
+    res += "\"";
+    return res;
 }
 
 // NOTE: This puts single quotes around the character!
@@ -219,7 +225,10 @@ std::string to_string( double d ) {
 // string without quotes use the  path's  string() method (or one
 // of its variants).
 string to_string( fs::path const& p ) {
-   return "\"" + p.string() + "\"";
+    string res = "\"";
+    res += p.string();
+    res += "\"";
+    return res;
 }
 
 // Will output a local time with format:
