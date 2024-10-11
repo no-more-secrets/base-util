@@ -65,14 +65,14 @@ bool iequals( StringT const& s1, StringT const& s2 ) {
 template<typename T>
 std::string join( std::vector<T> const& v,
                   std::string_view      what ) {
-  if( !v.size() ) return {};
+  std::string res;
+  if( !v.size() ) return res;
   // First attempt to compute how much space we need, which  we
   // should be able to do exactly.
   size_t total = 0;
   for( auto const& e : v ) total += e.size();
   total += what.size() * ( v.size() - 1 ); // v.size() > 0 always
   // Now construct the result (reserve +1 for good measure).
-  std::string res;
   res.reserve( total + 1 );
   bool first = true;
   for( auto const& e : v ) {
