@@ -3,6 +3,12 @@
 ****************************************************************/
 #pragma once
 
+#include <algorithm>
+#include <optional>
+#include <string>
+#include <iostream>
+#include <tuple>
+
 namespace util {
 
 /****************************************************************
