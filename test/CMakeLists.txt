@@ -10,7 +10,7 @@ add_executable( run-tests
     string.cpp
 )
 
-target_compile_features( run-tests PUBLIC cxx_std_20 )
+target_compile_features( run-tests PUBLIC cxx_std_23 )
 set_target_properties( run-tests PROPERTIES CXX_EXTENSIONS OFF )
 target_link_libraries( run-tests
                        PRIVATE

@@ -37,7 +37,7 @@ target_include_directories( base-util
     PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}> )
 
-target_compile_features( base-util PUBLIC cxx_std_20 )
+target_compile_features( base-util PUBLIC cxx_std_23 )
 set_target_properties( base-util PROPERTIES CXX_EXTENSIONS OFF )
 target_link_libraries( base-util PUBLIC ${cxx-fs-lib} )
 target_link_libraries( base-util PUBLIC Threads::Threads )
